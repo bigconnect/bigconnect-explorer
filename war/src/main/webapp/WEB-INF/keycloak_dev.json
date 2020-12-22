@@ -1,0 +1,24 @@
+{
+  "realm" : "demo",
+  "resource" : "explorer",
+  "realm-public-key" : "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl3z+3dY0bcAv8fKY7yhcz7Q+EfOHwNUdat9Wm3H6xESaWMw3V7Dv8sZ3A+laqHmlbAEiaNmaqWFt2KP5fcXrTgUQqyD/CUwSHtAdB9DukaoLxaDeKt+tbhBY2lup9ufugOCGN+3r2dUNOmYLre8DXDSUQ0gLzumDoCs/R8MaCIlGqSzGSzb0Gp/uboCHFeNPHMRzndBWWXPJrYZodTFxs01voAoHIAwS+wM0J6vfGwLx8/ulCdIMhwE/y+4CiHFXtPofq+5dR+HWeKUy7pjSKiw5OnG+9dLp2Ezyq+E7xPi0W2Au/G9iJNvzXNGF0DOf8gx4KlHoAoOyJPAAUfdUZQIDAQAB",
+  "auth-server-url" : "http://localhost:8080/auth",
+  "ssl-required" : "none",
+  "use-resource-role-mappings" : false,
+  "enable-cors" : true,
+  "cors-max-age" : 1000,
+  "cors-allowed-methods" : "POST, PUT, DELETE, GET",
+  "cors-exposed-headers" : "WWW-Authenticate, My-custom-exposed-Header",
+  "bearer-only" : false,
+  "enable-basic-auth" : false,
+  "expose-token" : true,
+  "credentials" : {
+    "secret" : "234234-234234-234234"
+  },
+  "connection-pool-size" : 20,
+  "disable-trust-manager": false,
+  "allow-any-hostname" : false,
+  "token-minimum-time-to-live" : 10,
+  "min-time-between-jwks-requests" : 10,
+  "public-key-cache-ttl": 86400
+}

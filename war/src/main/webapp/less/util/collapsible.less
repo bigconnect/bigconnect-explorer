@@ -1,0 +1,139 @@
+.twizzle {
+  &:before {
+    content: '▶';          
+    font-style: normal;
+    position: absolute;
+    left: 1.5ex;
+    font-size: 50%;
+    .transition-transform(ease-in-out);
+    .transform-origin(~"40% 48%");
+  }
+}
+
+.twizzle-expand {
+  &:before {
+    .rotate(90deg);
+  }
+}
+
+.collapsible {
+  @color: #727272;
+  margin-top: 1px;
+
+  & > h1, .collapsible-header {
+    .badge {      
+      position: absolute;
+      right: 1ex;
+      left: auto;
+      top: 0.3ex;
+
+      &.loading {
+        left: auto;
+        right: 10px;
+        top: 2px;
+      }
+      &:not(.loading) {
+        background: #fff;
+        color: #555;
+        text-shadow: 0 1px 0 white;
+        line-height: 2.8ex;
+      }
+    }
+  }
+
+  &.expanded {
+    & > h1, .collapsible-header {
+      .twizzle-expand;
+    }
+    & > div, .collapsible-section {
+      display: block;
+    }
+
+    .collapsible {
+      & > h1, .collapsible-header {
+        &:before {
+          .rotate(0);
+        }
+      }
+      &.expanded {
+        & > h1, .collapsible-header {
+          .twizzle-expand;
+        }
+      }
+    }
+
+    .element-list {
+      margin: 0 1em 1em 1em;
+    }
+
+    .alert {
+      margin: 0 1em 1em 1em;
+    }
+  }
+  
+  &.loading {      
+    strong {
+      padding-right: 1em;
+    }
+  }
+  
+  &.has-badge-number {
+    strong {
+      padding-right: 2em;
+    }
+  }
+
+  & > div, .collapsible-section {
+    display: none;
+  }
+
+
+  .collapsible-header-title {
+    display: inline-block;
+    background: white;
+    position: relative;
+    z-index: 2;
+    padding-right: 1em;
+  }
+
+  & > h1, .collapsible-header {
+    font-size: 100%;
+    padding: 0.25em 1em;
+    margin: 0;
+    cursor: pointer;
+    position: relative;
+    .disable-text-selection;
+
+    &:before, strong {
+      color: #727272;
+    }
+    .twizzle;
+
+    hr {
+      position: absolute;
+      top: 50%;
+      left: 10em;
+      transform: translateY(-50%);
+      width: 100%;
+      margin: 0;
+      z-index: 1;
+    }
+
+    strong {
+      display: inline-block;
+      text-overflow: ellipsis;
+      overflow: hidden;      
+      white-space: nowrap;
+      padding-left: 0.5em;
+    }
+  }
+
+  &.disabled > h1:before,
+  &.disabled .collapsible-header:before {
+    display: none;
+  }
+  &.disabled > h1,
+  &.disabled .collapsible-header {
+    cursor: default;
+  }
+}

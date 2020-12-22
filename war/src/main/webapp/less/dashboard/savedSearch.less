@@ -1,0 +1,19 @@
+@savedSearch-active-bgcolor: #03a9f4;
+
+.item-content {
+  .element-item.active {
+    background-color: @savedSearch-active-bgcolor;
+
+    a {
+      color: #000;
+
+      &:focus, &:hover {
+        background-color: @savedSearch-active-bgcolor;
+      }
+
+      span {
+        color: #fff78d !important;
+      }
+    }
+  }
+}

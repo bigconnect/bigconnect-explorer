@@ -1,0 +1,16 @@
+<label class="half">
+    {{ i18n 'csv.file_import.properties.auxiliary.date.format' }}
+  <select>
+    {{#each formats}}
+    <option value="{{ format }}"{{#if selected}} selected{{/if}}>{{ example }}</option>
+    {{/each}}
+  </select>
+  <input type="text" class="format form-control" placeholder="Date Format" value="{{ format }}">
+  <a target="_blank" href="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html">
+      {{ i18n 'csv.file_import.properties.auxiliary.date.format.help' }}
+  </a>
+</label>
+<label class="half">
+  {{ i18n 'csv.file_import.properties.auxiliary.date.timezone' }}
+  <input type="text" placeholder="timezone" class="timezone form-control" value="{{ timezone }}">
+</label>

@@ -1,0 +1,412 @@
+@pane-background: #f9f9f9;
+
+// Import bootstrap
+@import "../libs/bootstrap/dist/css/bootstrap.min.css";
+@import "../libs/bootstrap/less/mixins";
+#grid {
+    .core  {
+        .span(@gridColumns) {
+            width: (@gridColumnWidth * @gridColumns) + (@gridGutterWidth * (@gridColumns - 1));
+        }
+    }
+};
+
+body {
+  background-color: #f8f8f8;
+}
+
+@import (css) "../bclibs/pixeladmin/css/pixeladmin.min.css";
+@import (css) "../bclibs/pixeladmin/css/clean.min.css";
+@import (css) "../libs/antd/dist/antd.min.css";
+
+@import "../libs/video.js/dist/video-js.min.css";
+@import (less) "../bclibs/jquery-ui/jquery-ui.css";
+@import (less) "../libs/openlayers/dist/ol.css";
+@import (less) "../libs/gridstack/dist/gridstack.min.css";
+@import (css) "../libs/jqcloud2/dist/jqcloud.css";
+@import (css) "../libs/react-table/react-table.css";
+@import "../libs/react-select/dist/react-select.css";
+@import "../libs/react-virtualized-select/styles.css";
+@import (less) "../libs/font-awesome/less/font-awesome.less";
+@import "../libs/codemirror/lib/codemirror.css";
+@import "../libs/codemirror/addon/lint/lint.css";
+@import "../libs/codemirror/addon/hint/show-hint.css";
+@import "../libs/cypher-codemirror/dist/cypher-codemirror-syntax.css";
+@import "../bclibs/jstree/themes/default/style.min.css";
+@import "../libs/sweetalert2/dist/sweetalert2.min.css";
+@import "../libs/filepond/dist/filepond.css";
+@import "../libs/jQuery-QueryBuilder/dist/css/query-builder.default.min.css";
+
+
+.ReactTable {
+  border: none;
+  background-color: #fff;
+
+  .rt-noData {
+    background: rgba(220, 239, 238, 0.9);
+  }
+
+  .rt-thead {
+    &.-header {
+      border-top: 1px solid #eee;
+      box-shadow: none;
+    }
+
+    .rt-th {
+      border-right: none;
+      padding: 10px 5px;
+    }
+
+    .rt-resizable-header-content {
+      text-transform: uppercase;
+      color: #848484;
+    }
+  }
+
+  .rt-td {
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+
+    .Select {
+      padding: 0;
+      border: none;
+
+      .Select-control {
+        height: 35px;
+      }
+    }
+  }
+
+  .pagination-bottom {
+    width: 40em;
+    align-self: center;
+
+    .-pagination {
+      box-shadow: none;
+      border-top: none;
+
+      .-previous, .-next {
+        flex: 0;
+      }
+
+      .-center {
+        flex: 0 5 auto;
+      }
+
+      button {
+        width: 8em;
+      }
+    }
+  }
+}
+
+@import "util/constants";
+@import "util/css3";
+@import "util/animation";
+@import "util/common";
+@import "util/transforms";
+@import "util/badge-loading.less";
+@import "util/div-loading.less";
+@import "util/scrollbars.less";
+@import "util/controls";
+@import "util/collapsible";
+@import "util/splitbar";
+@import "util/positioning";
+@import "util/flexbox";
+@import "util/buttons";
+@import "util/video/scrubber";
+@import "util/audio/scrubber";
+@import "util/popovers/popovers";
+@import "util/element/item";
+@import "util/element/list";
+@import "util/actionbar/actionbar";
+@import "util/users/userSelect";
+@import "util/ontology/ontology";
+@import "util/instructions";
+@import "util/jquery-ui-draggable-multiselect";
+@import "util/context-menu";
+@import "util/selection";
+@import "util/offlineOverlay";
+@import "util/privileges";
+@import "util/nav-lists";
+@import "util/conceptSelect";
+@import "util/sessionExpirationOverlay";
+@import "components/wizard";
+@import "components/treegrid";
+@import "util/panels";
+@import "dashboard/dashboard";
+@import "fields/fields";
+@import "login/login";
+@import "notifications/notifications";
+@import "workspaces/userAccount";
+@import "workspaces/timeline";
+@import "search/sort";
+@import "search/restrictValuesMulti";
+@import "detail/layouts";
+@import "detail/vertex-detail";
+@import "structuredIngest/structuredIngest.less";
+@import "search/quicksearch";
+@import "search/searchresults";
+
+html.fullscreenApp {
+  height: 100%;
+  overflow: hidden;
+
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #app {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+    min-width: 1150px;
+  }
+}
+
+html.fullscreenDetails {
+  body {
+    background: #efefef;
+  }
+  .fullscreen-details {
+    @import "fullscreenDetails/details";
+  }
+}
+
+
+.left-pane(@left-padding: 0) {
+  .transition-transform(ease-in-out, 0.2s);
+  .translate3d(0, -100%, 0);
+
+  &.visible {
+    .translate3d(@menubar-width + @left-padding, 0, 0);
+  }
+}
+
+.right-pane {
+  .fullscreen;
+  left: auto !important;
+  right: 0;
+  width: 25%;
+  min-width: 200px !important;
+  .translate3d(100%, 0, 0);
+  .transition-transform(ease-in-out, 0.2s);
+
+  &.visible {
+    .translate3d(0, 0, 0);
+    .transition-transform(ease-in-out, 0.2s);
+  }
+}
+
+.top-pane {
+  .fullscreen;
+  left: auto;
+  right: auto;
+  min-width: 200px !important;
+  opacity: 0;
+  display: none;
+  .transition(opacity 1s linear);
+
+  &.visible {
+    display: block;
+    opacity: 1;
+    .transition(opacity 1s linear);
+  }
+}
+
+.fullscreenApp {
+  .activity-pane,
+  .workspaces-pane,
+  .plugin-pane,
+  .detail-pane {
+    .above-graph;
+    position: absolute;
+    background: @pane-background;
+
+    .content {
+      overflow: auto;
+      height: 100%;
+      .box-sizing(border-box);
+      & > .nav-list {
+        margin-top: 0.5em;
+      }
+    }
+  }
+
+  .detail-pane {
+    background: white;
+  }
+
+  .admin-pane {
+    overflow: auto;
+  }
+
+  .plugin-pane,
+  .detail-pane {
+    height: 100%;
+
+    .ui-resizable-handle {
+      .splitbar;
+    }
+  }
+
+  .detail-pane {
+    border-left: 1px solid @pane-border;
+    .ui-resizable-handle:before {
+      background: transparent;
+    }
+  }
+}
+
+.ingest-pane, .products-pane, .dashboard-pane, .search-pane, .fullscreen-pane, .admin-pane, .entity_details-pane {
+  display: none;
+  transition: all 1s ease-in-out;
+
+  &.visible {
+    display: block;
+  }
+  &.pullLeft{
+    left:-180px;
+  }
+}
+
+.plugin-pane .plugin-subpane {
+  display: block;
+  position: absolute;
+  left: 100% !important;
+  bottom: 0;
+  top: 0;
+  margin-left: 1px;
+  width: 200px;
+  background: @pane-background;
+  z-index: 89;
+}
+
+
+.menubar-pane {
+  z-index: @menubar-zIndex;
+  @import "menubar/menubar";
+}
+
+.search-pane {
+  @import "search/search";
+}
+
+.plugin-pane {
+  .left-pane;
+}
+
+.fullscreenApp .workspaces-pane {
+  .above-graph(2);
+  .top-pane;
+
+  @import "workspaces/workspaces";
+}
+
+.workspace-overlay {
+  @import "workspaces/overlay";
+}
+
+.fullscreenApp .activity-pane {
+  @padding: 10px;
+  .above-graph(2);
+  .top-pane;
+
+  @import "activity/activity";
+}
+
+.fullscreenApp .quicksearch-pane {
+  .above-graph(2);
+  .top-pane;
+
+  opacity: 1;
+  height: 30em;
+
+  .content {
+    display: block;
+    background-color: #fff;
+    overflow: auto;
+    height: 30em;
+    width: 50em;
+    max-width: 50em;
+  }
+}
+
+.admin-pane {
+  .fullscreen;
+  left: @menubar-width;
+
+  @import "admin/admin";
+}
+.products-pane {
+  .fullscreen;
+  left: @menubar-width;
+  border-right: 1px solid #d8d8d8;
+
+  @import "products/products";
+}
+
+.products-full-pane {
+  @import "products/full";
+}
+
+.fullscreen-pane {
+  .fullscreen;
+  transition: all 1s ease-in-out;
+  &.pullLeft{
+    left: 0!important;
+  }
+}
+
+.dashboard-pane {
+  .fullscreen;
+}
+
+.ingest-pane {
+  .fullscreen;
+
+  @import "ingest/ingest";
+}
+
+.search-pane {
+  .fullscreen;
+  overflow: scroll;
+}
+
+.help-dialog {
+  @import "help/help";
+  .modal-dialog {
+    width: 50%;
+  }
+  .modal-body {
+    overflow: auto;
+  }
+}
+
+.fullscreenApp .detail-pane {
+  .right-pane;
+  visibility: visible;
+  right: 0;
+  width: 30%;
+}
+
+@import "comments/comments";
+@import "products/full";
+
+.detail-pane {
+  @import "detail/detail";
+  padding-bottom: 51px;
+}
+.org-bigconnect-layout-body{
+  overflow: unset!important;
+}
+
+.js-plotly-plot {
+  width: 100%;
+  height: 100%;
+}
+

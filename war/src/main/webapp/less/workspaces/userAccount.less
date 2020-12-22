@@ -1,0 +1,65 @@
+.user-account.modal {
+
+  .modal-content {
+    min-width: 60em;
+  }
+
+  .modal-body {
+    min-height: 60vh;
+    padding: 0;
+
+    @width: 11em;
+
+    .nav-list {
+      position: absolute;
+      left: 0;
+      width: @width;
+      margin: 0;
+      .box-sizing(border-box);
+
+      li a {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      li.active {
+        background-color: #00B0E8;
+        a {
+          color: #fff;
+          &:focus { background-color: inherit; }
+          &:hover { background-color: inherit; }
+        }
+      }
+    }
+
+    .page {
+      @import "userAccount/bundled/settings.less";
+      @import "userAccount/bundled/watches.less";
+
+      overflow: auto;
+      padding: 0.25em 1em;
+
+      .profile-page-title h1 {
+        font-size: 18px;
+        margin: 1em;
+      }
+
+      .profile-page-content {
+        padding: 0 1em;
+
+        h4 {
+          margin: 0.5em 0;
+        }
+
+        p {
+          margin-bottom: 2em;
+
+          button {
+            margin: 0.5em;
+          }
+        }
+      }
+    }
+  }
+}

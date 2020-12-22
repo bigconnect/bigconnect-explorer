@@ -1,0 +1,51 @@
+<nav class="navbar">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <section class="navbar-brand" href="javascript:void(0)"><img src="img/menubar_logo.svg"></section>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="dashboard"><a>{{ i18n 'menubar.icons.dashboard' }}</a></li>
+                <li class="ingest"><a>{{ i18n 'menubar.icons.ingest' }}</a></li>
+                <li class="search"><a>{{ i18n 'menubar.icons.search' }}</a></li>
+                <li class="products"><a>{{ i18n 'menubar.icons.products' }}</a></li>
+                {{#if enableCypherLabLink}}
+                    <li class="lab"><a href="/cypherlab/index.html?connectURL={{connectURL}}&token={{jwtToken}}" target="_blank">{{ i18n 'search.advanced.lab' }}</a></li>
+                {{/if}}
+                <li class="add-items"><a>Add items...</a></li>
+            </ul>
+
+            <div class="navbar-form navbar-left">
+                <div class="form-group qs-form">
+                    <div class="input-group">
+                        <div class="input-group-addon"><img src="img/search_icon.svg" style="height: 15px;"></div>
+                        <input type="text" class="form-control col-md-8 quick-search" placeholder="Quick search...">
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="activity"><a><i class="material-icons">group_work</i></a></li>
+                {{#if isAdmin }}
+                    <li class="admin"><a><i class="material-icons">settings</i></a></li>
+                {{/if}}
+
+                <li class="dropdown user">
+                    <a class="dropdown-toggle" data-toggle="dropdown">{{ currentUser.displayName }}</a>
+                    <ul class="dropdown-menu">
+                        <li class="user-profile"><a>Preferences</a></li>
+                        <li class="logout"><a>Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="navbar-form navbar-right">
+                <h3 class="workspace-name workspaces">
+                    <i class="material-icons">dashboard</i>
+                </h3>
+            </div>
+        </div>
+    </div>
+</nav>
+
+

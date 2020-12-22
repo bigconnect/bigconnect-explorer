@@ -1,0 +1,18 @@
+<div class="form-group permissions-list">
+    {{#each permissions }}
+        <div class="radio">
+            <label>
+                <input
+                    data-permissions="{{ name }}"
+                    type="radio"
+                    name="permission"
+                    {{#if active }}checked{{/if}}>
+                <span class="circle"/>
+                <span class="check"/>
+                {{ display }}
+            </label>
+        </div>
+    {{/each}}
+
+    <button class="remove-access btn btn-raised btn-danger">{{ i18n 'workspaces.diff.button.revoke' }}</button>
+</div>

@@ -1,0 +1,140 @@
+@import "../../libs/bootstrap/less/mixins/vendor-prefixes";
+
+button.remove-icon {
+    font-size: 0;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    /*color: #999;
+    line-height: 1.4em;
+
+    opacity: 0.4;
+    background-color: transparent;
+    background-image: url(../img/glyphicons/glyphicons_192_circle_remove.png);
+    background-repeat: no-repeat;
+    background-size: 13px;
+    background-position: center;*/
+    &:after{
+        font-family: "Material Icons";
+        content:'\e5c9';
+        color: #ccc;
+        font-size: 14px;
+        background: none;
+        opacity: 1;
+        text-align: left;
+        transition: all 420ms;
+        position: relative;
+        right: 5px;
+      }
+    &:hover{
+        &:after{
+            color: red;
+        }
+    }
+}
+
+button:disabled {
+  pointer-events: none;
+}
+
+
+.btn-blue {
+    text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075);
+    color: white;
+    .btn-styles(#337ab7); //ex #1a69de
+
+    &:active, &.active {
+        color: white;
+        .box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
+        .btn-styles(#337ab7);
+    }
+
+    &:hover, &:focus, &.focus {
+        color: white;
+    }
+
+    &.disabled, &[disabled] {
+        opacity: 0.6;
+        border-color: #337ab7 !important;
+        background: #337ab7 !important;
+        color: #eee;
+        text-shadow: none;
+        .box-shadow(none);
+    }
+}
+
+.btn-link {
+    text-decoration: none;
+    &:focus,&:hover,&:active {
+        text-decoration: none;
+    }
+}
+.btn-link:focus {
+    outline: none;
+}
+
+button, .btn {
+    &.btn-link {
+        .caret {
+            border-top-color: @blue-color;
+        }
+    }
+    &.loading {
+        position: relative;
+        margin-left: 24px;
+        overflow: visible;
+
+        &:before {
+            background-image: url('../img/loading.gif');
+            background-repeat: no-repeat;
+            background-color: transparent;
+            background-size: 16px;
+            background-position: center;
+            width: 16px;
+            height: 16px;
+            display: block;
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            margin-top: -8px;
+            content: '';
+        }
+    }
+}
+
+.btn-styles(@btn-color: #555) {
+    background-color: @btn-color;
+    background: @btn-color;
+    border-color: lighten(@btn-color, 5%);
+
+    &:hover,
+    &:focus  {
+        border-color: @btn-color;
+        background-color: darken(@btn-color, 8%);
+        background-position: 0 -15px;
+    }
+
+    &:active,
+    &.active {
+        background-color: darken(@btn-color, 8%);
+        border-color: darken(@btn-color, 12%);
+    }
+
+    &.disabled,
+    &[disabled],
+    fieldset[disabled] & {
+        &,
+        &:hover,
+        &:focus,
+        &.focus,
+        &:active,
+        &.active {
+            background-color: darken(@btn-color, 8%);
+            background-image: none;
+        }
+    }
+}

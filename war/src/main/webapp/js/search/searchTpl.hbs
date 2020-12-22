@@ -1,0 +1,87 @@
+<div class="container-fluid">
+    <div class="row">
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <div class="collapse navbar-collapse search-bar">
+                    <ul class="nav navbar-nav search-types">
+                        <li><a href="#">{{ i18n 'search.advanced.default' }}</a></li>
+                        {{#if advancedSearch.length}}
+                            {{#each advancedSearch}}
+                                <li><a
+                                        data-saved-search-url="{{savedSearchUrl}}"
+                                        data-component-path="{{componentPath}}"
+                                        data-description-path="{{descriptionComponentPath}}"
+                                        href="#"
+                                >{{ displayName }}</a></li>
+                            {{/each}}
+                        {{/if}}
+                    </ul>
+
+                    <div class="navbar-form custom-navbar">
+                        <div class="search-query-container">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon search-glass">
+                                        <i class="material-icons">search</i>
+                                    </div>
+                                    <input type="input" class="search-input form-control" placeholder="Search everything" autocomplete="off" spellcheck="false">
+                                    <a class="clear-search">
+                                        <i class="material-icons">clear</i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="advanced-search-container" style="display: none;">
+                        </div>
+                    </div>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="search-export">
+                        <div class="btn-group btn-group-sm" data-toggle="tooltip" data-placement="bottom" title="Export search">
+                            <button class="btn btn-info btn-outline dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a class="searchExportWordIcon" href="#">WORD</a></li>
+                                <li><a class="searchExportXlsIcon" href="#">XLS</a></li>
+                                <li><a class="searchExportPdfIcon" href="#">PDF</a></li>
+                                <li><a class="searchExportXmlIcon" href="#">XML</a></li>
+                                <li><a class="searchExportRawIcon" href="#">RAW</a></li>
+                            </ul>
+                        </div>
+                        </li>
+                        <li class="search-dropdowns">
+                            <a class="saved">
+                                {{ i18n 'search.savedsearches.button' }} <span class="caret"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a title="{{ i18n 'dashboard.title.refresh' }}" class="refresh">
+                                <i class="material-icons">refresh</i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="query-builder" style="display:none;"></div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="row" style="display:none;">
+        <div class="col-md-12">
+            <div class="below-query">
+                <div class="extensions"></div>
+            </div>
+            <div class="search-query-validation"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="applied-refinements"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="search-type search-type-default active"></div>
+        </div>
+    </div>
+</div>

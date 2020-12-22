@@ -1,0 +1,16 @@
+<h1 class="header">
+    <label>
+        <i class="material-icons">dashboard</i>
+        <input class="form-control" type="text" disabled value="{{ i18n 'dashboard.title' title }}">
+    </label>
+    <div class="dashboard-toolbar">
+        {{#if creator}}
+            <button class="btn btn-blue edit-dashboard edit">{{ i18n 'dashboard.title.edit' }}</button>
+        {{/if~}}
+        <button title="{{ i18n 'dashboard.title.refresh' }}" class="btn btn-blue refresh">{{ i18n 'dashboard.title.refresh' }}</button>
+    </div>
+</h1>
+
+<div class="grid-scroller">
+    <div class="grid-stack" data-gs-width="12" data-gs-height="0"></div>
+</div>

@@ -1,0 +1,35 @@
+<div class="com-mware-usernamepassword">
+    <form action="" class="login">
+        <p class="text-error">{{#if errorMessage}}{{errorMessage}}{{/if}}</p>
+
+        <h2 class="title">Sign in</h2>
+
+        <div class="input-group">
+            <span class="input-group-addon">@</span>
+            <input id="username" type="text" class="form-control" placeholder="Username" autocomplete="off" autofocus
+                   spellcheck="false">
+        </div>
+
+        <div class="input-group m-t-3">
+            <span class="input-group-addon">#</span>
+            <input id="password" type="password" class="form-control" placeholder="Password" autocomplete="off" autofocus
+                   spellcheck="false">
+        </div>
+
+        <div class="form-group p-t-2 text-center">
+            <button class="btn btn-info">Log In</button>
+        </div>
+
+        <button class="btn btn-link forgotPassword" style="display:none; margin-top:1em;">Forgot Password</button>
+    </form>
+
+    <form action="" class="forgot" style="display:none">
+        <p class="text-error"></p>
+        <p class="text-info"></p>
+
+        <input class="username" type="text" placeholder="Username" autocomplete="off"/>
+
+        <button class="btn btn-primary">Reset</button>
+        <button class="btn btn-link signin" style="margin-top:1em;">&hellip;or Sign In</button>
+    </form>
+</div>

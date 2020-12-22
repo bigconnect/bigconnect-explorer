@@ -1,0 +1,16 @@
+{{#if name}}
+<h1 title="{{name}}" class="m-y-1">{{name}}</h1>
+{{/if}}
+{{#if size}}
+<h2  class="m-y-1">{{size}}</h2>
+{{/if}}
+<div class="concept-container m-y-1" data-file-index="{{index}}"></div>
+<div class="title-container m-y-1">
+    <div clas="form-group">
+        <input class="titleProp form-control" placeholder="Title" data-file-index="{{index}}"/>
+    </div>
+</div>
+{{#if justification}}
+<div class="justification m-y-1" data-file-index="{{index}}"></div>
+{{/if}}
+<div class="visibility m-y-1" data-file-index="{{index}}"></div>

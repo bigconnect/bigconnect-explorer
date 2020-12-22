@@ -1,0 +1,15 @@
+<div class="info">
+  <div class="edge-vertex-preview{{#if outVertex.custom}} custom{{/if}}" style="background-image: url('{{ outVertex.image }}');"></div>
+  <span class="title">
+    <div>
+      <span class="date">{{#if timeSubtitle }}{{ timeSubtitle }}{{/if}}</span>
+      <span class="source">{{#if subtitle }}{{ subtitle }}{{/if}}</span>
+    </div>
+  </span>
+  <div class="edge-vertex-preview{{#if inVertex.custom}} custom{{/if}}" style="background-image: url('{{ inVertex.image }}');"></div>
+</div>
+<div class="titles">
+    <div class="vertex-out">{{ outVertex.title }}</div>
+    <div class="edge-arrow"> → </div>
+    <div class="vertex-in">{{ inVertex.title }}</div>
+</div>

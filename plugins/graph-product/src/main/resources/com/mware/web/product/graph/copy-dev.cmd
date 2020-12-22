@@ -1,0 +1,1 @@
+xcopy /EXCLUDE:excluded-files.txt /Y /E /R . ..\..\..\..\..\..\..\..\target\classes\com\mware\web\product\graph\

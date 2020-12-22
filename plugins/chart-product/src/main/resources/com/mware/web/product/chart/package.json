@@ -1,0 +1,37 @@
+{
+  "name": "bigconnect-web-product-chart",
+  "description": "",
+  "main": "plugin.js",
+  "author": "MWARE SOLUTIONS SRL",
+  "license": "BigConnect License",
+  "private": true,
+
+  "dependencies": {
+    "history": "^4.7.2",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
+    "plotly.js": "^1.57.1",
+    "react-plotly.js": "^2.5.0",
+    "react-chart-editor":  "^0.42.0"
+  },
+
+  "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "babel-loader": "^8.2.1",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-transform-regenerator": "^7.12.1",
+    "@babel/preset-env": "^7.12.7",
+    "@babel/preset-react": "^7.12.7",
+    "babel-plugin-add-module-exports": "^1.0.4",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "css-loader": "^2.1.0",
+    "style-loader": "^0.23.1",
+    "sass-loader": "^10.1.0",
+    "node-sass": "^5.0.0",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^4.2.0"
+  },
+  "scripts": {
+    "webpack": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js"
+  }
+}

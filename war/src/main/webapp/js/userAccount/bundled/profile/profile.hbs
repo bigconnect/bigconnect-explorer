@@ -1,0 +1,34 @@
+<div class='profile-page-title'>
+    <h1>Profile</h1>
+    <hr/>
+</div>
+
+<div class='profile-page-content'>
+    <div class="errors"></div>
+
+    <div class="form-group">
+        <label class="control-label" for="emailInput">{{ i18n 'useraccount.page.profile.email.label' }}</label>
+        <input type="email"
+               class="form-control"
+               id="emailInput"
+               required
+               value="{{ email }}">
+    </div>
+
+    <div class="form-group">
+        <label class="control-label" for="currPasswordInput">{{ i18n 'useraccount.page.profile.current.password.label' }}</label>
+        <input id="currPasswordInput" type="password" class="current form-control">
+    </div>
+
+    <div class="form-group">
+        <label class="control-label" for="newPassInput">{{ i18n 'useraccount.page.profile.new.password.label' }}</label>
+        <input id="newPassInput" type="password" class="new form-control">
+    </div>
+
+    <div class="form-group">
+        <label class="control-label" for="newPassConfirmInput">{{ i18n 'useraccount.page.profile.new.password.confirmation.label' }}</label>
+        <input id="newPassConfirmInput" type="password" class="confirm form-control">
+    </div>
+
+    <button style="margin: 1em 0;width: 100%;" class="btn btn-primary">{{ i18n 'useraccount.page.profile.button' }}</button>
+</div>

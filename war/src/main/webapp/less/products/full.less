@@ -1,0 +1,265 @@
+@import "toolbar";
+
+left:180px !important; // size of the product list container
+
+.products-empty-wrap {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .products-empty {
+    width:100%;
+    padding: 2em;
+    text-align: center;
+    ul{
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 0 auto;
+      li{
+        width: 20%;
+        margin:1.5rem;
+        position: relative;
+        height: fit-content;
+
+        .contain{
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        h3{
+          margin: 0;
+          padding: 1.5rem 0 0 1.5rem;
+          text-align: left;
+          background: #fff;
+          font-weight: 400;
+          color:#666 ;
+        }
+        p{
+          text-align: left;
+          padding: 0 0 1.5rem 1.5rem;
+          margin: 0;
+          background: #fff;
+          color: #999;
+          font-weight: 200;
+        }
+        .info{
+          cursor: pointer;
+          &:before{
+            content: '\e88e';
+            font-family: "Material Icons";
+            color: #d8d8d8;
+            font-size: 20px;
+          }
+          position: absolute;
+          right:1.5rem;
+          bottom:1.5rem;
+          .moreInfo{
+            display: none;
+            position: absolute;
+            bottom:30px;
+            right:10px;
+            background: white;
+            padding: 1rem;
+            border:1px solid #eee;
+          }
+          &:hover{
+            .moreInfo{
+              display: block;
+            }
+          }
+        }
+        .productImg{
+          cursor: pointer;
+          height: 250px;
+          width: 100%;
+          position: relative;
+          transition: all 1s ease;
+          background-size: cover;
+
+          &.Charts{
+            background: url(../img/assets/chart.png) no-repeat center center;
+            .hoverContent{
+              &:before {
+                content: '\e01d';
+              }
+            }
+          }
+          &.Custom.Graph{
+            background: url(../img/assets/customGraph.png) no-repeat center center;
+            .hoverContent{
+              &:before {
+                content: '\e922';
+              }
+            }
+          }
+          &.Graph{
+            background: url(../img/assets/graph.png) no-repeat center center;
+            .hoverContent{
+              &:before {
+                content: '\e6e1';
+              }
+            }
+          }
+          &.Map{
+            background: url(../img/assets/map.png) no-repeat center center;
+            .hoverContent{
+              &:before {
+                content: '\e55f';
+              }
+            }
+          }
+          &.Machine.Learning{
+            background: url(../img/assets/notebook.png) no-repeat center center;
+            .hoverContent{
+              &:before {
+                content: '\e8cd';
+              }
+            }
+          }
+
+
+          .hoverContent{
+            opacity: 0;
+            position: absolute;
+            background: rgba(0, 0,  0, .5);
+            top:0;
+            width: 100%;
+            height: 100%;
+            color:#fff;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size:24px;
+            padding-top: 5rem;
+            transition: all 1s ease;
+            span{
+              display: block;
+              font-size: 16px;
+              font-weight: 200;
+              text-transform: capitalize;
+            }
+            &:before{
+              font-family: "Material Icons";
+              font-size: 30px;
+              display: block;
+            }
+          }
+          &:hover {
+            transform: scale(1.2);
+            width: 100%;
+            height: 250px;
+            .hoverContent{
+            opacity:1;
+          }
+          }
+        }
+
+      }
+    }
+    h1{
+      padding:1.5rem 0 .5rem 0;
+      margin: 0;
+      text-transform: uppercase;
+      color: #666;
+      font-weight: 400;
+      font-size: 24px;
+    }
+    h2{
+      padding:0 0 0 0;
+      margin: 0;
+      font-weight: 200;
+      color: #999;
+
+    }
+
+  }
+  h1 {
+    font-size: 130%;
+    line-height: 1em;
+    color: #666;
+    margin: 0;
+    text-shadow: 0 1px 0 white;
+  }
+  h2 {
+    font-size: 100%;    
+    line-height: 1.1em;
+    font-weight: normal;
+    margin: 2em 0 1em 0;
+    color: #999;
+  }
+
+  ul {    
+    list-style: none;
+    margin: 0em 0 0 0;
+    border-radius: 3px;
+    padding-left: 0px;
+
+    li {
+      margin: 5px 0 0 0;
+    }
+    button {
+      width: 100%;
+    }
+  }
+
+}
+ul.createGraph{
+  margin: 3rem auto 0 auto;
+  width: 70%!important;
+  li{
+    display: inline-block;
+    float: none!important;
+    margin: 0;
+    text-align: center;
+    width: 31%!important;
+    margin: 0 3rem 3rem 0;
+    padding: 0!important;
+    p{
+      text-align: center!important;
+      font-size: 16px;
+      padding: 2rem 0!important;
+    }
+    strong{
+      display: block;
+      padding:0 0 3rem 0!important;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+    &:before{
+      padding: 3rem 0 0 0!important;
+      display: block;
+      font-family: "Material Icons";
+      font-size: 40px!important;
+      color: #999!important;
+    }
+    &:first-child{
+      &:before{
+        content: '\e89c';
+
+      }
+    }
+    &:nth-child(2){
+      cursor: pointer;
+      &:before{
+        content: '\e8b6';
+
+      }
+    }
+    &:nth-child(3){
+      cursor: pointer;
+      &:before{
+        content: '\e2c2';
+
+      }
+    }
+    &:nth-child(4){
+      cursor: pointer;
+      &:before{
+        content: '\e02e'!important;
+
+      }
+    }
+  }
+}

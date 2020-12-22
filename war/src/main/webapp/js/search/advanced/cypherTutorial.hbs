@@ -1,0 +1,238 @@
+<div class="container search-hint">
+    <div class="row">
+        <div class="col-md-12">
+            <div id="cyCarousel" class="carousel slide" data-ride="carousel" data-interval="10000">
+                <!-- Wrapper for slides -->
+                <div class="carousel-inner">
+                    <div class="item active">
+                        <h3 class="m-t-0">Querying data using Cypher</h3>
+                        <p>Cypher is a human-readable query language that makes common operations easy.
+                            A combination of English prose and intuitive iconography,
+                            Cypher is accessible to developers and operations professionals alike.</p>
+
+                        <p>Cypher is a relatively simple but still very powerful language.
+                            Complicated database queries can easily be expressed through Cypher.</p>
+
+                        <p>Cypher is a graph query language which operates on a property graph. A property graph may be
+                            defined in graph theoretical terms as a directed, vertex-labeled, edge-labeled multigraph with selfedges,
+                            where edges have their own identity. In the property graph, we use the term node to denote
+                            a vertex, and relationship to denote an edge.</p>
+
+                        <h3>Nodes - represents records in a graph</h3>
+                        <p><code>()</code> It’s an empty node, to indicate that there is a node, but it’s not relevant for the query.</p>
+                        <p><code>(n)</code> It’s a node referred by the variable n, reusable in the query. It begins with lowercase and uses camelCase.</p>
+                        <p><code>(p:person)</code> You can add a label to your node, here "person". It’s like a type / a class / a category. It begins with uppercase and uses camelCase.</p>
+                        <p><code>(p:person {title : 'Théo Gauchoux', age : 22})</code> A node can have some properties, here name and age. It begins with lowercase and uses camelCase.</p>
+                        <p>You can access to a property with the dot style also: <code>p.name</code></p>
+                    </div>
+
+                    <div class="item">
+                        <h3 class="m-t-0">Relationships (or Edges - Connects two nodes)</h3>
+                        <p><code>[:Knows]</code> It’s a relationship with the label "Knows". It’s a label as the node’s label and it begins with uppercase.</p>
+                        <p><code>[k:Knows]</code> The same relationship, referred by the variable k, reusable in the query, but it’s not necessary.</p>
+                        <p><code>[k:Knows {since:2017}]</code> The same relationship, with properties (like node), here since.</p>
+                        <p><code>[k:Knows*..4]</code> It’s a structural information to use in a path (seen later). Here, *..4 says “Match the pattern, with the relationship k which be repeated between 1 and 4 times.</p>
+
+                        <h3>Paths - The way to mix nodes and relationships.</h3>
+                        <p><code>(a:person)-[:Knows]-(b:person)</code> A path describing that a and b know each other.</p>
+                        <p><code>(a:person)-[:Manages]->(b:person)</code> A path can be directed. This path describes that a is the manager of b.</p>
+                        <p><code>(a:person)-[:Knows]-(b:person)-[:Knows]-(c:person)</code> You can chain multiple relationships. This path describes the friend of a friend.</p>
+                        <p><code>(a:person)-[:Manages]->(b:person)-[:Manages]->(c:person)</code> A chain can also be directed. This path describes that a is the boss of b and the big boss of c.</p>
+                        <p>Patterns used often:</p>
+                        <pre class="literal">
+// Friend-of-a-friend
+(user)-[:Knows]-(friend)-[:Knows]-(foaf)
+
+// Shortest path
+path = shortestPath( (user)-[:Knows*..5]-(other) )
+
+// Collaborative filtering
+(user)-[:Purchased]->(product)<-[:Purchased]-()-[:Purchased]->(otherProduct)
+
+// Tree navigation
+(root)<-[:Parent*]-(leaf:Category)-[:Item]->(data:Product)
+                        </pre>
+                    </div>
+
+                    <div class="item">
+                        <h3 class="m-t-0">Match queries</h3>
+                        <p>Match all nodes: <code>MATCH (n) RETURN n</code></p>
+                        <p>Match nodes by label: <code>MATCH (a:person) RETURN a</code></p>
+                        <p>Match nodes by label and property: <code>MATCH (a:person {name:"Théo Gauchoux"}) RETURN a</code></p>
+                        <p>Match nodes according to relationships (undirected): <code>MATCH (a)-[:Knows]-(b) RETURN a,b</code></p>
+                        <p>Match nodes according to relationships (directed): <code>MATCH (a)-[:Manages]->(b) RETURN a,b</code></p>
+                        <p>Match nodes with a WHERE clause: <code>MATCH (p:person {name:"Théo Gauchoux"})-[s:LivesIn]->(city:city) WHERE s.since = 2015 RETURN p,state</code></p>
+
+                        <h3>Aggregations</h3>
+                        <p>Helpful aggregation operations, such as calculating averages, sums, percentiles, minimum/maximum,
+                            and counts are available in Cypher. You may find many of these have similar syntax to other query language operations,
+                            but Cypher does work slightly differently with aggregation.</p>
+
+                        <p>In Cypher, you do not need to specify a grouping key. It implicitly groups by a non-aggregate field in the return clause.
+                            This might seem much easier than more verbose syntax in other languages, but opinions may vary.</p>
+
+                        <h4>Aggregating by Count</h4>
+                        <p>Sometimes you only need to return a count of the results found in the database, rather than returning the objects themselves.
+                            The <code>count()</code> function in Cypher allows you to count the number of occurences of entities, relationships, or results returned.</p>
+
+                        <pre>
+// Count on the person nodes (does not include null values)
+MATCH (p:person) RETURN count(p.twitter)
+
+// count on the person nodes
+MATCH (p:person) RETURN count(*)
+                        </pre>
+                    </div>
+
+                    <div class="item">
+                        <h4 class="m-t-0">Aggregating Values</h4>
+                        <p>The <code>collect()</code> function in Cypher gives you the capability to aggregate values into a list.
+                            You can use this to group a set of values based on a particular starting node, relationship, property.</p>
+
+                        <p>To aggregate all of a person’s friends by the starting person, you can use <code>collect()</code>.
+                            This will group the friend values by the non-aggregate field (in our case, <code>p.name</code>).</p>
+                        <pre>
+MATCH (p:person)-[:IsFriendWith]->(friend:person)
+RETURN p.name, collect(friend.name) AS friend
+                        </pre>
+
+                        <h4>Counting Values in a List</h4>
+                        <p>If you have a list of values, you can also find the number of items in that list or calculate the size of an expression using the <code>size()</code> function.
+                            The examples below return the number of items or patterns found.</p>
+                        <pre>
+// Find number of items in collected list
+MATCH (p:person)-[:IsFriendWith]->(friend:person)
+RETURN p.name, size(collect(friend.name)) AS numberOfFriends
+
+// Find number of friends who have other friends
+MATCH (p:person)-[:IsFriendWith]->(friend:person)
+WHERE size((friend)-[:IsFriendWith]-(:person)) > 1
+RETURN p.name, collect(friend.name) AS friends, size((friend)-[:IsFriendWith]-(:person)) AS numberOfFoFs
+                        </pre>
+                    </div>
+
+                    <div class="item">
+                        <h3 class="m-t-0">Chaining Queries Together</h3>
+                        <p>Sometimes there are better ways to write a query. One of those ways is to use the <code>WITH</code> clause to pass values from one section of a query to another.
+                            This allows you to execute some intermediate calculations or operations within your query to use later.</p>
+                        <p>You must specify the variables in the <code>WITH</code> clause that you want to use later. Only those variables will be passed to the next part of the query.</p>
+                        <pre>
+// Find and list the technologies people like
+MATCH (a:person)-[r:Likes]-(t:technology)
+WITH a.name AS name, collect(t.type) AS technologies
+RETURN name, technologies
+
+// Find number of friends who have other friends - cleaner
+MATCH (p:person)-[:IsFriendWith]->(friend:person)
+WITH p, collect(friend.name) AS friendsList, size((friend)-[:IsFriendWith]-(:Person)) AS numberOfFoFs
+WHERE numberOfFoFs > 1
+RETURN p.name, friendsList, numberOfFoFs
+                        </pre>
+
+                        <p>WITH is also very helpful for setting up parameters before the query.
+                            Often useful for parameter keys, url strings, and other query variables when importing data.</p>
+                        <pre>
+// Find people with 2-6 years of experience
+WITH 2 AS experienceMin, 6 AS experienceMax
+MATCH (p:person)
+WHERE experienceMin <= p.yrsExperience <= experienceMax
+RETURN p
+                        </pre>
+                    </div>
+
+                    <div class="item">
+                        <h3 class="m-t-0">Looping through List Values</h3>
+                        <p>If you have a list that you want to inspect or separate the values, Cypher offers the <code>UNWIND</code> clause.
+                            This does the opposite of <code>collect()</code> and separates a list into individual values on separate rows.</p>
+                        <pre>
+// For a list of techRequirements, look for people who have each skill
+WITH ['Graphs','Query Languages'] AS techRequirements
+UNWIND techRequirements AS technology
+MATCH (p:person)-[r:Likes]-(t:technology {type: technology})
+RETURN t.type, collect(p.name) AS potentialCandidates
+
+// For numbers in a list, find candidates who have that many years of experience
+WITH [4, 5, 6, 7] AS experienceRange
+UNWIND experienceRange AS number
+MATCH (p:person)
+WHERE p.yearsExp = number
+RETURN p.name, p.yearsExp
+                        </pre>
+
+                        <h3>Ordering Results</h3>
+                        <p>The <code>ORDER BY</code> keyword will sort the results based on the value you specify and in ascending or descending order (ascending is default).
+                            Let’s use the same queries from our example with <code>UNWIND</code> and see how we can order our candidates.</p>
+                        <pre>
+// For a list of techRequirements, look for people who have each skill
+WITH ['Graphs','Query Languages'] AS techRequirements
+UNWIND techRequirements AS technology
+MATCH (p:person)-[r:Likes]-(t:technology {type: technology})
+WITH t.type AS technology, p.name AS personName
+ORDER BY technology, personName
+RETURN technology, collect(personName) AS potentialCandidates
+
+// For numbers in a list, find candidates who have that many years of experience
+WITH [4, 5, 6, 7] AS experienceRange
+UNWIND experienceRange AS number
+MATCH (p:person)
+WHERE p.yearsExp = number
+RETURN p.name, p.yearsExp ORDER BY p.yearsExp DESC
+                        </pre>
+                    </div>
+
+                    <div class="item">
+                        <h3 class="m-t-0">Returning Unique Results</h3>
+                        <p>To trim out duplicate entities, we can use the <code>DISTINCT</code> keyword.
+                            We will use past examples from queries, as well as a query from a previous page to show how to use this to remove repetitive results.</p>
+                        <pre>
+// Find people who have a twitter or like graphs or query languages
+MATCH (user:person)
+WHERE user.twitter IS NOT null
+WITH user
+MATCH (user)-[:Likes]-(t:technology)
+WHERE t.type IN ['Graphs','Query Languages']
+RETURN DISTINCT user.name
+                        </pre>
+                        <p>The first two lines of the query look for person nodes who have a Twitter handle.
+                            Then, we use <code>WITH</code> to pass those users over to the next MATCH, where we find out if the person likes graphs or query languages.
+                            By using <code>DISTINCT</code>, we only retrieve unique users.</p>
+
+                        <h3>Limiting Number of Results</h3>
+                        <p>There are times where you want a sampling set or you only want to pull so many results to update or process at a time.
+                            The <code>LIMIT</code> keyword takes the output of the query and limits the volume returned based on the number you specify.</p>
+                        <pre>
+// Find the top 3 people who have the most friends
+MATCH (p:person)-[r:IsFriendWith]-(other:person)
+RETURN p.name, count(other.name) AS numberOfFriends
+ORDER BY numberOfFriends DESC
+LIMIT 3
+                        </pre>
+                    </div>
+                </div>
+
+                <div class="carousel-controls">
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators">
+                        <li data-target="#cyCarousel" data-slide-to="0" class="active"></li>
+                        <li data-target="#cyCarousel" data-slide-to="1"></li>
+                        <li data-target="#cyCarousel" data-slide-to="2"></li>
+                        <li data-target="#cyCarousel" data-slide-to="3"></li>
+                        <li data-target="#cyCarousel" data-slide-to="4"></li>
+                        <li data-target="#cyCarousel" data-slide-to="5"></li>
+                        <li data-target="#cyCarousel" data-slide-to="6"></li>
+                    </ol>
+
+                    <!-- Left and right controls -->
+                    <a class="left carousel-control" href="#cyCarousel" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="right carousel-control" href="#cyCarousel" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

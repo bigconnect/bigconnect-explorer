@@ -1,0 +1,13 @@
+build/
+node_modules/
+libs/*
+css/*
+imgc/*
+js/plugin-development
+jsc/*
+test/reports
+libpeerconnection.log
+.idea/*
+*.iml
+yarn.lock
+yarn-error.log

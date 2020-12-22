@@ -1,0 +1,59 @@
+.analysis-pane {
+    .container-fluid {
+        padding: 0px;
+        height: 100%;
+
+        .row {
+            height: 100%;
+
+            #analysis-left {
+                display:flex;
+                flex-flow: column;
+                height: 100%;
+                padding-right: 0;
+
+                #analysis-graph {
+                    flex: 1 1 auto;
+                }
+
+                #analysis-time {
+                    flex: 0 1 170px;
+                }
+            }
+
+            #analysis-right {
+                display:flex;
+                flex-flow: column;
+                height: 100%;
+                padding-left:0;
+
+                .analysis-panel {
+                    flex: 1 1 auto;
+                    margin-bottom: 0px;
+                    overflow-y: scroll;
+                    overflow-x: hidden;
+
+                    .panel-title {
+                        margin: 5px 0px;
+                        line-height: 15px;
+                    }
+
+                    .form-group {
+                        margin: 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+#kl-mask {
+    position: absolute;
+    top:0px;
+    left:0px;
+    width: 100%;
+    height: 100%;
+    z-index:10000;
+    background: white;
+    opacity: 0;
+}

@@ -1,0 +1,227 @@
+a {
+  cursor: pointer;
+}
+
+
+// fix for IE displaying it's own "x" in text areas to clear text
+::-ms-clear {
+  width : 0;
+  height: 0;
+}
+
+// Fix for firefox when using box-sizing (can't see text otherwise)
+body,
+h1,h2,h3,h4,h5,h6,
+.popover {
+  font-family: "Roboto","Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif !important;
+}
+
+.popover {
+  border: 1px solid #ccc;
+}
+
+.col-centered {
+  float: none;
+  margin: 0 auto;
+}
+
+.above-graph(@extra:1) {
+  z-index: @graph-zIndex + @extra;
+}
+
+.accepts-file {
+  &:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5) url(../img/drop-items.png) no-repeat center center;
+    background-size: auto 45%;
+    .transition(~"all 0.2s ease-in-out");
+    .opacity(0);
+  }
+
+  &.file-hover {
+    &.uploading:after, &.uploading:hover:after {
+      display: none;
+    }
+
+    &:after {
+      .transition(~"all 0.2s ease-in-out 0.2s");
+      .opacity(80);
+    }
+  }
+}
+
+.mode-select-pane {
+  padding-left: 300px;
+}
+
+.ui-draggable-dragging {
+  .opacity(100);
+  .scale(1.0);
+  .transition(~"opacity ease-in-out 0.3s, -webkit-transform ease-in-out 0.3s");
+}
+.draggable-invisible {
+  .opacity(0);
+  .scale(0.1);
+}
+.draggable-wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.justification-selection {
+  background: rgba(42, 206, 29, 0.2);
+  padding: 0 2px;
+  margin: 0 2px;
+  text-shadow: 0 1px 0 fadeout(white, 60%);
+}
+
+.context-menu-warning {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  .translate(-50%, 0);
+  margin: auto;
+  z-index: @graph-zIndex;
+  .opacity(90);
+}
+
+.dropdown-menu li.disabled:hover > a > span {
+  color: #777;
+}
+
+.component-highlighter {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(24, 126, 226, 0.55);
+  border: 3px solid rgba(11, 76, 140, 0.36);
+  box-sizing: border-box;
+  z-index: 9999;
+  &:after {
+    content: attr(data-name);
+    top: 0;
+    left: 0;
+    color: white;
+    text-shadow: 0 -1px 0 rgba(11, 76, 140, 1.0);
+    font-size: 100%;
+    white-space: nowrap;
+    background: rgba(11, 76, 140, 0.36);
+    padding: 0 0.5em;
+    position: absolute;
+  }
+}
+
+.field-tooltip {
+  @import "../detail/field-tooltip";
+}
+
+.ol-rotate {
+  bottom: 2em;
+  top: auto;
+  right: .5em;
+}
+
+.ol-geocoder .gcd-txt-control {
+  height: 2.5em;
+}
+.ol-geocoder ul.gcd-txt-result {
+  top: 2.7em;
+}
+
+.pagination ul > .active > a,
+.pagination ul > .active > a:hover
+{
+  background-color: #0088d5;
+  color: white;
+}
+
+// Bootstrap 3 Dopdown Sub-Menu
+.dropdown-menu {
+  z-index: 16777271;
+}
+
+.dropdown-menu li {
+  overflow: visible;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #e9ebef;
+}
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #ccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+  border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+  float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  -webkit-border-radius: 6px 0 6px 6px;
+  -moz-border-radius: 6px 0 6px 6px;
+  border-radius: 6px 0 6px 6px;
+}
+
+.dropdown-submenu.pull-left {
+  float:none !important;
+}
+
+
+/* override modal l&f */
+.modal.in {
+  display: flex !important;
+  height: 100% !important;
+
+  .modal-dialog {
+    margin: auto !important;
+
+    .modal-content {
+      .modal-header {
+        h1, h2, h3, h4, h5, h6 {
+          margin: 0;
+        }
+      }
+      .modal-body {
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+    }
+  }
+}
+

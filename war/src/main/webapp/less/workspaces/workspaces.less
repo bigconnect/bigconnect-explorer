@@ -1,0 +1,254 @@
+@import (reference) "../util/positioning.less";
+
+width: auto;
+height: 35em;
+
+
+.content {
+  position: relative;
+  display: block;
+  max-width: none;
+  box-sizing: border-box;
+  white-space: normal;
+  overflow: auto;
+  background-color: #fff;
+  color: inherit;
+}
+
+li {
+  position: relative;
+
+  input {
+    width: 100%;
+    &.invalid {
+      color: #b94a48;
+      border-color: #ee5f5b;
+      &:focus {
+        border-color: darken(#ee5f5b, 10%);
+        @shadow: 0 0 6px lighten(#ee5f5b, 20%);
+        .box-shadow(@shadow);
+      }
+    }
+  }
+
+  .nav-list-title, .nav-list-subtitle {
+    padding-right: 35px;
+  }
+
+  .nav-list-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .disclosure {
+    border: 0;
+    width: 4em;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    box-shadow: none;
+    background-color: transparent;
+    padding-top: 0px;
+    height: 2.5em;
+    color: rgba(0, 0, 0, 0.54);
+
+    .opacity(30);
+    &:hover {
+      .opacity(100);
+    }
+  }
+
+  &.active .disclosure {
+    color: rgba(255, 255, 255, 1);
+    &:hover {
+      .opacity(100);
+    }
+  }
+
+  .badge {
+    float: right;
+
+    &.permissions {
+      align-self: center;
+    }
+  }
+}
+
+.workspaces-list {
+  width: 20em;
+  padding: 0 0.5em;
+
+  li a {
+    .disable-text-selection;
+
+    .item-title {
+      font-weight: bold;
+    }
+
+    .item-subtitle {
+      font-size: 85%;
+    }
+  }
+
+  li:not(.new-workspace) .loading {
+    position: absolute;
+    right: 0;
+    left: auto;
+    top: -1px;
+    border: 0;
+    height: 100%;
+    margin-right: 20px;
+  }
+
+  li.nav-header h5 {
+    margin: 1em;
+  }
+}
+
+.new-workspace {
+  padding-top: 1em;
+  padding-bottom: 0em;
+
+  .input-group {
+    padding: 5px;
+
+    .form-group {
+      margin-top: 5px;
+
+      input {
+        padding-left: 5px;
+      }
+    }
+  }
+
+  .add-title-error {
+    color: red;
+    font-size: 0.8em;
+    display: none;
+  }
+}
+
+.workspace-form {
+  width: 300px;
+  background: @pane-background;
+  height: 100%;
+  z-index: 89; // so it floats above graph, but below splitbar handles
+  border-left: 1px solid #ccc;
+
+  .content {
+    padding: 0 1em;
+  }
+
+  .badge {
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+
+  .popover {
+    width: 12em;
+    background-color: #fff;
+  }
+
+  .permissions-list button {
+    width: 100%;
+    float: none;
+  }
+
+  .caret {
+    position: relative;
+    border-top-color: white;
+  }
+  input[type=text] {
+    width: 100%;
+    .box-sizing(border-box);
+    margin: 0.5em 0;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    li .form-title-error {
+      color: red;
+      font-size: 0.8em;
+      display: none;
+    }
+  }
+  .scroller {
+    position: absolute;
+    bottom: 8em;
+    top: 0;
+    overflow: auto;
+    left: 0;
+    width: 100%;
+    padding: 0 1em;
+    .box-sizing(border-box);
+  }
+
+  .buttons {
+    position: absolute;
+    bottom: 0;
+    right: 1em;
+    left: 1em;
+
+    button {
+      margin-bottom: 1em;
+      width: 100%;
+    }
+  }
+
+  .share-list li.user-row {
+    display: flex;
+    margin: 0.5em 0;
+
+    .user-info {
+      flex: 1 1 auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      .user-displayname {
+        flex: 1 1 auto;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .user-status {
+        top: 1.5ex;
+      }
+
+      .subtitle {
+        font-size: 90%;
+        color: #555;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .share-list .nav-header {
+    margin: 0.5em 0 0;
+    padding: 0;
+  }
+
+  .share-list .share-header {
+    margin-top: 1.5em;
+  }
+
+  .share-form {
+    position: relative;
+    margin-top: 0.5em;
+
+    input {
+      margin: 0;
+    }
+
+    .typeahead {
+      width: 100%;
+    }
+
+    button {
+      float: none;
+    }
+  }
+}

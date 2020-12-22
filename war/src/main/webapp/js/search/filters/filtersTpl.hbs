@@ -1,0 +1,48 @@
+<ul class="nav nav-list search-options" {{#unless showMatchType}}style="display:none"{{/unless}}>
+    <li class="nav-header">
+        <div class="match-types">
+            <h5  class="filter-section-title">BY TYPE:</h5>
+            <label class="custom-control custom-radio radio-inline">
+                <input type="radio"
+                       class="custom-control-input match-type-vertex"
+                       name="match-type"
+                       value="vertex"
+                       {{#if showConceptFilter}}checked{{/if}}>
+                <span class="custom-control-indicator"></span>
+                {{ i18n 'search.filters.match.vertex' }}
+            </label>
+            <label class="custom-control custom-radio radio-inline">
+                <input type="radio"
+                       class="custom-control-input match-type-edge"
+                       name="match-type"
+                       value="edge"
+                       {{#if showEdgeFilter}}checked{{/if}}>
+                <span class="custom-control-indicator"></span>
+                {{ i18n 'search.filters.match.edge' }}
+            </label>
+        </div>
+    </li>
+</ul>
+<ul class="extension-filters nav nav-list"></ul>
+<ul style="display:none" class="entity-filters nav nav-list"></ul>
+<ul class="prop-filters list-unstyled">
+    <li {{#unless showConceptFilter}}style="display:none"{{/unless}} class="concepts-dropdown"></li>
+    <li {{#unless showConceptFilter}}style="display:none"{{/unless}} class="concepts-list">
+        <ul class="fields ui-sortable filterList"></ul>
+    </li>
+    <li {{#unless showEdgeFilter}}style="display:none"{{/unless}} class="edgetype-dropdown"></li>
+    <li {{#unless showEdgeFilter}}style="display:none"{{/unless}} class="edgetype-list">
+        <ul class="fields ui-sortable filterList"></ul>
+    </li>
+    {{#if showSorting}}
+        <li><h5 class="filter-section-title">SORT BY:</h5></li>
+        <li class="sort-content"></li>
+    {{/if}}
+    <li>
+</ul>
+<div class="filters-container-div" id="filters-container">
+    <h5 class="filter-section-title">BY PROPERTY:</h5>
+    <ul class="filters-container list-unstyled" id="filters-container">
+        <li class="header-control-filters prop-filter-header nav-header prop-filter-header-hide"></li>
+    </ul>
+</div>

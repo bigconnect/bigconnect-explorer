@@ -1,0 +1,16 @@
+<div class="popover connect-dialog top">
+  <div class="popover-title">
+    <button class="btn btn-link invert-connection"><%= i18n ('relationship.form.button.invert') %></button>
+    <span class="title"><%= cy.getElementById(edge.data('source')).data('title') %></span>
+  </div>
+  <div class="arrow"></div>
+  <div class="popover-content">
+    <div class="errors"></div>
+    <div class="form create-connection-form">
+      <div class="relationships m-t-1"></div>
+      <div class="justification m-t-1"></div>
+      <div class="visibility m-t-1"></div>
+      <button class="btn btn-primary btn-raised connect"><%= i18n('org.bigconnect.web.product.graph.connection.button.connect') %></button>
+    </div>
+  </div>
+</div>

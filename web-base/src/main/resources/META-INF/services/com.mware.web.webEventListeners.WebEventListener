@@ -1,0 +1,5 @@
+com.mware.web.webEventListeners.CurrentUserWebEventListener
+com.mware.web.webEventListeners.TraceWebEventListener
+com.mware.web.webEventListeners.ErrorHandlerWebEventListener
+com.mware.web.webEventListeners.SetThreadNameWebEventListener
+com.mware.web.webEventListeners.MemoryLoggerWebEventListener

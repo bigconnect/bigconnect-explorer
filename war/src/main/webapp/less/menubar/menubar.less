@@ -1,0 +1,120 @@
+@import (reference) "../util/animation";
+
+@menuIconHeight: 20px;
+
+& {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  .user-select(none);
+}
+
+.navbar {
+  background-color: white;
+  color: #383838;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 0;
+
+  .navbar-brand {
+    img {
+      width: 60px;
+      padding-top: 0.75em;
+    }
+  }
+
+  .navbar-nav {
+    li > a > i {
+      line-height: inherit;
+    }
+  }
+
+  .workspace-name {
+    margin: 0;
+    position: relative;
+    .twizzle;
+
+    &:before {
+      color: inherit;
+      left: auto;
+      right: -1.5em;
+      top: 0.5em;
+    }
+
+    &.expanded {
+      .twizzle-expand;
+    }
+  }
+
+  .navbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+
+.tooltip-inner .subtitle {
+  margin-left: 0.5em;
+  color: #ccc;
+  white-space: nowrap;
+  font-size: 90%;
+}
+
+// Activity is special in that it animates when active
+.activity {
+  .activityCount {
+    display: inline-block;
+    position: absolute;
+    top: 1ex;
+    right: -0.7ex;
+    font-size: 85%;
+    font-variant: small-caps;
+    font-weight: bold;
+    border-radius: 5px;
+    .disable-text-selection;
+    cursor: pointer;
+  }
+}
+
+.content {
+  &.hide-icon-text {
+    .menu-top a, .menu-bottom a {
+      height: @menuIconHeight;
+    }
+  }
+  &.hide-more {
+    .menu-bottom .divider, .menu-bottom .logout, .menu-bottom .spacer {
+        display: none;
+    }
+  }
+}
+
+#workspacePanel {
+  background-color: white;
+
+  @import "../workspaces/workspaces";
+}
+
+.workspace-name {
+  color: rgb(51, 122, 183);
+  cursor: pointer;
+  padding: 0 15px;
+  line-height: 50px;
+i{
+  position: relative;
+  top:5px;
+}
+  &:before {
+    content: '' !important;
+  }
+  &:hover{
+    background: #eee;
+    i{
+      color:rgb(35, 82, 124);
+
+    }
+  }
+}
+.navbar-form.navbar-right{
+  padding: 0;
+}

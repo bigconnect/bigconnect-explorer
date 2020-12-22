@@ -1,0 +1,207 @@
+<div class="panel panel-filters">
+    <div class="panel-heading">
+        <div class="panel-heading-title">Filters</div>
+        <div class="panel-heading-subtitle">Refine your results using filters</div>
+    </div>
+
+    <div class="panel-body">
+        <div class="search-filters">
+            <div class="search-options"></div>
+            <div class="content"></div>
+        </div>
+    </div>
+</div>
+<div class="search-hint">
+    <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="10000">
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner">
+            <div class="item active">
+                <h3 class="m-t-0">Querying data</h3>
+                <p>
+                    The query string is parsed into a series of terms and operators. A term can be a single word — quick or brown — or a phrase,
+                    surrounded by double quotes — "quick brown" — which searches for all the words in the phrase, in the same order.
+                </p>
+                <h4>Wildcards</h4>
+                <p>
+                    Wildcard searches can be run on individual terms, using ? to replace a single character, and * to replace zero or more characters:
+                </p>
+                <pre class="literal">qu?ck bro*</pre>
+                <p>
+                    Be aware that wildcard queries can use an enormous amount of memory and
+                    perform very badly — just think how many terms need to be queried to
+                    match the query string
+                </p>
+                <h4>Fuzziness</h4>
+                <p>
+                    We can search for terms that are similar to, but not exactly like our search terms, using the “fuzzy” operator:
+                </p>
+                <pre class="literal">quikc~ brwn~ foks~</pre>
+                <p>
+                    The default edit distance is 2, but an edit distance of 1 should be sufficient to catch 80% of all human misspellings. It can be specified as:
+                </p>
+                <pre class="literal">quikc~1</pre>
+            </div>
+
+            <div class="item">
+                <h4 class="m-t-0">Proximity searches</h4>
+                <p>
+                    While a phrase query (eg "john smith") expects all of the terms in exactly the same order,
+                    a proximity query allows the specified words to be further apart or in a different order.
+                    In the same way that fuzzy queries can specify a maximum edit distance for characters in a word,
+                    a proximity search allows us to specify a maximum edit distance of words in a phrase:
+                </p>
+                <pre class="literal">"fox quick"~5</pre>
+
+                <h4>Boosting</h4>
+                <p>
+                    Use the <span class="emphasis"><em>boost</em></span> operator <code class="literal">^</code> to make one term more relevant than another.
+                    For instance, if we want to find all documents about foxes, but we are
+                    especially interested in quick foxes:
+                </p>
+                <pre class="literal">quick^2 fox</pre>
+                <p>
+                    The default <code class="literal">boost</code> value is 1, but can be any positive floating point number.
+                    Boosts between 0 and 1 reduce relevance.
+                </p>
+                <p>Boosts can also be applied to phrases or to groups:</p>
+                <pre class="literal">"john smith"^2   (foo bar)^4</pre>
+            </div>
+
+            <div class="item">
+                <h4 class="m-t-0">Boolean operators</h4>
+                <p>By default, all terms are optional, as long as one term matches.  A search
+                    for <code class="literal">foo bar baz</code> will find any document that contains one or more of
+                    <code class="literal">foo</code> or <code class="literal">bar</code> or <code class="literal">baz</code>.
+                    But there are also <span class="emphasis"><em>boolean operators</em></span> which can be used in the query string itself to provide more control.</p>
+                <p>The preferred operators are <code class="literal">+</code> (this term <span class="strong strong"><strong>must</strong></span> be present) and <code class="literal">-</code>
+                    (this term <span class="strong strong"><strong>must not</strong></span> be present). All other terms are optional.
+                    For example, this query:</p>
+                <pre class="literal">quick brown +fox -news</pre>
+                <p>states that:</p>
+                <ul type="disc">
+                    <li><code class="literal">fox</code> must be present</li>
+                    <li><code class="literal">news</code> must not be present</li>
+                    <li><code class="literal">quick</code> and <code class="literal">brown</code> are optional — their presence increases the relevance</li>
+                </ul>
+                <p>The familiar operators <code class="literal">AND</code>, <code class="literal">OR</code> and <code class="literal">NOT</code> (also written <code class="literal">&amp;&amp;</code>, <code class="literal">||</code> and <code class="literal">!</code>)
+                    are also supported.  However, the effects of these operators can be more
+                    complicated than is obvious at first glance.  <code class="literal">NOT</code> takes precedence over
+                    <code class="literal">AND</code>, which takes precedence over <code class="literal">OR</code>.  While the <code class="literal">+</code> and <code class="literal">-</code> only affect
+                    the term to the right of the operator, <code class="literal">AND</code> and <code class="literal">OR</code> can affect the terms to
+                    the left and right.</p>
+            </div>
+
+            <div class="item">
+                <h4 class="m-t-0">Grouping</h4>
+                <p>Multiple terms or clauses can be grouped together with parentheses, to form sub-queries:</p>
+                <pre class="literal">(quick OR brown) AND fox</pre>
+                <p>Groups can be used to boost the result of a sub-query:</p>
+                <pre class="literal">(active OR pending) AND (full text search)^2</pre>
+
+                <h4>Reserved characters</h4>
+                <p>If you need to use any of the characters which function as operators in your
+                    query itself (and not as operators), then you should escape them with
+                    a leading backslash. For instance, to search for <code class="literal">(1+1)=2</code>, you would
+                    need to write your query as <code class="literal">\(1\+1\)\=2</code>.</p>
+                <p>The reserved characters are:  <code class="literal">+ - = &amp;&amp; || &gt; &lt; ! ( ) { } [ ] ^ " ~ * ? : \ /</code></p>
+                <p>Failing to escape these special characters correctly could lead to a syntax error which prevents your query from running.</p>
+                <p><strong>Note:</strong><code class="literal">&lt;</code> and <code class="literal">&gt;</code> can’t be escaped at all. The only way to prevent them from
+                    attempting to create a range query is to remove them from the query string entirely.</p>
+            </div>
+
+            <div class="item">
+                <h4 class="m-t-0">Filters</h4>
+                <p>The Filters panel on the left side can be used to visually build advanced search scenarios based on a wide variety of predicates:</p>
+                <ul>
+                    <li>You can filter by Concept Type or Relation Type by choosing one or more items from the dropdown list.</li>
+                    <li>You can filter by one or more properties from the data model by choosing a property and a search predicate.</li>
+                    <li>You can sort the search results using one or more properties.</li>
+                </ul>
+
+                <h4 class="m-t-2">Refinements</h4>
+                <p>Refinements are content-based filters which are made available once the search results are displayed.
+                You can use them to drill-down through search results to find out more detailed information about a particular topic.
+                Once you apply a refinement, it will be displayed above the search results and you can remove it anytime.</p>
+                <p>Each ontology property can act as a refinement, as long as it's configured to be indexed. Just enable "Searchable" and
+                    "Search Facet" for a property and it will be displayed in the refinements section.</p>
+
+                <h4 class="m-t-2">Saving searches</h4>
+                <p>Queries can be saved for later use, but more important, they can be added to the dashboard to build various types of aggregations.</p>
+            </div>
+        </div>
+
+        <div class="carousel-controls">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                <li data-target="#myCarousel" data-slide-to="1"></li>
+                <li data-target="#myCarousel" data-slide-to="2"></li>
+                <li data-target="#myCarousel" data-slide-to="3"></li>
+                <li data-target="#myCarousel" data-slide-to="4"></li>
+            </ol>
+
+            <!-- Left and right controls -->
+            <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="search-results" data-width-preference="searchResults">
+    <div class="panel">
+        <div class="panel-heading">
+            <span class="panel-heading-title">Results (<span class="total-hits"></span>)</span>
+            <div class="panel-heading-controls">
+                <div class="btn-group btn-group-sm" data-toggle="tooltip" data-placement="bottom" title="Export selected records">
+                    <button class="btn btn-info btn-outline dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a class="wordIcon" href="#">WORD</a></li>
+                        <li><a id="xlsIcon" href="#">XLS</a></li>
+                        <li><a class="pdfIcon" href="#">PDF</a></li>
+                        <li><a class="xmlIcon" href="#">XML</a></li>
+                    </ul>
+                </div>
+
+                <select id="res-per-page" class="custom-select form-control">
+                    <option value="10" selected>10 per page</option>
+                    <option value="25">25 per page</option>
+                    <option value="50">50 per page</option>
+                    <option value="100">100 per page</option>
+                    <option value="200">200 per page</option>
+                    <option value="500">500 per page</option>
+                </select>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="content scrollNode">
+                <div class="result-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center search-pagination">
+        <div class="pagination pagination-wrapper">
+             <nav aria-label="Page navigation">
+                <ul class="std pagination"></ul>
+             </nav>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-refinements" style="display: none;">
+    <div class="panel-heading">
+        <div class="panel-heading-title">Refinements</div>
+        <div class="panel-heading-subtitle">Drill down through search results</div>
+    </div>
+    <div class="panel-body">
+        <div class="search-refinements"></div>
+    </div>
+</div>
+
+
+

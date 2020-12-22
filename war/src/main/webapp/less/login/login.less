@@ -1,0 +1,148 @@
+#login {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: #21a79c;
+  background-repeat: no-repeat;
+  background-position: center 0%;
+}
+
+.logo-container {
+  padding-top: 5em;
+
+  .logo-content {
+    margin-left: auto;
+    margin-right: auto;
+    height: 210px;
+
+    background-color: rgba(0, 0, 0, 0.1);
+    margin-bottom: 1em;
+
+    img {
+      width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: white;
+      padding-left: 4em;
+      margin-top: -1em;
+    }
+  }
+}
+
+.authentication {
+  margin: 0 auto;
+  padding-top: 5em;
+
+  .authentication-box {
+    width: 32em;
+    margin: 0 auto;
+    border: 10px solid rgba(0, 0, 0, 0.33);
+    background-clip: padding-box;
+
+    .authentication-box-content {
+      padding: 10px 50px;
+      overflow: hidden;
+      background-color: rgba(0,0,0,0.5) !important;
+    }
+  }
+
+  input.username {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #6e7f8d;
+    border-radius: 5px;
+    box-shadow: none;
+    border: none;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 33px;
+    line-height: 33px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 10px;
+    font-size: 13px;
+    color: #fff;
+    transition: background-color .2s linear;
+
+    &::-webkit-input-placeholder {
+      color: #ddd;
+    }
+
+    &::-moz-placeholder {
+      color: #ddd;
+    }
+
+    &:-ms-input-placeholder {
+      color: #ddd;
+    }
+
+    &:-moz-placeholder {
+      color: #ddd;
+    }
+
+    &:focus {
+      outline: 0;
+      box-shadow: none;
+      background: #81929e
+    }
+  }
+
+  .btn {
+    background-color: #8EC63F !important;
+  }
+
+  .btn:disabled {
+    background-color: #8EC63F;
+    color: rgba(255,255,255, 0.84);
+  }
+}
+
+
+.animatelogin {
+  .menubar-pane {
+    left: @menubar-width * -1;
+    .transition(~"left 0.25s ease-out 0.7s");
+  }
+  .graph-pane {
+    .opacity(0);
+    .transition(~"all 0.25s ease-out 1s");
+  }
+  #login {
+    .username, .logo {
+      .transition(~"all 0.25s ease-in-out 0.2s");
+    }
+    .password {
+      .transition(~"all 0.25s ease-in-out 0.1s");
+    }
+    button {
+      .transition(~"all 0.25s ease-in-out 0s");
+    }
+  }
+}
+
+.animateloginstart {
+  .menubar-pane {
+    left: 0;
+  }
+  .graph-pane {
+    .opacity(100);
+  }
+  #login {
+    .username, .password, button {
+      position: relative;
+      left: 25px;
+      .opacity(0);
+    }
+    .logo {
+      .opacity(0);
+    }
+  }
+}
+

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>root</artifactId>
+        <groupId>io.bigconnect</groupId>
+        <version>4.2.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>web-group</artifactId>
+    <packaging>pom</packaging>
+    <name>BigConnect Explorer</name>
+
+    <scm>
+        <url>https://github.com/mware-solutions/bigconnect-web</url>
+        <connection>scm:git:git://github.com/mware-solutions/bigconnect-web.git</connection>
+        <developerConnection>scm:git:git@github.com:mware-solutions/bigconnect-web.git</developerConnection>
+    </scm>
+
+    <properties>
+        <bigconnect.dw.version>4.2.0</bigconnect.dw.version>
+        <bigconnect.cypherlab.version>4.2.0</bigconnect.cypherlab.version>
+        <atmosphere.version>2.5.9</atmosphere.version>
+        <tomcat.version>8.5.23</tomcat.version>
+        <plugin.frontend>1.8.0</plugin.frontend>
+        <enforcer.skip>true</enforcer.skip>
+        <!-- Node Properties -->
+        <node.version>v10.16.0</node.version>
+        <yarnjs.version>v1.10.1</yarnjs.version>
+        <frontend.installDirectory>${settings.localRepository}/node/${node.version}</frontend.installDirectory>
+    </properties>
+
+    <modules>
+        <module>web-base</module>
+        <module>plugins</module>
+        <module>tomcat-server</module>
+        <module>war</module>
+    </modules>
+
+    <repositories>
+        <repository>
+            <id>snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.atmosphere</groupId>
+                <artifactId>atmosphere-annotations</artifactId>
+                <version>${atmosphere.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.atmosphere</groupId>
+                <artifactId>atmosphere-runtime</artifactId>
+                <version>${atmosphere.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>transport</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codelibs.elasticsearch.module</groupId>
+            <artifactId>lang-painless</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.11.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.11.2</version>
+        </dependency>
+    </dependencies>
+
+    <!--
+        This execution only works when at this level. It really belongs in 'war/pom.xml', but Maven insists on
+        attempting to download that module's war artifact during the clean phase, which makes no sense.
+    -->
+    <profiles>
+        <profile>
+            <id>clean-webapp</id>
+            <properties>
+                <webapp.dir>${basedir}/war/src/main/webapp</webapp.dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>${plugin.maven.antrun.version}</version>
+                        <inherited>false</inherited>
+                        <executions>
+                            <execution>
+                                <phase>clean</phase>
+                                <configuration>
+                                    <target>
+                                        <delete dir="${webapp.dir}/jsc"/>
+                                        <delete dir="${webapp.dir}/css"/>
+                                        <delete dir="${webapp.dir}/libs"/>
+                                        <delete dir="${webapp.dir}/node_modules"/>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

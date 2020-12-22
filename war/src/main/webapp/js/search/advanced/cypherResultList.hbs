@@ -1,0 +1,44 @@
+<div class="search-results" data-width-preference="searchResults">
+    <div class="panel">
+        <div class="panel-heading">
+            <span class="panel-heading-title">Results (<span class="total-hits"></span>, query time: <span class="query-time"></span>)</span>
+            <div class="panel-heading-controls">
+                <div class="btn-group btn-group-sm" data-toggle="tooltip" data-placement="bottom" title="Export selected records">
+                    <button class="btn btn-info btn-outline dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-download"></i></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a class="wordIcon" href="#">WORD</a></li>
+                        <li><a id="xlsIcon" href="#">XLS</a></li>
+                        <li><a class="pdfIcon" href="#">PDF</a></li>
+                        <li><a class="xmlIcon" href="#">XML</a></li>
+                    </ul>
+                </div>
+
+                <select id="cy-res-per-page" class="custom-select form-control">
+                    <option value="10" selected>10 per page</option>
+                    <option value="25">25 per page</option>
+                    <option value="50">50 per page</option>
+                    <option value="100">100 per page</option>
+                    <option value="200">200 per page</option>
+                    <option value="500">500 per page</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <div class="content scrollNode">
+                <div class="result-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center search-pagination">
+        <div class="pagination pagination-wrapper">
+            <nav aria-label="Page navigation">
+                <ul class="cy pagination"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+

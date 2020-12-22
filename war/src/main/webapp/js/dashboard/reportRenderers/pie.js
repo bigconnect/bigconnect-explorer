@@ -1,0 +1,353 @@
+/*
+ * This file is part of the BigConnect project.
+ *
+ * Copyright (c) 2013-2020 MWARE SOLUTIONS SRL
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License version 3
+ * as published by the Free Software Foundation with the addition of the
+ * following permission added to Section 15 as permitted in Section 7(a):
+ * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+ * MWARE SOLUTIONS SRL, MWARE SOLUTIONS SRL DISCLAIMS THE WARRANTY OF
+ * NON INFRINGEMENT OF THIRD PARTY RIGHTS
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses or write to
+ * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA, 02110-1301 USA, or download the license from the following URL:
+ * https://www.gnu.org/licenses/agpl-3.0.txt
+ *
+ * The interactive user interfaces in modified source and object code versions
+ * of this program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU Affero General Public License.
+ *
+ * You can be released from the requirements of the license by purchasing
+ * a commercial license. Buying such a license is mandatory as soon as you
+ * develop commercial activities involving the BigConnect software without
+ * disclosing the source code of your own applications.
+ *
+ * These activities include: offering paid services to customers as an ASP,
+ * embedding the product in a web application, shipping BigConnect with a
+ * closed source product.
+ */
+define([
+    'flight/lib/component',
+    'util/formatters',
+    'util/requirejs/promise!util/service/ontologyPromise',
+    './withRenderer'
+], function(
+    defineComponent,
+    F,
+    ontology,
+    withRenderer) {
+    'use strict';
+
+    const pieCss = `
+        .legend text { font-family: Roboto; font-size: 90%; font-weight: normal; fill: #555; }
+        .legend-item.hidden, .legend-info.hidden { display: none; }
+    `;
+    const PIE_OTHER_CATEGORY = 'PIE_OTHER_CATEGORY',
+        nameAsFloat = _.compose(floatFn, nameFn),
+        nameAsDate = function(d) {
+            return new Date(nameFn(d))
+        };
+
+    return defineComponent(Pie, withRenderer);
+
+    function isOtherCategory(d) {
+        return nameFn(d) === PIE_OTHER_CATEGORY;
+    }
+
+    function clickableFn(d) {
+        return !isOtherCategory(d);
+    }
+
+    function countFn(d) {
+        d = (d.data || d);
+        if (d.orderedByMe && d.value && d.value.nestedResults) {
+            var nestedValues = _.values(d.value.nestedResults);
+            if (nestedValues.length > 0)
+                return nestedValues[0].value;
+            else
+                return d.value.count;
+        } else
+            return d.value.count;
+    }
+
+    function percentageFn(d) {
+        return (d.data || d).value.percentage;
+    }
+
+    function labelFn(d) {
+        return (d.data || d).label;
+    }
+
+    function nameFn(d) {
+        return (d.data || d).name;
+    }
+
+    function floatFn(d) {
+        return parseFloat(d, 10);
+    }
+
+    function Pie() {
+
+        this.processData = function(data) {
+            var self = this,
+                report = this.attr.report,
+                root = data.root[0],
+                buckets = _.map(root.buckets, b => { return { orderedByMe: root.orderedByNestedAgg, ...b}}),
+                totalValue = _.reduce(buckets, function(memo, d) { return memo + countFn(d) }, 0),
+                partitionedData = _.chain(buckets)
+                    .map(function(b) {
+                        var copy = _.extend({}, b);
+                        copy.value = _.extend({}, copy.value, { percentage: countFn(b) / totalValue });
+                        return copy;
+                    })
+                    .partition(function(d) {
+                        return percentageFn(d) > 0.05;
+                    })
+                    .value();
+
+            this.numBuckets = buckets.length;
+            this.isHistogram = root.type === 'histogram';
+            var reportAggregations = report.endpointParameters.aggregations.map(JSON.parse);
+            this.field = reportAggregations[0].field;
+            var ontologyProperty = ontology.properties.byTitle[this.field];
+            this.isDates = ontologyProperty && ontologyProperty.dataType === 'date';
+
+            var sortedData = this.isHistogram ?
+                _.sortBy(partitionedData[0], nameAsFloat) :
+                _.sortBy(partitionedData[0], countFn).reverse();
+
+            if (partitionedData[1].length) {
+                sortedData.push(_.tap({ value: {}, name: '' }, function(otherSlice) {
+                    var otherValue = _.reduce(partitionedData[1], function(memo, d) { return memo + countFn(d); }, 0);
+                    otherSlice.field = data.root[0].field;
+                    otherSlice.value.percentage = otherValue / totalValue;
+                    otherSlice.value.count = otherValue;
+                    otherSlice.name = PIE_OTHER_CATEGORY;
+                    otherSlice.displayName = i18n('dashboard.report.other');
+                }));
+            }
+            this.numLabels = sortedData.length;
+
+            return sortedData;
+        };
+
+        this.render = function renderPieChart(d3, node, data, d3tip) {
+            var $node = $(node);
+            if (!data || !data.length) {
+                $node.empty();
+                return;
+            }
+
+            var self = this,
+                displayName = function(d) {
+                    if (self.isHistogram) {
+                        if (labelFn(d)) {
+                            return labelFn(d);
+                        } else if (isOtherCategory(d)) {
+                            return d.data.displayName;
+                        } else if (self.isDates) {
+                            return [
+                                F.date.dateString(nameAsDate(d)),
+                                F.date.dateString(new Date(nameAsDate(d).getTime() + self.aggregation.interval))
+                            ].join('-')
+                        } else {
+                            return [
+                                F.number.pretty(parseFloat(nameFn(d))),
+                                F.number.pretty(parseFloat(nameFn(d)) + self.aggregation.interval)
+                            ].join('-')
+                        }
+                    }
+                    return d.data.displayName || self.aggregation.displayName(d.data);
+                },
+                width = $node.width(),
+                height = $node.height(),
+                report = this.attr.report,
+                radius = (Math.min(width, height) - this.CHART_PADDING) / 2,
+                pie = d3.layout.pie().sort(null).value(countFn)(data),
+                svg = d3.select(node).selectAll('svg').data([1]).call(function() {
+                    this.enter().append('svg');
+                    this.attr('height', '100%');
+                    this.attr('width', '100%');
+                    this.append('defs').append('style').attr('type', 'text/css').text(pieCss);
+                }),
+                gPie = svg.selectAll('g').data([1]).call(function() {
+                        this.enter().append('g')
+                            .attr('transform', 'translate(' + radius + ',' + radius + ')');
+                    }),
+                slices = gPie.selectAll('path').data(pie),
+                gLegend = svg.select('.legend').size() ? svg.select('.legend') : svg.append('g').classed('legend', true),
+                gLabels = gLegend.selectAll('.legend-item').data(pie, displayName.bind(this)),
+                tip = this.tooltip = this.tooltip || this.createTooltip(svg, d3tip, function(d) {
+                        return d3.format('%')(percentageFn(d)) +
+                            ' (' +
+                            d3.format(self.attr.tipFormat || ',')(countFn(d)) +
+                            ')';
+                    },
+                    function(d) {
+                        var label = displayName(d),
+                            labelLimit = 25;
+                        return label;
+                    }
+                );
+
+            gPie.transition()
+                .duration(self.TRANSITION_DURATION)
+                .attr('transform', 'translate(' + radius + ',' + radius + ')');
+
+            slices.enter().append('path')
+                    .attr('fill', function(d, i) { return self.colors[isOtherCategory(d) ? self.OTHER_COLOR_INDEX : i]; })
+                    .each(function(d) {
+                        this._current = { startAngle: 0, endAngle: 0, padAngle: 0, radius: radius };
+                    })
+                    .on('mousedown', tip.hide)
+                    .on('mouseout', function(d, i) {
+                        tip.hide();
+                        d3.select(this).attr('fill', self.colors[isOtherCategory(d) ? self.OTHER_COLOR_INDEX : i]);
+                    })
+                    .on('mouseover', function(d, i) {
+                        tip.show(d, gPie[0][0]);
+                        d3.select(this).attr('fill', self.highlightColors[isOtherCategory(d) ? self.OTHER_COLOR_INDEX : i]);
+
+                    })
+                    .on('mousemove', function() {
+                        var $tip = $('#' + tip.attr('id'));
+                        tip.style({left: event.pageX - ($tip.width() / 1.5) + 'px', top: event.pageY - ($tip.height() * 1.75) + 'px'});
+                    });
+
+            slices.transition().duration(self.TRANSITION_DURATION)
+                    .attrTween('d', function(a) {
+                        var ia = d3.interpolate(this._current, a),
+                            ir = d3.interpolate(this._current.radius, radius);
+                        this._current = _.extend(a, { radius: radius });
+                        return function(t) {
+                            return d3.svg.arc().outerRadius(ir(t))(ia(t));
+                        };
+                    });
+
+            slices.exit().remove();
+
+            var labelTransform = function(d, i) {
+                return 'translate(0,' + (i * self.LEGEND_LABEL_HEIGHT) + ')';
+            };
+
+            gLabels.enter().append('g').classed('legend-item', true)
+                .call(function() {
+                   this.append('text')
+                       .attr('x', self.LEGEND_COLOR_SWATCH_SIZE + self.LEGEND_SWATCH_TO_TEXT_MARGIN)
+                       .style('text-anchor', 'start')
+                       .text(displayName.bind(self));
+                   this.append('rect')
+                        .attr({ width: self.LEGEND_COLOR_SWATCH_SIZE, height: self.LEGEND_COLOR_SWATCH_SIZE})
+                        .attr('y', -self.LEGEND_COLOR_SWATCH_SIZE);
+                })
+                .attr('transform', labelTransform)
+                .style('opacity', 0)
+                .on('mousedown', tip.hide)
+                .on('mouseout', function(d, i, n) {
+                    tip.hide();
+                    d3.select(slices[0][i]).attr('fill', self.colors[isOtherCategory(d) ? self.OTHER_COLOR_INDEX : i]);
+                })
+                .on('mouseover', function(d, i, n) {
+                    tip.show(d, gPie[0][0]);
+                    d3.select(slices[0][i]).attr('fill', self.highlightColors[isOtherCategory(d) ? self.OTHER_COLOR_INDEX : i]);
+                });
+
+            gLabels.exit().transition().duration(self.TRANSITION_DURATION)
+                .style('opacity', 0)
+                .remove();
+
+            gLabels.order().transition().duration(self.TRANSITION_DURATION)
+                .style('opacity', 1)
+                .attr('transform', labelTransform)
+                .selectAll('rect')
+                .style('fill', function(d, i, n) {
+                    return self.colors[isOtherCategory(d) ? self.OTHER_COLOR_INDEX : n];
+                });
+
+            var maxLabels = (Math.floor(height / self.LEGEND_LABEL_HEIGHT) - 1);
+            gLabels.classed('hidden', function(d, i) {
+                return i >= maxLabels;
+            });
+
+            if (this.numLabels > maxLabels) {
+                var legendInfoItem = gLegend.select('.legend-info');
+                var hiddenBuckets = this.numBuckets - maxLabels;
+
+                if (!legendInfoItem.empty()) {
+                    legendInfoItem.classed('hidden', false)
+                        .select('text').text(i18n('dashboard.report.pie.more', hiddenBuckets));
+                } else {
+                    gLegend.append('g')
+                       .classed({ 'legend-info': true, hidden: false })
+                       .attr('transform', function(d) {
+                           return labelTransform(d, maxLabels);
+                       })
+                       .style('opacity', 0)
+                       .append('text')
+                       .text(i18n('dashboard.report.pie.more', hiddenBuckets))
+                       .attr('x', self.LEGEND_COLOR_SWATCH_SIZE + self.LEGEND_SWATCH_TO_TEXT_MARGIN)
+                       .style('text-anchor', 'start');
+                }
+                gLegend.select('.legend-info').transition().duration(self.TRANSITION_DURATION)
+                    .style('opacity', 1)
+
+            } else {
+                gLegend.select('.legend-info').classed('hidden', true);
+            }
+
+            var gLabelXOffset = 2 * radius + self.CHART_PADDING,
+                availableLegendSpace = width - self.CHART_PADDING - gLabelXOffset,
+                availableLegendTextWidth = availableLegendSpace - self.LEGEND_COLOR_SWATCH_SIZE - self.LEGEND_SWATCH_TO_TEXT_MARGIN;
+            gLegend.attr('transform', 'translate(' + gLabelXOffset + ',' + self.CHART_PADDING + ')');
+            if (availableLegendTextWidth < 10 /* 10 is a totally arbitrary min width */) {
+                gLegend.style('opacity', 0);
+            } else {
+                gLegend.style('opacity', 1);
+                if (gLegend.node().getBBox().width > availableLegendSpace) {
+                    gLegend.selectAll('g:not(.hidden) > text').each(function(d) {
+                        var d3Self = d3.select(this),
+                            text = d3.select(this).text();
+                        while (text.length > 0 && this.getBBox().width > availableLegendTextWidth) {
+                            text = text.substring(0, text.length - 1);
+                            d3Self.text(text + '...');
+                        }
+                    });
+                } else {
+                    gLabels.selectAll('text').text(displayName.bind(self));
+                }
+            }
+
+            if (this.handleClick) {
+                slices.on('click', function(d) {
+                    var filter = {
+                        propertyId: d.data.field,
+                        values: [nameFn(d)],
+                        predicate: 'equal'
+                    }
+                    if (isOtherCategory(d)) {
+                        console.info('Unable to search on other list', d.data.field);
+                        return;
+                    } else if (self.isHistogram) {
+                        filter.values.push(String(nameAsFloat(d) + self.aggregation.interval));
+                        filter.predicate = 'range';
+                    }
+                    self.handleClick({ filters: [filter] });
+                });
+                gLabels.on('click', function(object) {
+                    self.handleClick(object.data);
+                })
+                gLabels.classed('clickable', clickableFn);
+                slices.classed('clickable', clickableFn);
+            }
+        };
+
+    }
+});

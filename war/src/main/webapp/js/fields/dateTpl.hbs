@@ -1,0 +1,20 @@
+{{#if displayTime}}
+  <div class="input-group dateField">
+    <input type="text"
+      data-provide="datepicker"
+      placeholder="{{today}}"
+      value="{{dateString}}"
+      required="required"
+      class="date form-control">
+    <input type="text"
+      placeholder="{{todayTime}}"
+      pattern="\d+(:\d)?(\s*[amAMpmPM])?"
+      required="required"
+      value="{{timeString}}"
+      class="timepicker form-control">
+    <span class="add-on timezone"></span>
+  </div>
+{{else}}
+  <input data-provide="datepicker" placeholder="{{today}}"
+    value="{{dateString}}" type="text" required class="form-control"/>
+{{/if}}
