@@ -20,43 +20,47 @@
         <plugin.maven.war.version>2.4</plugin.maven.war.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>web-base</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.tomcat.embed</groupId>
-                    <artifactId>tomcat-embed-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.tomcat.embed</groupId>
-                    <artifactId>tomcat-embed-websocket</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.tomcat.embed</groupId>
-                    <artifactId>tomcat-embed-jasper</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.tomcat.embed</groupId>
-                    <artifactId>tomcat-embed-el</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk14</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-		<dependency>
-			<groupId>io.bigconnect</groupId>
-			<artifactId>tomcat-server</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-    </dependencies>
-
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${plugin.frontend}</version>
+                <configuration>
+                    <workingDirectory>src/main/webapp</workingDirectory>
+                    <installDirectory>${frontend.installDirectory}</installDirectory>
+                    <nodeVersion>${node.version}</nodeVersion>
+                    <yarnVersion>${yarnjs.version}</yarnVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>yarn install</id>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                            <goal>yarn</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>grunt deps</id>
+                        <goals>
+                            <goal>grunt</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>deps</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>grunt development</id>
+                        <goals>
+                            <goal>grunt</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>development</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -142,52 +146,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>build-webapp</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <version>${plugin.frontend}</version>
-                        <configuration>
-                            <workingDirectory>src/main/webapp</workingDirectory>
-                            <installDirectory>${frontend.installDirectory}</installDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>yarn install</id>
-                                <goals>
-                                    <goal>yarn</goal>
-                                </goals>
-                            </execution>
-							<execution>
-                                <id>grunt deps</id>
-                                <goals>
-                                    <goal>grunt</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>deps</arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>grunt development</id>
-                                <goals>
-                                    <goal>grunt</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>development</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
         <profile>
             <id>production</id>
             <build>

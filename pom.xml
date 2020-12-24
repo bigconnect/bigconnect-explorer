@@ -24,11 +24,11 @@
         <bigconnect.cypherlab.version>4.2.0</bigconnect.cypherlab.version>
         <atmosphere.version>2.5.9</atmosphere.version>
         <tomcat.version>8.5.23</tomcat.version>
-        <plugin.frontend>1.8.0</plugin.frontend>
+        <plugin.frontend>1.11.0</plugin.frontend>
         <enforcer.skip>true</enforcer.skip>
         <!-- Node Properties -->
         <node.version>v10.16.0</node.version>
-        <yarnjs.version>v1.10.1</yarnjs.version>
+        <yarnjs.version>v1.22.10</yarnjs.version>
         <frontend.installDirectory>${settings.localRepository}/node/${node.version}</frontend.installDirectory>
     </properties>
 
