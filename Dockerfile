@@ -3,7 +3,7 @@
 ##################
 FROM maven:3.6-jdk-11 as builder
 
-## build core
+# build core
 WORKDIR /core
 RUN git clone https://github.com/bigconnect/bigconnect.git \
     && cd bigconnect \
@@ -27,7 +27,7 @@ ENV BIGCONNECT_DIR=/bc
 ENV JAVA_OPTS="-Xms4g -Xmx4g -server -XX:+UseG1GC -Dfile.encoding=utf8 -Djava.awt.headless=true"
 RUN mkdir -p ${BIGCONNECT_DIR}/datastore
 
-COPY --from=builder /source/release/target/explorer/explorer ${BIGCONNECT_DIR}
+COPY --from=builder /explorer/release/target/explorer/explorer ${BIGCONNECT_DIR}
 
 VOLUME /bc/datastore
 
