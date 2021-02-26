@@ -43,6 +43,8 @@ import com.mware.core.bootstrap.BootstrapBindingProvider;
 import com.mware.core.config.Configuration;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
+import com.mware.ge.cypher.connection.DefaultNetworkConnectionTracker;
+import com.mware.ge.cypher.connection.NetworkConnectionTracker;
 import com.mware.geocoder.DefaultGeocoderRepository;
 import com.mware.geocoder.GeocoderRepository;
 import com.mware.http.CachingHttpRepository;
@@ -80,6 +82,9 @@ public class ApplicationBindingProvider implements BootstrapBindingProvider {
                 .in(Scopes.SINGLETON);
         binder.bind(GeocoderRepository.class)
                 .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, DefaultGeocoderRepository.class))
+                .in(Scopes.SINGLETON);
+        binder.bind(NetworkConnectionTracker.class)
+                .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, DefaultNetworkConnectionTracker.class))
                 .in(Scopes.SINGLETON);
     }
 }
