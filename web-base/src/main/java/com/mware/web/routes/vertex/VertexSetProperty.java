@@ -78,6 +78,7 @@ import com.mware.web.parameterProviders.JustificationText;
 import com.mware.web.routes.SetPropertyBase;
 import com.mware.web.util.VisibilityValidator;
 import com.mware.workspace.WorkspaceHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
@@ -190,7 +191,13 @@ public class VertexSetProperty extends SetPropertyBase implements ParameterizedH
         );
         graph.flush();
 
-        auditService.auditGenericEvent(user, workspaceId, AuditEventType.SET_PROPERTY, propertyName, valueStr);
+        StringBuilder auditValue = new StringBuilder();
+        if (!StringUtils.isEmpty(valueStr))
+            auditValue.append(valueStr);
+        else
+            auditValue.append(valuesStr);
+
+        auditService.auditGenericEvent(user, workspaceId, AuditEventType.SET_PROPERTY, propertyName, auditValue.toString());
 
         if (!autoPublish) {
             // add the vertex to the workspace so that the changes show up in the diff panel

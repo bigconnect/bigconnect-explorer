@@ -21,12 +21,14 @@
                 <configuration>
                     <workingDirectory>src/main/resources/com/mware/web/product/chart</workingDirectory>
                     <installDirectory>${frontend.installDirectory}</installDirectory>
+                    <nodeVersion>v10.22.0</nodeVersion>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>yarn install</id>
+                        <id>npm install</id>
                         <goals>
-                            <goal>yarn</goal>
+                            <goal>install-node-and-npm</goal>
+                            <goal>npm</goal>
                         </goals>
                     </execution>
                     <execution>
