@@ -83,7 +83,7 @@ define([
                 })
                 .appendTo(document.body);
 
-            // this.on('click', this.onClick);
+            this.on('click', this.onClick);
             // this.on('dblclick', this.onClick);
             this.on('clipboardClear', this.clear);
             this.on('clipboardSet', this.set);

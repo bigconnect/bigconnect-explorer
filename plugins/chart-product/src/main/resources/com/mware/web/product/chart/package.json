@@ -5,16 +5,14 @@
   "author": "MWARE SOLUTIONS SRL",
   "license": "BigConnect License",
   "private": true,
-
   "dependencies": {
     "history": "^4.7.2",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "plotly.js": "^1.57.1",
     "react-plotly.js": "^2.5.0",
-    "react-chart-editor":  "^0.42.0"
+    "react-chart-editor": "^0.42.0"
   },
-
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "babel-loader": "^8.2.1",
