@@ -319,6 +319,19 @@ define([
                                 clicked.actionPayload &&
                                 clicked.actionPayload.url) {
                                 window.open(clicked.actionPayload.url);
+                            } else if (clicked.actionEvent === 'OBJECT_ID' &&
+                                clicked.actionPayload &&
+                                clicked.actionPayload.id) {
+                                self.trigger(document, 'selectObjects', {
+                                    vertexIds: [],
+                                    edgeIds: []
+                                });
+                                setTimeout(() => {
+                                    self.trigger(document, 'selectObjects', {
+                                        vertexIds: [clicked.actionPayload.id],
+                                        edgeIds: []
+                                    });
+                                },100);
                             } else {
                                 _.defer(function() {
                                     self.trigger(clicked.actionEvent, clicked.actionPayload);

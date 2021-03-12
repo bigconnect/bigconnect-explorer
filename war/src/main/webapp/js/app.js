@@ -429,7 +429,9 @@ define([
                 require(['notifications/notifications'], function(Notifications) {
                     Notifications.attachTo(self.$node, {
                         emptyMessage: false,
-                        showInformational: false
+                        showInformational: true,
+                        allowSystemDismiss: true,
+                        showUserDismissed: false
                     });
                 });
             });
