@@ -88,7 +88,8 @@ public class UnresolveTermEntity implements ParameterizedHandler {
             throw new BcResourceNotFoundException("Could not find term mention with id: " + termMentionId);
         }
 
-        Vertex resolvedVertex = singleOrDefault(termMention.getVertices(Direction.OUT, BcSchema.TERM_MENTION_LABEL_RESOLVED_TO, authorizations), null);
+        Authorizations authorizationsWithTermMention = termMentionRepository.getAuthorizations(authorizations);
+        Vertex resolvedVertex = singleOrDefault(termMention.getVertices(Direction.OUT, BcSchema.TERM_MENTION_LABEL_RESOLVED_TO, authorizationsWithTermMention), null);
         if (resolvedVertex == null) {
             throw new BcResourceNotFoundException("Could not find resolved vertex from term mention: " + termMentionId);
         }

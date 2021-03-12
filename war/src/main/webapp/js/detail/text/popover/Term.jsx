@@ -182,6 +182,7 @@ define([
                 onHoverTerm,
                 onFocusElements,
                 canEdit,
+                canUnresolve,
                 termMentionFor,
                 sandboxStatus,
                 conceptType,
@@ -195,14 +196,13 @@ define([
 
             if (element) {
                 actions.push(
-                        { label: i18n('detail.text.terms.open'), title: i18n('detail.text.terms.open.tooltip'), handler: onOpen },
-                        { label: i18n('detail.text.terms.openfullscreen'), title: i18n('detail.text.terms.openfullscreen.tooltip'), handler: onFullscreen }
-                    );
+                    { label: i18n('detail.text.terms.open'), title: i18n('detail.text.terms.open.tooltip'), handler: onOpen },
+                    // { label: i18n('detail.text.terms.openfullscreen'), title: i18n('detail.text.terms.openfullscreen.tooltip'), handler: onFullscreen }
+                );
 
-                    const canUnresolve = canEdit && termMentionFor === 'VERTEX' && sandboxStatus !== 'PUBLIC';
-                if (canUnresolve) {
-                        actions.push({ label: i18n('detail.text.terms.unresolve'), title: i18n('detail.text.terms.unresolve.tooltip'), handler: onUnresolve, classes: { 'btn-danger': true }})
-                    }
+                if (canEdit && canUnresolve && termMentionFor === 'VERTEX') {
+                    actions.push({ label: i18n('detail.text.terms.unresolve'), title: i18n('detail.text.terms.unresolve.tooltip'), handler: onUnresolve, classes: { 'btn-danger': true }})
+                }
             }
 
             return (
@@ -297,6 +297,7 @@ define([
                 onFocusElements,
                 onHoverTerm: this.onHoverTerm,
                 canEdit: privileges.EDIT,
+                canUnresolve: privileges.UNRESOLVE
             };
 
             switch (type) {

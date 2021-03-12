@@ -34,4 +34,4 @@
  * embedding the product in a web application, shipping BigConnect with a
  * closed source product.
  */
-var PRIVILEGES = 'READ COMMENT EDIT PUBLISH SEARCH_SAVE_GLOBAL HISTORY_READ ADMIN ONTOLOGY_ADD ONTOLOGY_PUBLISH'.split(' ')
+var PRIVILEGES = 'READ COMMENT EDIT PUBLISH SEARCH_SAVE_GLOBAL UNRESOLVE ADMIN ONTOLOGY_ADD ONTOLOGY_PUBLISH'.split(' ')

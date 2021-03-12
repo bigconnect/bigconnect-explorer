@@ -202,10 +202,10 @@ public class Router extends HttpServlet {
             app.post("/vertex/export-xls", authenticator, csrfProtector, EditPrivilegeFilter.class, ExportToXls.class);
             app.post("/vertex/export-raw-search", authenticator, csrfProtector, EditPrivilegeFilter.class, ExportRawSearch.class);
 
-            app.post("/vertex/unresolve-term", authenticator, csrfProtector, EditPrivilegeFilter.class, UnresolveTermEntity.class);
-            app.post("/vertex/unresolve-all-terms", authenticator, csrfProtector, EditPrivilegeFilter.class, VertexUnresolveTermMentions.class);
+            app.post("/vertex/unresolve-term", authenticator, csrfProtector, UnresolvePrivilegeFilter.class, UnresolveTermEntity.class);
+            app.post("/vertex/unresolve-all-terms", authenticator, csrfProtector, UnresolvePrivilegeFilter.class, VertexUnresolveTermMentions.class);
             app.post("/vertex/resolve-detected-object", authenticator, csrfProtector, EditPrivilegeFilter.class, ResolveDetectedObject.class);
-            app.post("/vertex/unresolve-detected-object", authenticator, csrfProtector, EditPrivilegeFilter.class, UnresolveDetectedObject.class);
+            app.post("/vertex/unresolve-detected-object", authenticator, csrfProtector, UnresolvePrivilegeFilter.class, UnresolveDetectedObject.class);
             app.get("/vertex/detected-objects", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexGetDetectedObjects.class);
             app.get("/vertex/property", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexGetPropertyValue.class);
             app.get("/vertex/property/history", authenticator, csrfProtector, HistoryReadPrivilegeFilter.class, VertexGetPropertyHistory.class);
