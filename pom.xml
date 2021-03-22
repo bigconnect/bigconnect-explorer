@@ -140,4 +140,36 @@
             </build>
         </profile>
     </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>useLastCommittedRevision</id>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                        <configuration>
+                            <useLastCommittedRevision>true</useLastCommittedRevision>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-formatted-timestamp</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>create-timestamp</goal>
+                        </goals>
+                        <configuration>
+                            <timestampFormat>EEEE, MMMM dd, yyyy HH:mm:ss.sss zzz</timestampFormat>
+                            <timestampPropertyName>build.timestamp.formatted</timestampPropertyName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
