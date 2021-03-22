@@ -89,13 +89,14 @@
       .theme(@notification-info);
 
       &:before {
-        content: '';
+        content: ' ';
+        background-image: url("../../img/info-icon.png");
+        background-size: cover;
         position: absolute;
-        width: 12px;
-        height: 12px;
-        background: mix(@notification-info, white, 40%);
+        width: 15px;
+        height: 15px;
         left: 9px;
-        top: 50%;
+        top: 15px;
         border-radius: 6px;
         margin-top: -5px;
       }
@@ -170,9 +171,6 @@
       &.informational {
         h1 {
           color: @notification-info;
-        }
-        &:before {
-          background: @notification-info;
         }
       }
 

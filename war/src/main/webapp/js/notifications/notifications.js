@@ -363,12 +363,12 @@ define([
                     this.select('button').style('display', function(n) {
                         return self.canDismissNotification(n) ? '' : 'none';
                     });
-                    this.select('h1').text(function(n) {
+                    this.select('h1').html(function(n) {
                         return n.title
                     }).style('cursor', function(n) {
                         return n.actionPayload ? 'pointer' : 'default';
                     });
-                    this.select('h2').text(function(n) {
+                    this.select('h2').html(function(n) {
                         return n.message
                     }).style('cursor', function(n) {
                         return n.actionPayload ? 'pointer' : 'default';

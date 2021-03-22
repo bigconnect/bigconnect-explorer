@@ -38,6 +38,7 @@ package com.mware.web.routes.notification;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.model.notification.Notification;
 import com.mware.core.model.notification.SystemNotification;
 import com.mware.core.model.notification.SystemNotificationRepository;
 import com.mware.core.model.notification.UserNotificationRepository;
@@ -67,7 +68,7 @@ public class Notifications implements ParameterizedHandler {
 
     @Handle
     public JSONObject handle(
-            @Optional(name = "futureDays", defaultValue = "10") int futureDays,
+            @Optional(name = "futureDays", defaultValue = "0") int futureDays,
             User user
     ) throws Exception {
         JSONObject notifications = new JSONObject();
@@ -89,8 +90,8 @@ public class Notifications implements ParameterizedHandler {
 
         JSONArray userNotifications = new JSONArray();
         userNotificationRepository.getActiveNotifications(user)
-                .map(notification -> notification.toJSONObject())
-                .forEach(json -> userNotifications.put(json));
+                .map(Notification::toJSONObject)
+                .forEach(userNotifications::put);
 
         notifications.put("system", systemNotifications);
         notifications.put("user", userNotifications);
