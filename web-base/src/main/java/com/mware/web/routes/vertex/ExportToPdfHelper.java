@@ -47,6 +47,7 @@ import com.itextpdf.text.pdf.FontSelector;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcException;
+import com.mware.core.model.file.FileSystemRepository;
 import com.mware.core.model.schema.SchemaProperty;
 import com.mware.core.model.schema.SchemaRepository;
 import com.mware.ge.Authorizations;
@@ -77,14 +78,16 @@ public class ExportToPdfHelper {
     public static final String EXPORT_MIME_TYPE = "application/pdf";
 
     private final Configuration configuration;
+    private FileSystemRepository fileSystemRepository;
     private final Graph graph;
     private final SchemaRepository schemaRepository;
 
     @Inject
-    public ExportToPdfHelper(Graph graph, SchemaRepository schemaRepository, Configuration configuration) {
+    public ExportToPdfHelper(Graph graph, SchemaRepository schemaRepository, Configuration configuration, FileSystemRepository fileSystemRepository) {
         this.graph = graph;
         this.schemaRepository = schemaRepository;
         this.configuration = configuration;
+        this.fileSystemRepository = fileSystemRepository;
     }
 
     public InputStream export(List<String> vertices, Authorizations authorizations) {
@@ -92,11 +95,10 @@ public class ExportToPdfHelper {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             PdfWriter pdfWriter = PdfWriter.getInstance(document, out);
-            String fontFilePath = configuration.get("fontfile.path",null);
-            if (fontFilePath == null) {
+            File fontFile = fileSystemRepository.getLocalFileFor("/arialuni.ttf");
+            if (fontFile == null) {
                 throw new BcException("No font configured, use fontfile.path config property!");
             }
-            File fontFile = new File(fontFilePath);
             pdfWriter.getAcroForm().setNeedAppearances(true);
             BaseFont unicode = BaseFont.createFont(fontFile.getAbsolutePath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
