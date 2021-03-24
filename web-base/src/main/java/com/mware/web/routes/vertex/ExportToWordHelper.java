@@ -37,9 +37,15 @@
 package com.mware.web.routes.vertex;
 
 import com.google.inject.Singleton;
+import com.mware.core.model.properties.BcSchema;
+import com.mware.core.model.properties.RawObjectSchema;
+import com.mware.core.model.schema.Concept;
+import com.mware.core.model.schema.SchemaConstants;
 import com.mware.core.model.schema.SchemaProperty;
 import com.mware.core.model.schema.SchemaRepository;
 import com.mware.core.model.workQueue.WebQueueRepository;
+import com.mware.core.util.BcLogger;
+import com.mware.core.util.BcLoggerFactory;
 import com.mware.ge.Authorizations;
 import com.mware.ge.Graph;
 import com.mware.ge.Property;
@@ -47,12 +53,26 @@ import com.mware.ge.Vertex;
 import com.mware.ge.tools.GraphToolBase;
 import com.mware.ge.values.storable.DateTimeValue;
 import com.mware.ge.values.storable.StreamingPropertyValue;
+import com.mware.web.framework.handlers.MimeType;
+import com.mware.web.routes.resource.ImageUtils;
+import com.mware.web.routes.structuredIngest.MimeTypes;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.Units;
+import org.apache.poi.xwpf.usermodel.Document;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.keycloak.common.util.MimeTypeUtil;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
 
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -63,6 +83,7 @@ import static com.mware.web.routes.vertex.ExportUtils.CHARS_TO_AVOID;
 
 @Singleton
 public class ExportToWordHelper {
+    private static final BcLogger LOGGER = BcLoggerFactory.getLogger(ExportToWordHelper.class);
     public static final String EXPORT_FILE_EXT = ".docx";
     public static final String EXPORT_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
@@ -96,15 +117,23 @@ public class ExportToWordHelper {
                 XWPFRun run;
                 try {
                     List<ImmutablePair<String, String>> addToTheEnd = new ArrayList<>();
+
+                    Concept concept = schemaRepository.getConceptByName(v.getConceptType(), SchemaRepository.PUBLIC);
+                    if (concept.getIntents() != null && ArrayUtils.contains(concept.getIntents(), SchemaConstants.INTENT_ENTITY_IMAGE)) {
+                        String mimeType = BcSchema.MIME_TYPE_METADATA.getMetadataValue(BcSchema.RAW.getProperty(v));
+                        StreamingPropertyValue raw = BcSchema.RAW.getPropertyValue(v);
+                        addImage(document, raw.getInputStream(), mimeType);
+                    }
+
                     for (SchemaProperty prop : schemaRepository.getProperties(SchemaRepository.PUBLIC)) {
                         if (prop.getUserVisible() && v.getProperty(prop.getName()) != null && v.getProperty(prop.getName()).getValue() != null) {
                             String displayName = prop.getDisplayName();
                             for (String stringToAvoid : CHARS_TO_AVOID) {
-                                displayName = displayName.replace(stringToAvoid,"");
+                                displayName = displayName.replace(stringToAvoid, "");
                             }
 
                             if (v.getProperty(prop.getName()).getValue() instanceof StreamingPropertyValue) {
-                                StreamingPropertyValue _value = (StreamingPropertyValue)v.getProperty(prop.getName()).getValue();
+                                StreamingPropertyValue _value = (StreamingPropertyValue) v.getProperty(prop.getName()).getValue();
                                 StringWriter stringWriter = new StringWriter();
                                 org.apache.commons.io.IOUtils.copy(_value.getInputStream(), stringWriter, "utf-8");
                                 String value = stringWriter.toString();
@@ -122,9 +151,8 @@ public class ExportToWordHelper {
                     for (ImmutablePair<String, String> pair : addToTheEnd) {
                         addParagraph(document, pair.getLeft(), pair.getRight());
                     }
-                    paragraph = document.createParagraph();
-                    run = paragraph.createRun();
-                    run.setText("\n\n\n");
+
+                    addSeparator(document);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -150,6 +178,58 @@ public class ExportToWordHelper {
         run.setBold(true);
         run.setFontSize(14);
         run.setText(displayName + ": " + value);
+    }
+
+    private void addSeparator(XWPFDocument document) {
+        XWPFParagraph paragraph = document.createParagraph();
+        XWPFRun run = paragraph.createRun();
+        run.setFontSize(14);
+        run.setText("--------------------------------------------------------------------------------------");
+    }
+
+    private void addImage(XWPFDocument document, InputStream image, String mimeType) {
+        int type = mimeTypeToDocumentImageType(mimeType);
+        if (type < 0)
+            return;
+
+        XWPFParagraph p = document.createParagraph();
+        XWPFRun r = p.createRun();
+        try {
+            BufferedImage bufferedImage = ImageIO.read(image);
+            int[] newImageDims = ImageUtils.getScaledDimension(bufferedImage.getWidth(), bufferedImage.getHeight(), 300, 300);
+            Image scaledInstance = bufferedImage.getScaledInstance(newImageDims[0], newImageDims[1], Image.SCALE_SMOOTH);
+            BufferedImage dimg = new BufferedImage(newImageDims[0], newImageDims[1], BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = dimg.createGraphics();
+            g2d.drawImage(scaledInstance, 0, 0, null);
+            g2d.dispose();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(dimg, "png", baos);
+
+            r.addPicture(new ByteArrayInputStream(baos.toByteArray()), type, "image", Units.toEMU(newImageDims[0]), Units.toEMU(newImageDims[1]));
+            r.addCarriageReturn();
+        } catch (Exception e) {
+            LOGGER.warn("Could not add image to Word document: "+e.getMessage());
+        }
+    }
+
+
+
+    private int mimeTypeToDocumentImageType(String mimeType) {
+        switch (mimeType) {
+            case "image/bmp":
+                return Document.PICTURE_TYPE_BMP;
+            case "image/gif":
+                return Document.PICTURE_TYPE_GIF;
+            case "image/jpeg":
+                return Document.PICTURE_TYPE_JPEG;
+            case "image/png":
+                return Document.PICTURE_TYPE_PNG;
+            case "image/tiff":
+                return Document.PICTURE_TYPE_TIFF;
+            default:
+                return -1;
+        }
     }
 
     public static String getExportFileName() {
