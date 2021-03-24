@@ -57,7 +57,6 @@ import com.mware.workspace.WorkspaceHelper;
 
 import static com.mware.ge.util.IterableUtils.singleOrDefault;
 
-@Singleton
 public class UnresolveTermEntity implements ParameterizedHandler {
     private static final BcLogger LOGGER = BcLoggerFactory.getLogger(UnresolveTermEntity.class);
     private final TermMentionRepository termMentionRepository;

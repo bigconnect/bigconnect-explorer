@@ -529,6 +529,10 @@ define([
         unresolveTerm: function(params) {
             return ajax('POST', '/vertex/unresolve-term', params);
         },
+        deleteTerm: function(params) {
+            return ajax('POST', '/vertex/delete-term', params);
+        },
+
 		editText:  function(params) {
             return ajax('POST', '/vertex/edit-text', params);
         },

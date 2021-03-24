@@ -47,7 +47,8 @@ define([
     './forms/Resolve',
     './forms/Unresolve',
     './forms/Property',
-    './forms/Relationship'
+    './forms/Relationship',
+    './forms/Delete'
 ], function(
     createReactClass,
     PropTypes,
@@ -61,7 +62,8 @@ define([
     Resolve,
     Unresolve,
     Property,
-    Relationship) {
+    Relationship,
+    Delete) {
 
     const THING = ONTOLOGY_CONSTANTS.THING_CONCEPT;
 
@@ -116,6 +118,7 @@ define([
                 onFullscreen,
                 onComment,
                 onUnresolve: this.onUnresolve,
+                onDelete: this.onDelete,
                 onResolve: this.onResolve,
                 onProperty: this.onProperty
             };
@@ -145,6 +148,16 @@ define([
                     return (
                         <Unresolve
                             onUnresolve={this.doUnresolve}
+                            onCancel={this.onViewList}
+                            {...viewing.data}
+                            {...rest}
+                            {...formState} />
+                    );
+
+                case 'delete':
+                    return (
+                        <Delete
+                            onDelete={this.doDelete}
                             onCancel={this.onViewList}
                             {...viewing.data}
                             {...rest}
@@ -190,6 +203,11 @@ define([
                 viewing: { type: 'unresolve', data: this._dataForTerm(term) }
             })
         },
+        onDelete(term) {
+            this.setState({
+                viewing: { type: 'delete', data: this._dataForTerm(term) }
+            })
+        },
         onResolve(term) {
             this.setState({
                 viewing: { type: 'resolve', data: this._dataForTerm(term) }
@@ -220,6 +238,9 @@ define([
         },
         doUnresolve(termMentionId) {
             this._do('vertex', 'unresolveTerm', { termMentionId })
+        },
+        doDelete(termMentionId) {
+            this._do('vertex', 'deleteTerm', { termMentionId })
         },
         doProperty(data) {
             const { element, property } = data;

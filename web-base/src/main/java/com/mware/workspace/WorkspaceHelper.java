@@ -156,24 +156,26 @@ public class WorkspaceHelper {
         String resolveEdgeId = BcSchema.TERM_MENTION_RESOLVED_EDGE_ID.getPropertyValue(termMention, null);
         if (resolveEdgeId != null) {
             Edge resolveEdge = graph.getEdge(resolveEdgeId, authorizations);
-            long beforeDeletionTimestamp = System.currentTimeMillis() - 1;
-            graph.deleteEdge(resolveEdge, authorizations);
-            graph.flush();
+            if (resolveEdge != null) {
+                long beforeDeletionTimestamp = System.currentTimeMillis() - 1;
+                graph.deleteEdge(resolveEdge, authorizations);
+                graph.flush();
 
-            webQueueRepository.broadcastEdgeDeletion(resolveEdge);
+                webQueueRepository.broadcastEdgeDeletion(resolveEdge);
 
-            webQueueRepository.broadcastPropertyChange(resolveEdge, null, null, null);
+                webQueueRepository.broadcastPropertyChange(resolveEdge, null, null, null);
 
-            workQueueRepository.pushGraphPropertyQueue(
-                    resolveEdge,
-                    null,
-                    null,
-                    null,
-                    null,
-                    Priority.HIGH,
-                    ElementOrPropertyStatus.DELETION,
-                    beforeDeletionTimestamp
-            );
+                workQueueRepository.pushGraphPropertyQueue(
+                        resolveEdge,
+                        null,
+                        null,
+                        null,
+                        null,
+                        Priority.HIGH,
+                        ElementOrPropertyStatus.DELETION,
+                        beforeDeletionTimestamp
+                );
+            }
         }
 
         termMentionRepository.delete(termMention, authorizations);

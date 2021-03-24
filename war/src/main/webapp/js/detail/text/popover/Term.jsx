@@ -179,6 +179,7 @@ define([
                 onOpen,
                 onFullscreen,
                 onUnresolve,
+                onDelete,
                 onHoverTerm,
                 onFocusElements,
                 canEdit,
@@ -202,6 +203,7 @@ define([
 
                 if (canEdit && canUnresolve && termMentionFor === 'VERTEX') {
                     actions.push({ label: i18n('detail.text.terms.unresolve'), title: i18n('detail.text.terms.unresolve.tooltip'), handler: onUnresolve, classes: { 'btn-danger': true }})
+                    actions.push({ label: i18n('detail.text.terms.delete'), title: i18n('detail.text.terms.delete.tooltip'), handler: onDelete, classes: { 'btn-danger': true }})
                 }
             }
 

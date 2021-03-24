@@ -203,6 +203,7 @@ public class Router extends HttpServlet {
             app.post("/vertex/export-raw-search", authenticator, csrfProtector, EditPrivilegeFilter.class, ExportRawSearch.class);
 
             app.post("/vertex/unresolve-term", authenticator, csrfProtector, UnresolvePrivilegeFilter.class, UnresolveTermEntity.class);
+            app.post("/vertex/delete-term", authenticator, csrfProtector, UnresolvePrivilegeFilter.class, DeleteTermEntity.class);
             app.post("/vertex/unresolve-all-terms", authenticator, csrfProtector, UnresolvePrivilegeFilter.class, VertexUnresolveTermMentions.class);
             app.post("/vertex/resolve-detected-object", authenticator, csrfProtector, EditPrivilegeFilter.class, ResolveDetectedObject.class);
             app.post("/vertex/unresolve-detected-object", authenticator, csrfProtector, UnresolvePrivilegeFilter.class, UnresolveDetectedObject.class);
