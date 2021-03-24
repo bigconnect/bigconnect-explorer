@@ -40,7 +40,7 @@ define([
 ], function(defineComponent) {
     'use strict';
 
-    const IGNORE_SELECTORS = 'input,select,option,textarea,.bigconnect-allow-focus,.bigconnect-allow-focus *,.Select *,.ReactCodeMirror *, .org-bigconnect-chartdesigner *, .ant-picker, .ant-picker-time-panel-cell-inner';
+    const IGNORE_SELECTORS = 'input,select,option,textarea,.bigconnect-allow-focus,.bigconnect-allow-focus *,.Select *,.ReactCodeMirror *, .org-bigconnect-chartdesigner *, .ant-picker, .ant-picker-cell-inner, .ant-picker-time-panel-cell-inner';
     const WAIT_FOR_DBLCLICK_SELECTORS = '.bc-allow-dblclick-selection, .bc-allow-dblclick-selection *';
 
     return defineComponent(ClipboardManager);
