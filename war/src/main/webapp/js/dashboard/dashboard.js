@@ -377,10 +377,6 @@ define([
                     this.$node.find('.item-content').trigger('reflow');
                 }
             });
-
-            window.setInterval(function(){
-                self.trigger('dashboardRefreshData');
-            }, 5*60*1000); //5 min
         });
 
         this.onToolbarExtensionClick = function(event) {
