@@ -38,8 +38,8 @@ package com.mware.web.routes.search;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.model.search.SearchRepository;
 import com.mware.core.user.User;
-import com.mware.search.SearchRepository;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Optional;

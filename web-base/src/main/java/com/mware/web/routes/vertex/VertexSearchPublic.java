@@ -38,16 +38,16 @@ package com.mware.web.routes.vertex;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.model.clientapi.dto.ClientApiElementSearchResponse;
 import com.mware.core.model.clientapi.dto.ClientApiGeObject;
 import com.mware.core.model.role.GeAuthorizationRepository;
 import com.mware.core.model.schema.SchemaRepository;
+import com.mware.core.model.search.*;
 import com.mware.core.security.AuditService;
 import com.mware.ge.Authorizations;
 import com.mware.ge.Graph;
-import com.mware.search.*;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
-import com.mware.web.model.ClientApiElementSearchResponse;
 import com.mware.web.routes.search.WebSearchOptionsFactory;
 
 import javax.servlet.http.HttpServletRequest;

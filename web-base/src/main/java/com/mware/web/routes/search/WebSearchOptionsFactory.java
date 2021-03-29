@@ -36,7 +36,7 @@
  */
 package com.mware.web.routes.search;
 
-import com.mware.search.SearchOptions;
+import com.mware.core.model.search.SearchOptions;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;

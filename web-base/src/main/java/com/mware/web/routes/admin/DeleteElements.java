@@ -38,16 +38,16 @@ package com.mware.web.routes.admin;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.model.clientapi.dto.ClientApiSearch;
+import com.mware.core.model.longRunningProcess.DeleteRestoreElementsQueueItem;
 import com.mware.core.model.longRunningProcess.LongRunningProcessRepository;
+import com.mware.core.model.search.SearchRepository;
 import com.mware.core.user.User;
 import com.mware.ge.Authorizations;
-import com.mware.search.SearchRepository;
-import com.mware.search.worker.backupRestore.DeleteRestoreElementsLRPQueueItem;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
 import com.mware.web.model.ClientApiLongRunningProcessSubmitResponse;
-import com.mware.web.model.ClientApiSearch;
 
 @Singleton
 public class DeleteElements implements ParameterizedHandler {
@@ -69,10 +69,11 @@ public class DeleteElements implements ParameterizedHandler {
             Authorizations authorizations
     ) throws Exception {
         ClientApiSearch search = searchRepository.getSavedSearch(savedSearchId, user);
-        DeleteRestoreElementsLRPQueueItem queueItem =
-                new DeleteRestoreElementsLRPQueueItem(savedSearchId, backup, search.name,
+
+        DeleteRestoreElementsQueueItem queueItem =
+                new DeleteRestoreElementsQueueItem(savedSearchId, backup, search.name,
                         user.getUserId(), authorizations.getAuthorizations(),
-                        DeleteRestoreElementsLRPQueueItem.SEARCH_DELETE_ELEMENTS_TYPE);
+                        DeleteRestoreElementsQueueItem.SEARCH_DELETE_ELEMENTS_TYPE);
         String id = this.longRunningProcessRepository.enqueue(queueItem, user, authorizations);
         return new ClientApiLongRunningProcessSubmitResponse(id);
     }

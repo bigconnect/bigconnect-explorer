@@ -39,6 +39,7 @@ package com.mware.web.routes.dataset;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.model.clientapi.dto.ClientApiObject;
+import com.mware.core.model.clientapi.dto.ClientApiSearch;
 import com.mware.core.model.clientapi.dto.ClientApiUser;
 import com.mware.core.model.role.AuthorizationRepository;
 import com.mware.core.model.user.UserRepository;
@@ -50,7 +51,6 @@ import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Optional;
 import com.mware.web.framework.annotations.Required;
-import com.mware.web.model.ClientApiSearch;
 import com.mware.web.model.ResponseType;
 import com.mware.web.routes.dataset.ProcessedDataset.ClientApiReadProcessedDatasetResponse.GraphNode;
 

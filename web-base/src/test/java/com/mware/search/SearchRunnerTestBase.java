@@ -40,6 +40,7 @@ import com.mware.core.config.Configuration;
 import com.mware.core.config.ConfigurationLoader;
 import com.mware.core.config.HashMapConfigurationLoader;
 import com.mware.core.model.schema.SchemaRepository;
+import com.mware.core.model.search.SearchRepository;
 import com.mware.core.user.User;
 import com.mware.ge.Authorizations;
 import com.mware.ge.Graph;

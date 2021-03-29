@@ -37,6 +37,9 @@
 package com.mware.search;
 
 import com.mware.core.model.schema.SchemaConstants;
+import com.mware.core.model.search.EdgeSearchRunner;
+import com.mware.core.model.search.QueryResultsIterableSearchResults;
+import com.mware.core.model.search.SearchOptions;
 import com.mware.ge.Vertex;
 import org.json.JSONArray;
 import org.junit.Before;

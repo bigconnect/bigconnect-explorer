@@ -43,6 +43,7 @@ import com.mware.core.model.clientapi.dto.*;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.properties.RawObjectSchema;
 import com.mware.core.model.role.AuthorizationRepository;
+import com.mware.core.model.search.*;
 import com.mware.core.model.user.UserRepository;
 import com.mware.core.user.User;
 import com.mware.core.util.BcLogger;
@@ -106,7 +107,6 @@ public class ReadDataset implements ParameterizedHandler  {
         }
         ClientApiUser userMe = userRepository.toClientApiPrivate(user);
         Authorizations authorizations = authorizationRepository.getGraphAuthorizations(user, userMe.getCurrentWorkspaceId());
-
 
         SearchRunner searchRunner = searchRepository.findSearchRunnerByUri(search.get().url);
         SearchResults results = searchRunner.run(

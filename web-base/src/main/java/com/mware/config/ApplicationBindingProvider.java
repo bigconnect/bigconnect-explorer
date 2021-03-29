@@ -41,6 +41,8 @@ import com.google.inject.Scopes;
 import com.mware.core.bootstrap.BcBootstrap;
 import com.mware.core.bootstrap.BootstrapBindingProvider;
 import com.mware.core.config.Configuration;
+import com.mware.core.model.search.GeSearchRepository;
+import com.mware.core.model.search.SearchRepository;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
 import com.mware.ge.cypher.connection.DefaultNetworkConnectionTracker;
@@ -51,8 +53,6 @@ import com.mware.http.CachingHttpRepository;
 import com.mware.http.HttpRepository;
 import com.mware.ingest.database.DataConnectionRepository;
 import com.mware.ingest.database.GeDataConnectionRepository;
-import com.mware.search.GeSearchRepository;
-import com.mware.search.SearchRepository;
 import com.mware.search.behaviour.BehaviourRepository;
 import com.mware.search.behaviour.GeBehaviourRepository;
 import com.mware.security.ACLProvider;
@@ -67,9 +67,6 @@ public class ApplicationBindingProvider implements BootstrapBindingProvider {
 
         binder.bind(DataConnectionRepository.class)
                 .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, GeDataConnectionRepository.class))
-                .in(Scopes.SINGLETON);
-        binder.bind(SearchRepository.class)
-                .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, GeSearchRepository.class))
                 .in(Scopes.SINGLETON);
         binder.bind(ACLProvider.class)
                 .toProvider(BcBootstrap.getConfigurableProvider(configuration, Configuration.ACL_PROVIDER_REPOSITORY, AllowAllAclProvider.class))

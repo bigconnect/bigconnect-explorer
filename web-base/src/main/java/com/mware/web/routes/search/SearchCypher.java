@@ -38,14 +38,14 @@ package com.mware.web.routes.search;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.model.clientapi.dto.ClientApiSearchResponse;
+import com.mware.core.model.search.SearchOptions;
 import com.mware.core.user.User;
 import com.mware.ge.Authorizations;
 import com.mware.search.CypherSearchRunner;
-import com.mware.search.SearchOptions;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
-import com.mware.web.model.ClientApiSearchResponse;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 
 import java.util.HashMap;

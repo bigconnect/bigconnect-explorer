@@ -39,15 +39,16 @@ package com.mware.web.routes.search;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.exception.BcException;
+import com.mware.core.model.clientapi.dto.ClientApiSearch;
+import com.mware.core.model.search.SearchHelper;
 import com.mware.core.user.User;
 import com.mware.core.util.ClientApiConverter;
 import com.mware.ge.Authorizations;
-import com.mware.search.SearchHelper;
+import com.mware.search.WebSearchHelper;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
-import com.mware.web.model.ClientApiSearch;
 import com.mware.web.routes.vertex.ExportToPdfHelper;
 import com.mware.web.routes.vertex.ExportToWordHelper;
 import com.mware.web.routes.vertex.ExportToXlsHelper;
@@ -90,7 +91,7 @@ public class SearchExport implements ParameterizedHandler {
                 Authorizations authorizations,
                 BcResponse response
             ) throws Exception {
-        if (!SearchHelper.isVertexRunner(url) && !SearchHelper.isCypherRunner(url)) {
+        if (!WebSearchHelper.isVertexRunner(url) && !WebSearchHelper.isCypherRunner(url)) {
             throw new BcException("Only vertex exports are supported!");
         }
 
@@ -102,11 +103,11 @@ public class SearchExport implements ParameterizedHandler {
 
         List<String> vertexIds = new ArrayList();
 
-        if (SearchHelper.isVertexRunner(url)) {
+        if (WebSearchHelper.isVertexRunner(url)) {
             vertexIds.addAll(searchHelper.search(search, user, authorizations, false).stream()
                     .map(v -> v.getId())
                     .collect(Collectors.toList()));
-        } else if (SearchHelper.isCypherRunner(url)) {
+        } else if (WebSearchHelper.isCypherRunner(url)) {
             vertexIds.addAll(searchHelper.searchCypher(search, user, authorizations));
         }
 

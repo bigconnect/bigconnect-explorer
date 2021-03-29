@@ -36,6 +36,7 @@
  */
 package com.mware.web.model;
 
+import com.mware.core.model.clientapi.dto.ClientApiSearchResponse;
 import lombok.Getter;
 
 import java.util.ArrayList;

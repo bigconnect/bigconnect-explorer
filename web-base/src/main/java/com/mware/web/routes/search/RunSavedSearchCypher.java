@@ -37,15 +37,15 @@
 package com.mware.web.routes.search;
 
 import com.google.inject.Inject;
+import com.mware.core.model.clientapi.dto.ClientApiSearchResponse;
+import com.mware.core.model.search.SearchOptions;
+import com.mware.core.model.search.SearchRepository;
+import com.mware.core.model.search.SearchRunner;
 import com.mware.core.user.User;
 import com.mware.ge.Authorizations;
 import com.mware.search.CypherSearchRunner;
-import com.mware.search.SearchOptions;
-import com.mware.search.SearchRepository;
-import com.mware.search.SearchRunner;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
-import com.mware.web.model.ClientApiSearchResponse;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 
 import javax.servlet.http.HttpServletRequest;

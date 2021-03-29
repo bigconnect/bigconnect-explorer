@@ -39,11 +39,11 @@ package com.mware.web.routes.vertex;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.model.schema.SchemaRepository;
+import com.mware.core.model.search.GeObjectSearchRunnerBase;
+import com.mware.core.model.search.SearchRepository;
+import com.mware.core.model.search.VertexSearchRunner;
 import com.mware.core.security.AuditService;
 import com.mware.ge.Graph;
-import com.mware.search.GeObjectSearchRunnerBase;
-import com.mware.search.SearchRepository;
-import com.mware.search.VertexSearchRunner;
 import com.mware.web.framework.ParameterizedHandler;
 
 @Singleton

@@ -48,9 +48,7 @@ import com.mware.core.user.User;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
 import com.mware.ge.*;
-import com.mware.web.model.ClientApiEdgeSearchResponse;
 import com.mware.web.model.ClientApiElementFindRelatedResponse;
-import com.mware.web.model.ClientApiElementSearchResponse;
 
 import java.util.*;
 import java.util.stream.Collectors;

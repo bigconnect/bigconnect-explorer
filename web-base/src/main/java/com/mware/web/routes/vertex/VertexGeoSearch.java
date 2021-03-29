@@ -38,6 +38,7 @@ package com.mware.web.routes.vertex;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.model.clientapi.dto.ClientApiElementSearchResponse;
 import com.mware.core.model.clientapi.dto.PropertyType;
 import com.mware.core.model.schema.SchemaProperty;
 import com.mware.core.model.schema.SchemaRepository;
@@ -51,7 +52,6 @@ import com.mware.ge.values.storable.Values;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
-import com.mware.web.model.ClientApiElementSearchResponse;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 
 @Singleton

@@ -36,8 +36,8 @@
  */
 package com.mware.web.framework;
 
+import com.mware.core.model.clientapi.dto.ClientApiSearch;
 import com.mware.web.framework.utils.StdDateFormat;
-import com.mware.web.model.ClientApiSearch;
 import com.mware.web.model.ResponseType;
 import org.apache.commons.lang3.StringUtils;
 

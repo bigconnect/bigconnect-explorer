@@ -39,11 +39,11 @@ package com.mware.web.routes.edge;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.model.schema.SchemaRepository;
+import com.mware.core.model.search.EdgeSearchRunner;
+import com.mware.core.model.search.GeObjectSearchRunnerBase;
+import com.mware.core.model.search.SearchRepository;
 import com.mware.core.security.AuditService;
 import com.mware.ge.Graph;
-import com.mware.search.EdgeSearchRunner;
-import com.mware.search.GeObjectSearchRunnerBase;
-import com.mware.search.SearchRepository;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.routes.vertex.GeObjectSearchBase;
 
