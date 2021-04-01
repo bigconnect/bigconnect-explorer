@@ -5,18 +5,19 @@
     <parent>
         <artifactId>root</artifactId>
         <groupId>io.bigconnect</groupId>
-        <version>4.2.1</version>
+        <version>4.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>web-group</artifactId>
     <packaging>pom</packaging>
+
     <name>BigConnect Explorer</name>
 
     <scm>
-        <url>https://github.com/mware-solutions/bigconnect-web</url>
-        <connection>scm:git:git://github.com/mware-solutions/bigconnect-web.git</connection>
-        <developerConnection>scm:git:git@github.com:mware-solutions/bigconnect-web.git</developerConnection>
+        <url>https://github.com/bigconnect/bigconnect-explorer</url>
+        <connection>scm:git:git://github.com/bigconnect/bigconnect-explorer.git</connection>
+        <developerConnection>scm:git:git@github.com:bigconnect/bigconnect-explorer.git</developerConnection>
     </scm>
 
     <properties>
@@ -35,6 +36,7 @@
     <modules>
         <module>web-base</module>
         <module>war</module>
+        <module>tomcat-server</module>
     </modules>
 
     <repositories>

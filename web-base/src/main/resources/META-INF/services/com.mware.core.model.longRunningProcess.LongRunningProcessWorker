@@ -1,5 +1,2 @@
 com.mware.ingest.structured.worker.StructuredIngestProcessWorker
 com.mware.ingest.database.DataSourceImportLongRunningProcess
-com.mware.search.worker.backupRestore.DeleteElementsLongRunningUtilWorker
-com.mware.search.worker.backupRestore.RestoreElementsLongRunningUtilWorker
-com.mware.search.worker.export.SearchExportLongRunningWorker
