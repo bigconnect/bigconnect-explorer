@@ -42,7 +42,7 @@ define([
     'util/privileges',
     'util/dnd',
     'require'
-], function(
+], function (
     withElementScrolling,
     withCollapsibleSections,
     F,
@@ -66,14 +66,16 @@ define([
             propertiesSelector: '.org-bigconnect-properties',
             relationshipsSelector: '.org-bigconnect-relationships',
             commentsSelector: '.org-bigconnect-comments',
-            deleteFormSelector: '.delete-form',
-            requeueFormSelector: '.requeue-form'
+            confirmFormSelector: '.confirm-form',
+            multipleSelector: '.multiple',
         });
 
-        this.after('initialize', function() {
+        this.after('initialize', function () {
             var self = this;
 
             this.on('openFullscreen', this.onOpenFullscreen);
+            this.on('deleteMultipleItems', this.deleteMultipleItems);
+
             if (!_.isArray(this.attr.model)) {
                 this.on('addProperty', this.redirectToPropertiesComponent);
                 this.on('deleteProperty', this.redirectToPropertiesComponent);
@@ -95,14 +97,14 @@ define([
             }
         });
 
-        this.onCreateWatch = function(evt, data) {
+        this.onCreateWatch = function (evt, data) {
             var root = $('<div class="underneath">'),
                 self = this;
 
             $('<tr><td colspan="3"></td></tr>')
                 .prependTo(this.select('propertiesSelector').find('table')).find('td').append(root);
 
-            require(['../dropdowns/watchForm/watch'], function(WatchForm) {
+            require(['../dropdowns/watchForm/watch'], function (WatchForm) {
                 WatchForm.attachTo(root, {
                     data: self.attr.model
                 });
@@ -110,17 +112,17 @@ define([
 
         };
 
-        this.onUnresolveTermMentions = function(evt, data) {
+        this.onUnresolveTermMentions = function (evt, data) {
             var self = this,
-                $container = this.select('deleteFormSelector');
+                $container = this.select('confirmFormSelector');
 
             if ($container.length === 0) {
-                $container = $('<div class="delete-form"></div>').insertBefore(
+                $container = $('<div class="confirm-form"></div>').insertBefore(
                     this.select('propertiesSelector')
                 );
             }
 
-            require(['../dropdowns/confirmForm/confirmForm'], function(ConfirmForm) {
+            require(['../dropdowns/confirmForm/confirmForm'], function (ConfirmForm) {
                 var node = $('<div class="underneath"></div>').appendTo($container);
                 ConfirmForm.attachTo(node, {
                     data: self.attr.model,
@@ -131,32 +133,82 @@ define([
             });
         };
 
-        this.onRequeue = function (event, data) {
+        this.onDeleteItem = function (event) {
             var self = this,
-                $container = this.select('requeueFormSelector');
+                $container = this.select('confirmFormSelector');
 
             if ($container.length === 0) {
-                $container = $('<div class="requeue-form"></div>').insertBefore(
+                $container = $('<div class="confirm"></div>').insertBefore(
                     this.select('propertiesSelector')
                 );
             }
 
-            require(['../dropdowns/requeueForm/requeueForm'], function(RequeueForm) {
+            require(['../dropdowns/confirmForm/confirmForm'], function (ConfirmForm) {
                 var node = $('<div class="underneath"></div>').appendTo($container);
-                RequeueForm.attachTo(node, {
-                    data: self.attr.model
+                ConfirmForm.attachTo(node, {
+                    data: self.attr.model,
+                    service: self.attr.model.type,
+                    method: 'delete',
+                    arguments: self.attr.model.id
                 });
             });
-
         };
 
-        this.onUpdateModel = function(event, data) {
+        this.deleteMultipleItems = function (event, data) {
+            event.stopPropagation();
+            const elements = _.map(this.attr.model, (d) => {
+                return {type: d.type, id: d.id}
+            });
+
+            var self = this,
+                $container = this.select('confirmFormSelector');
+
+            if ($container.length === 0) {
+                $container = $('<div class="confirm"></div>').insertBefore(
+                    this.select('multipleSelector')
+                );
+            }
+
+            require(['../dropdowns/confirmForm/confirmForm'], function (ConfirmForm) {
+                var node = $('<div class="underneath"></div>').appendTo($container);
+                ConfirmForm.attachTo(node, {
+                    data: self.attr.model,
+                    service: 'vertex',
+                    method: 'deleteMultiple',
+                    arguments: elements
+                });
+            });
+        };
+
+        this.onRequeue = function (event, data) {
+            var self = this,
+                $container = this.select('confirmFormSelector');
+
+            if ($container.length === 0) {
+                $container = $('<div class="confirm"></div>').insertBefore(
+                    this.select('propertiesSelector')
+                );
+            }
+
+            require(['../dropdowns/confirmForm/confirmForm'], function (ConfirmForm) {
+                var node = $('<div class="underneath"></div>').appendTo($container);
+                ConfirmForm.attachTo(node, {
+                    data: self.attr.model,
+                    service: self.attr.model.type,
+                    method: 'requeue',
+                    message: i18n('detail.requeue.form.warning.explanation.' + self.attr.model.type),
+                    arguments: self.attr.model.id
+                });
+            });
+        };
+
+        this.onUpdateModel = function (event, data) {
             if (event.target === this.node) {
                 this.attr.model = data.model;
             }
         };
 
-        this.redirectToPropertiesComponent = function(event, data) {
+        this.redirectToPropertiesComponent = function (event, data) {
             if ($(event.target).closest('.comments').length) {
                 return;
             }
@@ -166,7 +218,7 @@ define([
 
                 var properties = this.select('propertiesSelector');
                 if (properties.length) {
-                    _.defer(function() {
+                    _.defer(function () {
                         properties.trigger(event.type, data);
                     })
                 } else {
@@ -175,22 +227,22 @@ define([
             }
         };
 
-        this.onOpenOriginal = function(event) {
+        this.onOpenOriginal = function (event) {
             window.open(F.vertex.raw(this.attr.model));
         };
 
-        this.onDownloadOriginal = function(event) {
+        this.onDownloadOriginal = function (event) {
             var rawSrc = F.vertex.raw(this.attr.model);
             window.open(rawSrc + (
                 /\?/.test(rawSrc) ? '&' : '?'
             ) + 'download=true');
         };
 
-        this.onAddImage = function(event, data) {
+        this.onAddImage = function (event, data) {
             this.$node.find('.entity-glyphicon').trigger('setImage', data);
         };
 
-        this.onCommentOnSelection = function(event, data) {
+        this.onCommentOnSelection = function (event, data) {
             var $comments = this.select('commentsSelector');
 
             if (!$(event.target).is($comments)) {
@@ -198,66 +250,48 @@ define([
             }
         };
 
-        this.makeVertexTitlesDraggable = function() {
+        this.makeVertexTitlesDraggable = function () {
             const model = this.attr.model;
             this.$node.find('.org-bigconnect-layout-header .vertex-draggable')
             this.$node.find('.org-bigconnect-layout-header .vertex-draggable')
-                .filter(function() {
+                .filter(function () {
                     if (!_.isEmpty($(this).attr('data-vertex-id'))) {
                         this.setAttribute('draggable', true)
                         return true
                     }
                     return false
                 })
-                .on('dragstart', function(e) {
+                .on('dragstart', function (e) {
                     const id = e.target.dataset.vertexId;
-                    const elements = { vertexIds: [id], edgeIds: [] };
+                    const elements = {vertexIds: [id], edgeIds: []};
                     const dt = e.originalEvent.dataTransfer;
 
                     if (model.id === id) {
                         const url = F.vertexUrl.url([model], bcData.currentWorkspaceId);
-                        dnd.setDataTransferWithElements(dt, { elements: [model] })
+                        dnd.setDataTransferWithElements(dt, {elements: [model]})
                     } else {
                         dnd.setDataTransferWithElements(dt, elements);
                     }
                 })
         };
 
-        this.onAddNewProperty = function(event) {
+        this.onAddNewProperty = function (event) {
             this.trigger(this.select('propertiesSelector'), 'editProperty');
         };
 
-        this.onAddNewComment = function(event) {
+        this.onAddNewComment = function (event) {
             this.trigger(this.select('commentsSelector'), 'editComment');
         };
 
-        this.onDeleteItem = function(event) {
-            var self = this,
-                $container = this.select('deleteFormSelector');
-
-            if ($container.length === 0) {
-                $container = $('<div class="delete-form"></div>').insertBefore(
-                    this.select('propertiesSelector')
-                );
-            }
-
-            require(['../dropdowns/deleteForm/deleteForm'], function(DeleteForm) {
-                var node = $('<div class="underneath"></div>').appendTo($container);
-                DeleteForm.attachTo(node, {
-                    data: self.attr.model
-                });
-            });
-        };
-
-        this.onOpenFullscreen = function(event, data) {
+        this.onOpenFullscreen = function (event, data) {
             event.stopPropagation();
 
             var viewing = this.attr.model,
                 vertices = data && data.vertices ?
                     data.vertices :
                     _.isObject(viewing) && viewing.vertices ?
-                    viewing.vertices :
-                    viewing,
+                        viewing.vertices :
+                        viewing,
                 url = F.vertexUrl.url(
                     _.isArray(vertices) ? vertices : [vertices],
                     bcData.currentWorkspaceId
@@ -265,11 +299,11 @@ define([
             window.open(url);
         };
 
-        this.onOpenSourceUrl = function(event, data) {
+        this.onOpenSourceUrl = function (event, data) {
             window.open(data.sourceUrl);
         };
 
-        this.onMaskWithOverlay = function(event, data) {
+        this.onMaskWithOverlay = function (event, data) {
             event.stopPropagation();
             if (data.done) {
                 this.$node.find('.detail-overlay').remove();

@@ -270,13 +270,24 @@ define([
         },
 
         /**
-         * Delete a vertex (sandboxed)
+         * Delete a vertex
          *
          * @param {string} vertexId
          */
         'delete': function(vertexId) {
             return ajax('DELETE', '/vertex', {
                 graphVertexId: vertexId
+            })
+        },
+
+        /**
+         * Deletes multiple vertices
+         *
+         * @param {string} vertexId
+         */
+        'deleteMultiple': function(elements) {
+            return ajax('POST', '/elements/delete', {
+                elements: JSON.stringify(elements)
             })
         },
 

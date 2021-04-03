@@ -37,7 +37,7 @@
 define([
     'flight/lib/component',
     'util/withDropdown',
-    'tpl!./confirmForm',
+    './confirmForm.hbs',
     'tpl!util/alert',
     'util/withDataRequest',
     'data/web-worker/store/product/actions',
@@ -68,7 +68,13 @@ define([
             this.on('click', {
                 primarySelector: this.onDelete
             })
-            this.$node.html(template(this.attr.data));
+
+            const message = this.attr.message || i18n('detail.confirm.form.warning.explanation');
+
+            this.$node.html(template({
+                data: this.attr.data,
+                message
+            }));
         }
 
         this.onDelete = function(event) {

@@ -81,21 +81,22 @@ define([
         'https://docs.bigconnect.io/developer-guide/plugin-development/web-plugins/extension-point-reference-1/inspector-toolbar'
     );
 
-    var DIVIDER = {
-            divider: true
-        },
-        ToolbarComponent = defineComponent(Toolbar, withDataRequest);
+    const DIVIDER = {
+        divider: true
+    };
+
+    const ToolbarComponent = defineComponent(Toolbar, withDataRequest);
 
     ToolbarComponent.ITEMS = {
-        DIVIDER: DIVIDER,
+        DIVIDER,
         BACK: { title: '◀' },
         FORWARD: { title: '▶' },
-        // FULLSCREEN: {
-        //     title: i18n('detail.toolbar.open.fullscreen'),
-        //     cls: 'hide-in-fullscreen-details',
-        //     subtitle: i18n('detail.toolbar.open.fullscreen.subtitle'), //'Open in New Window / Tab',
-        //     event: 'openFullscreen'
-        // },
+        FULLSCREEN: {
+            title: i18n('detail.toolbar.open.fullscreen'),
+            cls: 'hide-in-fullscreen-details',
+            subtitle: i18n('detail.toolbar.open.fullscreen.subtitle'), //'Open in New Window / Tab',
+            event: 'openFullscreen'
+        },
         ADD_PROPERTY: {
             title: i18n('detail.toolbar.add.property'),
             subtitle: i18n('detail.toolbar.add.property.entity.subtitle'), // 'Add New Property to Entity',
@@ -128,6 +129,12 @@ define([
             cls: 'requires-EDIT',
             event: 'deleteItem'
         },
+        DELETE_ITEMS: {
+            title: i18n('detail.toolbar.delete'),
+            subtitle: i18n('detail.toolbar.delete.entity.subtitle'),
+            cls: 'requires-EDIT',
+            event: 'deleteMultipleItems',
+        },
         REQUEUE_ITEM: {
             title: i18n('detail.toolbar.requeue'),
             subtitle: i18n('detail.toolbar.requeue.subtitle'),
@@ -145,6 +152,11 @@ define([
             subtitle: i18n('detail.toolbar.unresolveMentions.subtitle'),
             cls: 'requires-EDIT',
             event: 'unresolveMentions'
+        },
+        REFRESH: {
+            title: i18n('detail.toolbar.refresh'),
+            subtitle: i18n('detail.toolbar.refresh.subtitle'),
+            event: 'refresh'
         }
     };
 
@@ -251,8 +263,14 @@ define([
                         {
                             title: i18n('detail.toolbar.open'),
                             submenu: [
-                                ToolbarComponent.ITEMS.FULLSCREEN
+                                ToolbarComponent.ITEMS.FULLSCREEN,
                             ].concat(this.selectionHistory())
+                        },
+                        {
+                            title: i18n('detail.toolbar.actions'),
+                            submenu: _.compact([
+                                ToolbarComponent.ITEMS.DELETE_ITEMS,
+                            ])
                         },
                         {
                             title: i18n('detail.multiple.selected', F.number.pretty(model.length)),
@@ -270,7 +288,6 @@ define([
                             {
                                 title: i18n('detail.toolbar.open'),
                                 submenu: _.compact([
-                                    ToolbarComponent.ITEMS.FULLSCREEN,
                                     this.sourceUrlToolbarItem(model),
                                     this.openToolbarItem(model),
                                     this.downloadToolbarItem(model)
@@ -289,16 +306,12 @@ define([
                                 submenu: _.compact([
                                     ToolbarComponent.ITEMS.ADD_WATCH,
                                     ToolbarComponent.ITEMS.REQUEUE_ITEM,
-                                    ToolbarComponent.ITEMS.UNRESOLVE_MENTIONS
+                                    ToolbarComponent.ITEMS.UNRESOLVE_MENTIONS,
+                                    ToolbarComponent.ITEMS.DIVIDER,
+                                    this.deleteToolbarItem(model)
+
                                 ])
                             },
-                            {
-                                icon: 'img/glyphicons/glyphicons_157_show_lines@2x.png',
-                                right: true,
-                                submenu: _.compact([
-                                    this.deleteToolbarItem(model)
-                                ])
-                            }
                         ],
                         objects: { vertices: vertices, edges: edges }
                     };

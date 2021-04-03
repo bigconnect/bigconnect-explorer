@@ -65,6 +65,7 @@ import com.mware.web.routes.dataset.DatasetList;
 import com.mware.web.routes.dataset.ProcessedDataset;
 import com.mware.web.routes.dataset.ReadDataset;
 import com.mware.web.routes.edge.*;
+import com.mware.web.routes.element.ElementDelete;
 import com.mware.web.routes.element.ElementSearch;
 import com.mware.web.routes.extendedData.ExtendedDataGet;
 import com.mware.web.routes.extendedData.ExtendedDataSearch;
@@ -179,6 +180,8 @@ public class Router extends HttpServlet {
 
             app.get("/element/search", authenticator, csrfProtector, ReadPrivilegeFilter.class, ElementSearch.class);
             app.post("/element/search", authenticator, csrfProtector, ReadPrivilegeFilter.class, ElementSearch.class);
+
+            app.post("/elements/delete", authenticator, csrfProtector, EditPrivilegeFilter.class, ElementDelete.class);
 
             app.delete("/vertex", authenticator, csrfProtector, EditPrivilegeFilter.class, VertexRemove.class);
             app.get("/vertex/highlighted-text", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexHighlightedText.class);
