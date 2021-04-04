@@ -204,10 +204,7 @@ define([
          */
         this.onSelectObjects = function(event, data) {
             if (data && 'focus' in data) {
-                console.warn(`selectObjects event with "focus" should be moved to options object.
-Support will be removed in future versions, use:
-
-    this.trigger('selectObjects', { options: { focus: true }})`);
+                console.warn(`selectObjects event with "focus" should be moved to options object. Support will be removed in future versions, use: this.trigger('selectObjects', { options: { focus: true }})`);
                 data.options = { focus: data.focus, ...(data.options || {}) };
             }
             if (!data || data.dispatch !== false) {

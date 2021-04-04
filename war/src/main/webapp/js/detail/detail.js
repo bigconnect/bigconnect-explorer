@@ -38,8 +38,9 @@ define([
     'flight/lib/component',
     'util/vertex/formatters',
     'util/withDataRequest',
-    'configuration/plugins/registry'
-], function(defineComponent, F, withDataRequest, registry) {
+    'configuration/plugins/registry',
+    'data/web-worker/store/element/selectors'
+], function(defineComponent, F, withDataRequest, registry, elementSelectors) {
     'use strict';
 
     return defineComponent(DetailPane, withDataRequest);
@@ -59,6 +60,7 @@ define([
 
             this.on(document, 'objectsSelected', this.onObjectsSelected);
             this.on(document, 'selectObjects', this.onSelectObjects);
+            this.on(document, 'reloadElement', this.onReloadElement);
             this.preventDropEventsFromPropagating();
 
             this.before('teardown', this.teardownComponents);
@@ -88,13 +90,10 @@ define([
         this.onObjectsSelected = function(evt, data) {
             var self = this,
                 { vertices, edges, options } = data,
-                moduleName, moduleData, moduleName2,
                 pane = this.$node.closest('.detail-pane');
 
             if (!vertices.length && !edges.length) {
-
                 this.cancelTransitionTeardown = false;
-
                 return pane.on(TRANSITION_END, function(e) {
                     if (/transform/.test(e.originalEvent && e.originalEvent.propertyName)) {
                         if (self.cancelTransitionTeardown !== true) {
@@ -132,6 +131,34 @@ define([
                     focus: options.focus
                 });
             })
+        };
+
+        this.onReloadElement = function(event, data) {
+            if (this.isCollapsed)
+                return;
+
+            const self = this;
+            require(['data/web-worker/store/element/actions'], actions => {
+                bcData.storePromise.then(store => store.dispatch(actions.refreshElement({
+                    workspaceId: bcData.currentWorkspaceId,
+                    vertexId: data.id
+                })));
+
+                bcData.storePromise.then((store) => store.observe(elementSelectors.getElements, (elements) => {
+                    bcData.storePromise.then(store => {
+                        const selectedIds = store.getState().selection.idsByType;
+                        const vertices = _.filter(elements.vertices, v => _.contains(selectedIds.vertices, v.id));
+                        const edges = _.filter(elements.edges, v => _.contains(selectedIds.edges, v.id));
+
+                        require(['detail/item/item'], (Module) => {
+                            Module.attachTo(self.select('detailTypeContentSelector').teardownAllComponents(), {
+                                model: vertices.concat(edges),
+                                constraints: ['width']
+                            });
+                        });
+                    })
+                }))
+            });
         };
 
         this.teardownComponents = function() {

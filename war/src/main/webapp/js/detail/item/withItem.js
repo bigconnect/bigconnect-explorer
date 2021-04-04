@@ -92,10 +92,16 @@ define([
                 this.on('requeue', this.onRequeue);
                 this.on('createWatch', this.onCreateWatch);
                 this.on('unresolveMentions', this.onUnresolveTermMentions);
+                this.on('refreshItem', this.onRefreshItem);
 
                 this.makeVertexTitlesDraggable();
             }
         });
+
+        this.onRefreshItem = function (evt) {
+            const model = this.attr.model;
+            this.trigger(document, 'reloadElement', model);
+        };
 
         this.onCreateWatch = function (evt, data) {
             var root = $('<div class="underneath">'),

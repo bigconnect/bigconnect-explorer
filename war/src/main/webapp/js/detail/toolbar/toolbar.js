@@ -156,7 +156,7 @@ define([
         REFRESH: {
             title: i18n('detail.toolbar.refresh'),
             subtitle: i18n('detail.toolbar.refresh.subtitle'),
-            event: 'refresh'
+            event: 'refreshItem'
         }
     };
 
@@ -304,6 +304,7 @@ define([
                             {
                                 title: i18n('detail.toolbar.actions'),
                                 submenu: _.compact([
+                                    ToolbarComponent.ITEMS.REFRESH,
                                     ToolbarComponent.ITEMS.ADD_WATCH,
                                     ToolbarComponent.ITEMS.REQUEUE_ITEM,
                                     ToolbarComponent.ITEMS.UNRESOLVE_MENTIONS,
