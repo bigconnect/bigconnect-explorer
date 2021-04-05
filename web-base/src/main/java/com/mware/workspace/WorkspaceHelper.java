@@ -196,14 +196,10 @@ public class WorkspaceHelper {
         if (autoPublish) {
             workspaceId = null;
         }
-        long beforeActionTimestamp = System.currentTimeMillis() - 1;
-        ElementOrPropertyStatus status;
         if (propertyIsPublic && workspaceId != null) {
             e.markPropertyHidden(property, new Visibility(workspaceId), authorizations);
-            status = ElementOrPropertyStatus.HIDDEN;
         } else {
             e.softDeleteProperty(property.getKey(), property.getName(), property.getVisibility(), authorizations);
-            status = ElementOrPropertyStatus.DELETION;
         }
 
         if (e instanceof Vertex) {
@@ -425,10 +421,10 @@ public class WorkspaceHelper {
             workspaceRepository.updateEntityOnWorkspace(workspaceId, vertex.getId(), user);
         }
         VisibilityJson visibilityJson = BcSchema.VISIBILITY_JSON.getPropertyValue(vertex);
-        visibilityJson = VisibilityJson.removeFromAllWorkspace(visibilityJson);
+        VisibilityJson.removeFromAllWorkspace(visibilityJson);
 
         // because we store the current vertex image in a property we need to possibly find that property and change it
-        //  if we are deleting the current image.
+        // if we are deleting the current image.
         LOGGER.debug("change entity image properties");
         for (Edge edge : vertex.getEdges(Direction.BOTH, entityHasImageIri, authorizations)) {
             if (edge.getVertexId(Direction.IN).equals(vertex.getId())) {
