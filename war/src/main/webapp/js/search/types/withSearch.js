@@ -72,7 +72,7 @@ define([
 
         this.after('initialize', function() {
             this.render();
-            this.currentPage = 1; //123
+            this.currentPage = 1;
 
             var mainSelf = this;
             this.on(this.select('resultsPerPageSelector'), 'change', function() {
@@ -82,6 +82,10 @@ define([
 
             this.on('searchByParameters', this.onSearchByParameters);
             this.on('listRendered', this.onResultsRendered);
+            this.on('searchRequestBegan', () => {
+                this.currentPage = 1;
+            });
+
             this.on('searchRequestCompleted', function(event, data) {
                 if (data.success && data.result) {
                     var self = this,
@@ -168,7 +172,7 @@ define([
                 leftRange = Math.floor(pagesToDisplay/2),
                 elPrev = $('<li><a href="#">Prev</a></li>')
 
-            if(this.currentPage == 1) {
+            if(this.currentPage === 1) {
                 elPrev.addClass('disabled');
             }
 
@@ -178,7 +182,7 @@ define([
             });
 
             var elNext = $('<li><a href="#">Next</a></li>');
-            if(this.currentPage == totalPages) {
+            if(this.currentPage === totalPages) {
                 elNext.addClass('disabled');
             }
 
@@ -200,11 +204,11 @@ define([
             }
 
             for(var i = startPage; i <= endPage; i++) {
-                var elPage = $('<li page="'+i+'"><a href="#">'+i+'</a></li>');
-                if(i == this.currentPage)
+                var elPage = $(`<li page="${i}'"><a href="#">${i}</a></li>`);
+                if(i === this.currentPage)
                     elPage.addClass('active');
 
-                if(i != this.currentPage) {
+                if(i !== this.currentPage) {
                     elPage.click(function () {
                         var selectedPage = $(this).attr('page');
                         self.changePage(parseInt(selectedPage));
@@ -243,8 +247,6 @@ define([
 
             this.hideSearchResults();
 
-            this.headerFixer();
-
             this.on('filtersLoaded', function() {
                 this.trigger('searchtypeloaded', { type: this.attr.searchType });
             });
@@ -259,13 +261,6 @@ define([
 
             $('[data-toggle="tooltip"]').tooltip();
         };
-
-        this.headerFixer = function () {
-            // $('.search-pane').scroll(function() {
-            //     var currentScroll = $('.search-pane').scrollTop() - 25;
-            //     $('#mw-search-toolbar').css({top: currentScroll, 'z-index': 9999, position: 'absolute'});
-            // });
-        }
 
         this.hideSearchResults = function() {
             this.select('hintSelector')
