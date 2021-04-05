@@ -40,6 +40,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.model.schema.SchemaProperty;
 import com.mware.core.model.schema.SchemaRepository;
+import com.mware.core.util.BcLogger;
+import com.mware.core.util.BcLoggerFactory;
 import com.mware.ge.Authorizations;
 import com.mware.ge.Graph;
 import com.mware.ge.Vertex;
@@ -57,13 +59,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.mware.web.routes.vertex.ExportUtils.DATE_FORMAT;
 
 @Singleton
 public class ExportToXlsHelper {
+    private static final BcLogger LOGGER = BcLoggerFactory.getLogger(ExportToXlsHelper.class);
     public static final String EXPORT_FILE_EXT = ".xlsx";
     public static final String EXPORT_MIME_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
@@ -85,7 +89,7 @@ public class ExportToXlsHelper {
         Map<String, String> uniqueColumns = new HashMap<>();
         for (SchemaProperty prop : ontologyRepository.getProperties(SchemaRepository.PUBLIC)) {
             if (prop.getUserVisible()) {
-                if(!uniqueColumns.containsKey(prop.getName()))
+                if (!uniqueColumns.containsKey(prop.getName()))
                     uniqueColumns.put(prop.getName(), prop.getDisplayName());
             }
         }
@@ -111,7 +115,7 @@ public class ExportToXlsHelper {
     }
 
     private void appendVertices(XSSFSheet sheet, short rowIndex, List<String> vertices, Authorizations authorizations, Map<String, String> uniqueColumns) {
-        for(String vertexId : vertices) {
+        for (String vertexId : vertices) {
             Vertex v = graph.getVertex(vertexId, authorizations);
             if (v != null) {
                 Row row = sheet.createRow(rowIndex++);
@@ -125,23 +129,28 @@ public class ExportToXlsHelper {
                     }
 
                     String value = "";
-                    if (v.getProperty(propIRI).getValue() instanceof StreamingPropertyValue) {
-                        value = ((StreamingPropertyValue)v.getProperty(propIRI).getValue()).readToString();
-                    } else if (v.getProperty(propIRI).getValue() instanceof DateTimeValue) {
-                        value = v.getProperty(propIRI).getValue().prettyPrint();
-                    } else {
-                        Iterable<Value> propValue = v.getPropertyValues(propIRI);
-                        if(propValue != null) {
-                            for(Value val : propValue) {
-                                if(val != null)
-                                    value += val.prettyPrint() + ",";
-                            }
+                    try {
+                        if (v.getProperty(propIRI).getValue() instanceof StreamingPropertyValue) {
+                            value = ((StreamingPropertyValue) v.getProperty(propIRI).getValue()).readToString();
+                        } else if (v.getProperty(propIRI).getValue() instanceof DateTimeValue) {
+                            value = v.getProperty(propIRI).getValue().prettyPrint();
+                        } else {
+                            Iterable<Value> propValue = v.getPropertyValues(propIRI);
+                            if (propValue != null) {
+                                for (Value val : propValue) {
+                                    if (val != null)
+                                        value += val.prettyPrint() + ",";
+                                }
 
-                            if(value.endsWith(","))
-                                value = value.substring(0, value.length()-1);
+                                if (value.endsWith(","))
+                                    value = value.substring(0, value.length() - 1);
+                            }
                         }
+
+                        if (value.length() > 30000) value = value.substring(0, 30000);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
-                    if (value.length() > 30000) value = value.substring(0,30000);
 
                     row.createCell(cellIndex).setCellValue(value);
                     cellIndex++;
