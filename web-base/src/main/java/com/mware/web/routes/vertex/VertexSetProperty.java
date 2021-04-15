@@ -51,6 +51,7 @@ import com.mware.core.model.clientapi.dto.VisibilityJson;
 import com.mware.core.model.graph.GraphRepository;
 import com.mware.core.model.graph.VisibilityAndElementMutation;
 import com.mware.core.model.properties.BcSchema;
+import com.mware.core.model.properties.RawObjectSchema;
 import com.mware.core.model.schema.SchemaProperty;
 import com.mware.core.model.schema.SchemaRepository;
 import com.mware.core.model.workQueue.Priority;
@@ -279,6 +280,10 @@ public class VertexSetProperty extends SetPropertyBase implements ParameterizedH
                     throw new BcException(ex.getMessage(), ex);
                 }
             }
+        }
+
+        if (RawObjectSchema.RAW_LANGUAGE.isSameName(propertyName)) {
+            propertyKey = valueStr;
         }
 
         VisibilityAndElementMutation<Vertex> setPropertyResult = graphRepository.setProperty(
