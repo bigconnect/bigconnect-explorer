@@ -220,10 +220,11 @@ define([
                          */
                         item.options.insertIntoMenuItems(item, toolbarItems);
                     } else {
+                        var submenu = [];
                         if (_.isArray(item.submenu)) {
-                            item.submenu = _.filter(item.submenu, (subItem) => !_.isFunction(subItem.canHandle) || subItem.canHandle(objects));
+                            submenu = _.filter(item.submenu, (subItem) => !_.isFunction(subItem.canHandle) || subItem.canHandle(objects));
                         }
-                        toolbarItems.push(item);
+                        toolbarItems.push({...item, submenu});
                     }
                 }
             });
