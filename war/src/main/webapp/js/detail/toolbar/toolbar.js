@@ -220,6 +220,9 @@ define([
                          */
                         item.options.insertIntoMenuItems(item, toolbarItems);
                     } else {
+                        if (_.isArray(item.submenu)) {
+                            item.submenu = _.filter(item.submenu, (subItem) => !_.isFunction(subItem.canHandle) || subItem.canHandle(objects));
+                        }
                         toolbarItems.push(item);
                     }
                 }
@@ -324,7 +327,12 @@ define([
             var self = this,
                 $target = $(event.target).closest('li'),
                 eventName = $target.data('event'),
-                eventData = $target.data('eventData');
+                eventData = $target.data('eventData'),
+                model = this.attr.model;
+
+            var isArray = _.isArray(model),
+                vertices = isArray ? _.where(model, { type: 'vertex' }) : (model.type === 'vertex' ? [model] : []),
+                edges = isArray ? _.where(model, { type: 'edge' }) : (model.type === 'edge' ? [model] : []);
 
             if ($target.length && $target.hasClass('disabled')) {
                 event.preventDefault();
@@ -349,7 +357,7 @@ define([
                 event.stopPropagation();
 
                 _.defer(function() {
-                    self.trigger(eventName, eventData);
+                    self.trigger(eventName, { ...eventData, vertices, edges });
                 });
 
                 this.hideMenu();
