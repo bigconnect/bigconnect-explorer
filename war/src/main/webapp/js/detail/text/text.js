@@ -123,7 +123,7 @@ define([
 
     function descriptionProperty(p) {
         var textDescription = ONTOLOGY_CONSTANTS.PROP_TEXT_DESCRIPTION;
-        return p[textDescription] || p.metadata[textDescription] || p.key || p.name;
+        return p[textDescription] || p.metadata[textDescription] || p.name;
     }
 
     function textPropertySort(p) {

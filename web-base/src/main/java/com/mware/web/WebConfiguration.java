@@ -96,6 +96,9 @@ public class WebConfiguration {
     public static final PropertyMetadata PROPERTY_METADATA_STATUS = new PropertyMetadata("sandboxStatus",
             "properties.metadata.label.status",
             "sandboxStatus");
+    public static final PropertyMetadata PROPERTY_METADATA_KEY = new PropertyMetadata("key",
+            "properties.metadata.label.key",
+            "string");
 
     public static final Map<String, String> DEFAULTS = new HashMap<>();
 
@@ -158,19 +161,22 @@ public class WebConfiguration {
                 PROPERTY_METADATA_SOURCE_TIMEZONE.getName(),
                 PROPERTY_METADATA_MODIFIED_DATE.getName(),
                 PROPERTY_METADATA_MODIFIED_BY.getName(),
-                PROPERTY_METADATA_STATUS.getName()
+                PROPERTY_METADATA_STATUS.getName(),
+                PROPERTY_METADATA_KEY.getName()
         ));
         DEFAULTS.put(PROPERTIES_METADATA_PROPERTY_NAMES_DISPLAY, Joiner.on(',').join(
                 PROPERTY_METADATA_SOURCE_TIMEZONE.getMessageKey(),
                 PROPERTY_METADATA_MODIFIED_DATE.getMessageKey(),
                 PROPERTY_METADATA_MODIFIED_BY.getMessageKey(),
-                PROPERTY_METADATA_STATUS.getMessageKey()
+                PROPERTY_METADATA_STATUS.getMessageKey(),
+                PROPERTY_METADATA_KEY.getMessageKey()
         ));
         DEFAULTS.put(PROPERTIES_METADATA_PROPERTY_NAMES_TYPE, Joiner.on(',').join(
                 PROPERTY_METADATA_SOURCE_TIMEZONE.getDataType(),
                 PROPERTY_METADATA_MODIFIED_DATE.getDataType(),
                 PROPERTY_METADATA_MODIFIED_BY.getDataType(),
-                PROPERTY_METADATA_STATUS.getDataType()
+                PROPERTY_METADATA_STATUS.getDataType(),
+                PROPERTY_METADATA_KEY.getDataType()
         ));
 
         DEFAULTS.put(MAP_PROVIDER, MapProvider.OSM.toString());

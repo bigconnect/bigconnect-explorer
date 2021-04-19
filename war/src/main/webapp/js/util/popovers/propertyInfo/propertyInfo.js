@@ -240,7 +240,7 @@ define([
                         return displayNames[d[0]];
                     });
 
-                    var valueElement = this.select('td.property-value')
+                    this.select('td.property-value')
                         .each(function(d) {
                             var self = this,
                                 typeName = displayTypes[d[0]],
@@ -264,14 +264,11 @@ define([
                                     element: element
                                 });
                             } else {
-                                console.warn('No metadata type formatter: ' + typeName);
                                 d3.select(this).text(value);
                             }
                         });
-                })
-
-                // Hide blank metadata
-                .each(function(d) {
+                }).each(function(d) {
+                    // Hide empty metadata
                     $(this).toggle($(this).find('.property-value').text() !== '');
                 });
 
