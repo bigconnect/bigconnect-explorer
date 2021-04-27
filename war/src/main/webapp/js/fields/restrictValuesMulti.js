@@ -119,7 +119,7 @@ define([
             var self = this;
             this.values = [];
             this.$node.find('ul.values').empty();
-            values = _.isArray(values) ? values : [values];
+            values = _.isArray(values) ? values : (values === "" ? [] : [values]);
 
             values.sort(compare).forEach(function(value) {
                 if (self.addValue(value)) {
