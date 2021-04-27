@@ -83,7 +83,6 @@ define([
                 displayTime: this.displayTime
             }));
 
-
             this.select('timeFieldSelector').timepicker({
                 template: 'dropdown',
                 showInputs: false,
@@ -91,7 +90,9 @@ define([
                 minuteStep: 15,
                 defaultTime: timeString || false,
                 disableMousewheel: true
-            })
+            }).on('changeTime.timepicker', function () {
+                self.triggerFieldUpdated();
+            });
 
             this.on('click', {
                 timezoneSelector: this.onTimezoneOpen
@@ -115,6 +116,10 @@ define([
                 todayHighlight: true,
                 todayBtn: 'linked',
             }).on('changeDate', () => {
+                const timeField = input.next('input.timepicker');
+                if (!timeField.val()) {
+                    timeField.val('00:00');
+                }
                 this.triggerFieldUpdated();
             });
         });
@@ -127,6 +132,9 @@ define([
                 var timeField = input.next('input.timepicker'),
                     timeVal = timeField.val();
 
+                if (!timeVal) {
+                    timeVal = '00:00';
+                }
                 if (dateStr && timeVal && this.currentTimezone) {
                     return F.timezone.dateTimeStringServer(dateStr + ' ' + timeVal, this.currentTimezone.name);
                 }
