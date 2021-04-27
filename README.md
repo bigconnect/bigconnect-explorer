@@ -66,7 +66,7 @@ The release artifacts are available in the ```release/target/explorer-*``` folde
     * Name: BC Tomcat
     * Main Class: com.mware.web.TomcatWebServer
     * VM Arguments: -DHADOOP_HOME=/opt/bdl/lib/hadoop
-    * Program arguments: --webAppDir $MODULE_DIR$/../war/src/main/webapp --port 8888 --httpsPort 8889 --keyStorePath $MODULE_DIR$/config/keystore.jks --keyStorePassword password --trustStorePath $MODULE_DIR$/config/truststore.jks --trustStorePassword password
+    * Program arguments: --webAppDir $MODULE_DIR$/../war/src/main/webapp --port 8888
     * Working directory: $MODULE_DIR$/..
     * Environment variables: BIGCONNECT_DIR=$MODULE_DIR$/..
     * Use classpath of module: bc-tomcat-server
@@ -75,6 +75,7 @@ The release artifacts are available in the ```release/target/explorer-*``` folde
 4. Start the "BC Tomcat" run configuration
 
 ###	JavaScript Development instructions
+0. Run <code>npm install</code> in war/src/main/webapp
 1. If changes are made to the <b>package.json</b> file you need to run <i>mvn compile</i> from the <i>project</i>/web/war folder
 2. To compile all JavaScript and Less files run <i>grunt</i> from the <i>project</i>/web/war/src/main/webapp folder
 3. After all files are compiled, you can start the <i>watch.cmd</i> utility from the <i>project</i>/web/war/src/main/webapp folder to scan for filesystem changes
