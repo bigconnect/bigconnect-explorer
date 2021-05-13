@@ -54,6 +54,7 @@ const ONTOLOGY_CONSTANTS = {
     PROP_TEXT: 'text',
     PROP_VIDEO_TRANSCRIPT: 'videoTranscript',
     PROP_RAW_POSTER_FRAME: 'rawPosterFrame',
+    PROP_RAW_LANGUAGE: 'language',
     PROP_VIDEO_FORMAT: 'mediaVideoFormat',
     PROP_AUDIO_FORMAT: 'mediaAudioFormat',
     PROP_VIDEO_CODEC: 'mediaVideoCodec',
