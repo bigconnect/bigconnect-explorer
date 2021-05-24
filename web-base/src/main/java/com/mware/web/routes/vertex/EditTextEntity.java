@@ -50,12 +50,10 @@ import com.mware.core.model.workQueue.WorkQueueRepository;
 import com.mware.core.security.AuditEventType;
 import com.mware.core.security.AuditService;
 import com.mware.core.user.User;
-import com.mware.ge.Authorizations;
-import com.mware.ge.Graph;
-import com.mware.ge.Property;
-import com.mware.ge.Vertex;
+import com.mware.ge.*;
 import com.mware.ge.values.storable.DefaultStreamingPropertyValue;
 import com.mware.ge.values.storable.StreamingPropertyValue;
+import com.mware.ge.values.storable.Value;
 import com.mware.security.ACLProvider;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
@@ -113,6 +111,8 @@ public class EditTextEntity implements ParameterizedHandler {
 
         StreamingPropertyValue finalText = StreamingPropertyValue.create(valueStr);
 
+        Value textDescription = vertex.getProperty(propertyKey, propertyName).getMetadata()
+                                            .getValue(BcSchema.TEXT_DESCRIPTION_METADATA.getMetadataKey());
         try (GraphUpdateContext ctx = graphRepository.beginGraphUpdate(Priority.HIGH, user, authorizations)) {
             vertex = ctx.update(vertex, elemCtx -> {
                 Property rawProperty = BcSchema.RAW.getProperty(elemCtx.getElement());
@@ -152,6 +152,11 @@ public class EditTextEntity implements ParameterizedHandler {
 
         graph.flush();
         auditService.auditGenericEvent(user, workspaceId, AuditEventType.SET_PROPERTY, BcSchema.TEXT.getPropertyName(), "");
+
+        vertex = graph.getVertex(graphVertexId, authorizations);
+        Property textProperty = BcSchema.TEXT.getProperty(vertex, propertyKey);
+        vertex.prepareMutation()
+                .setPropertyMetadata(textProperty, BcSchema.TEXT_DESCRIPTION_METADATA.getMetadataKey(), textDescription, Visibility.EMPTY).save(authorizations);
 
         webQueueRepository.pushTextUpdated(graphVertexId, Priority.HIGH);
         workQueueRepository.pushGraphPropertyQueue(
