@@ -57,8 +57,6 @@ define([
         });
 
         this.after('initialize', function() {
-            var self = this;
-
             if ('localStorage' in window) {
                 var previouslyDismissed = localStorage.getItem('notificationsDismissed');
                 if (previouslyDismissed) {
@@ -75,6 +73,7 @@ define([
             this.on(document, 'notificationActive', this.onNotificationActive);
             this.on(document, 'notificationDeleted', this.onNotificationDeleted);
             this.on(document, 'notificationClearAll', this.onDismissAllNotifications);
+            this.on('refreshData', this.onRefresh);
 
             this.on('mouseover', {
                 notificationSelector: this.onMouseOver
@@ -83,6 +82,19 @@ define([
             this.immediateUpdate = this.update;
             this.update = _.debounce(this.update.bind(this), 250);
             this.sendMarkRead = _.debounce(this.sendMarkRead.bind(this), 3000);
+
+            this.loadData();
+
+            this.$container = $('<div>')
+                .addClass('notifications')
+                .appendTo(this.$node);
+        });
+
+        this.loadData = function() {
+            this.stack = [];
+            this.markRead = [];
+
+            var self = this;
 
             Promise.all([
                 this.dataRequest('config', 'properties'),
@@ -97,13 +109,12 @@ define([
                     user: parseInt(properties['notifications.user.autoDismissSeconds'] || '-1')
                 };
                 self.displayNotifications(notifications.system.active.concat(notifications.user));
-            })
+            });
+        };
 
-            this.$container = $('<div>')
-                .addClass('notifications')
-                .appendTo(this.$node);
-
-        });
+        this.onRefresh = function() {
+            this.loadData();
+        };
 
         this.onPostLocalNotification = function(event, data) {
             var notification = data && data.notification;
