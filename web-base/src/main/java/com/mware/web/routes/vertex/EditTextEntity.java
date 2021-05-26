@@ -111,32 +111,25 @@ public class EditTextEntity implements ParameterizedHandler {
 
         StreamingPropertyValue finalText = StreamingPropertyValue.create(valueStr);
 
-        Value textDescription = vertex.getProperty(propertyKey, propertyName).getMetadata()
-                                            .getValue(BcSchema.TEXT_DESCRIPTION_METADATA.getMetadataKey());
-        try (GraphUpdateContext ctx = graphRepository.beginGraphUpdate(Priority.HIGH, user, authorizations)) {
-            vertex = ctx.update(vertex, elemCtx -> {
-                Property rawProperty = BcSchema.RAW.getProperty(elemCtx.getElement());
-                if (rawProperty != null) {
-                    StreamingPropertyValue raw = (StreamingPropertyValue) rawProperty.getValue();
-                    if (raw != null) {
-                        ByteArrayInputStream bis = new ByteArrayInputStream(valueStr.getBytes());
-                        StreamingPropertyValue newRaw = new DefaultStreamingPropertyValue(bis, raw.getValueType());
-                        BcSchema.RAW.updateProperty(elemCtx, newRaw, rawProperty.getMetadata(), rawProperty.getVisibility());
-                    }
-                }
-
-                Property textProperty = BcSchema.TEXT.getProperty(elemCtx.getElement(), propertyKey);
-                BcSchema.TEXT.updateProperty(
-                        elemCtx,
-                        propertyKey,
-                        finalText,
-                        textProperty.getMetadata(),
-                        textProperty.getVisibility()
-                );
-            }).get();
-        } catch (Exception e) {
-            throw new BcException("Could not update text", e);
+        Property rawProperty = BcSchema.RAW.getProperty(vertex);
+        if (rawProperty != null) {
+            StreamingPropertyValue raw = (StreamingPropertyValue) rawProperty.getValue();
+            if (raw != null) {
+                ByteArrayInputStream bis = new ByteArrayInputStream(valueStr.getBytes());
+                StreamingPropertyValue newRaw = new DefaultStreamingPropertyValue(bis, raw.getValueType());
+                BcSchema.RAW.setProperty(vertex, newRaw, rawProperty.getMetadata(), rawProperty.getVisibility(), authorizations);
+            }
         }
+
+        Property textProperty = BcSchema.TEXT.getProperty(vertex, propertyKey);
+        BcSchema.TEXT.addPropertyValue(
+                vertex,
+                propertyKey,
+                finalText,
+                Metadata.create(textProperty.getMetadata()),
+                textProperty.getVisibility(),
+                authorizations
+        );
 
         Iterable<Vertex> termMentions = termMentionRepository.findByOutVertex(vertex.getId(), authorizations);
         Iterator<Vertex> termMentionsIterator = termMentions.iterator();
@@ -152,11 +145,6 @@ public class EditTextEntity implements ParameterizedHandler {
 
         graph.flush();
         auditService.auditGenericEvent(user, workspaceId, AuditEventType.SET_PROPERTY, BcSchema.TEXT.getPropertyName(), "");
-
-        vertex = graph.getVertex(graphVertexId, authorizations);
-        Property textProperty = BcSchema.TEXT.getProperty(vertex, propertyKey);
-        vertex.prepareMutation()
-                .setPropertyMetadata(textProperty, BcSchema.TEXT_DESCRIPTION_METADATA.getMetadataKey(), textDescription, Visibility.EMPTY).save(authorizations);
 
         webQueueRepository.pushTextUpdated(graphVertexId, Priority.HIGH);
         workQueueRepository.pushGraphPropertyQueue(
