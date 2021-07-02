@@ -147,8 +147,8 @@ define([
                 bcData.storePromise.then((store) => store.observe(elementSelectors.getElements, (elements) => {
                     bcData.storePromise.then(store => {
                         const selectedIds = store.getState().selection.idsByType;
-                        const vertices = _.filter(elements.vertices, v => _.contains(selectedIds.vertices, v.id));
-                        const edges = _.filter(elements.edges, v => _.contains(selectedIds.edges, v.id));
+                        const vertices = _.filter(elements.vertices, v => v && _.contains(selectedIds.vertices, v.id));
+                        const edges = _.filter(elements.edges, e => e && _.contains(selectedIds.edges, e.id));
 
                         require(['detail/item/item'], (Module) => {
                             Module.attachTo(self.select('detailTypeContentSelector').teardownAllComponents(), {
