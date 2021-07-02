@@ -37,11 +37,9 @@
 package com.mware.web.routes.vertex;
 
 import com.google.inject.Singleton;
-import com.mware.core.exception.BcException;
 import com.mware.core.ingest.dataworker.ElementOrPropertyStatus;
 import com.mware.core.model.clientapi.dto.ClientApiObject;
 import com.mware.core.model.graph.GraphRepository;
-import com.mware.core.model.graph.GraphUpdateContext;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.termMention.TermMentionRepository;
 import com.mware.core.model.workQueue.Priority;
@@ -51,9 +49,7 @@ import com.mware.core.security.AuditEventType;
 import com.mware.core.security.AuditService;
 import com.mware.core.user.User;
 import com.mware.ge.*;
-import com.mware.ge.values.storable.DefaultStreamingPropertyValue;
 import com.mware.ge.values.storable.StreamingPropertyValue;
-import com.mware.ge.values.storable.Value;
 import com.mware.security.ACLProvider;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
@@ -62,7 +58,6 @@ import com.mware.web.model.ClientApiSuccess;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 
 import javax.inject.Inject;
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -110,17 +105,6 @@ public class EditTextEntity implements ParameterizedHandler {
         aclProvider.checkCanAddOrUpdateProperty(vertex, propertyKey, propertyName, user, workspaceId);
 
         StreamingPropertyValue finalText = StreamingPropertyValue.create(valueStr);
-
-        Property rawProperty = BcSchema.RAW.getProperty(vertex);
-        if (rawProperty != null) {
-            StreamingPropertyValue raw = (StreamingPropertyValue) rawProperty.getValue();
-            if (raw != null) {
-                ByteArrayInputStream bis = new ByteArrayInputStream(valueStr.getBytes());
-                StreamingPropertyValue newRaw = new DefaultStreamingPropertyValue(bis, raw.getValueType());
-                BcSchema.RAW.setProperty(vertex, newRaw, rawProperty.getMetadata(), rawProperty.getVisibility(), authorizations);
-            }
-        }
-
         Property textProperty = BcSchema.TEXT.getProperty(vertex, propertyKey);
         BcSchema.TEXT.addPropertyValue(
                 vertex,

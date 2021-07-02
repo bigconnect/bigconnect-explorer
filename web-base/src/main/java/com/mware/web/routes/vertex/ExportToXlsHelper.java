@@ -132,18 +132,18 @@ public class ExportToXlsHelper {
                     try {
                         if (v.getProperty(propIRI).getValue() instanceof StreamingPropertyValue) {
                             value = ((StreamingPropertyValue) v.getProperty(propIRI).getValue()).readToString();
-                        } else if (v.getProperty(propIRI).getValue() instanceof DateTimeValue) {
-                            value = v.getProperty(propIRI).getValue().prettyPrint();
                         } else {
                             Iterable<Value> propValue = v.getPropertyValues(propIRI);
                             if (propValue != null) {
                                 for (Value val : propValue) {
-                                    if (val != null)
+                                    if (val != null) {
                                         value += val.prettyPrint() + ",";
+                                    }
                                 }
 
-                                if (value.endsWith(","))
+                                if (value.endsWith(",")) {
                                     value = value.substring(0, value.length() - 1);
+                                }
                             }
                         }
 
