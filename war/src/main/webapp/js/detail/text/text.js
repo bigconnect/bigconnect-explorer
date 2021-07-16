@@ -452,11 +452,6 @@ define([
                         });
 
                     if (textProperties.length) {
-                        const sentiment = F.vertex.propRaw(this.attr.model, ONTOLOGY_CONSTANTS.PROP_SENTIMENT);
-                        if (self) {
-                            self.$node.find('.text').addClass(sentiment)
-                        }
-
                         if (this.attr.focus) {
                             return this.openText(this.attr.focus.textPropertyKey, this.attr.focus.textPropertyName)
                                 .then(function() {
@@ -975,8 +970,6 @@ define([
             if (validWords.length === 0) {
                 return;
             }
-
-            var currentlyDragging = null;
 
             validWords
                 .each(function() {

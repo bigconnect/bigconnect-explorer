@@ -85,7 +85,8 @@ public class VertexUnresolveTermMentions implements ParameterizedHandler {
         long beforeDeletionTimestamp = System.currentTimeMillis() - 1;
         Vertex vertex = this.graph.getVertex(vertexId, authorizations);
         TermMentionUtils termMentionUtils = new TermMentionUtils(graph, visibilityTranslator, authorizations, user);
-        termMentionRepository.deleteTermMentions(vertexId, authorizations);
+        termMentionRepository.deleteTermMentions("", vertexId, authorizations);
+        termMentionRepository.deleteTermMentions("ent", vertexId, authorizations);
         termMentionUtils.removeHasDetectedEntityRelations(vertex);
         graph.flush();
 

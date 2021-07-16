@@ -47,8 +47,8 @@ define([
         },
         render() {
             const { selection, terms, ...rest } = this.props;
-
-            const transformed = terms.map(term => {
+            const termsWithoutSentiment = terms.filter(t => t.type !== 'sent');
+            const transformed = termsWithoutSentiment.map(term => {
                 const { termMentionFor, resolvedToEdgeId, resolvedToVertexId } = term;
                 const resolved = resolvedToVertexId && resolvedToEdgeId;
                 let type;

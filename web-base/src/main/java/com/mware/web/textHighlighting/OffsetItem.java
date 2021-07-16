@@ -61,40 +61,32 @@ public abstract class OffsetItem implements Comparable {
     }
 
     public abstract long getEnd();
-
     public abstract String getId();
-
     public abstract String getProcess();
-
     public abstract void setShouldBitShiftOffsetsForVideoTranscript(boolean shouldBitShiftOffsetsForVideoTranscript);
-
     public String getOutVertexId() {
         return null;
     }
-
     public String getResolvedToVertexId() {
         return null;
     }
-
     public String getResolvedFromTermMentionId() {
         return null;
     }
-
     public String getResolvedToTermMentionId() {
         return null;
     }
-
     public String getResolvedToEdgeId() {
         return null;
     }
-
     public abstract TermMentionFor getTermMentionFor();
-
     public abstract String getTermMentionForElementId();
-
     public abstract SandboxStatus getSandboxStatus();
-
     public abstract String getClassIdentifier();
+    public abstract String getConceptName();
+    public abstract String getType();
+    public abstract String getStyle();
+    public abstract Double getScore();
 
     public JSONObject getInfoJson() {
         try {
@@ -122,6 +114,12 @@ public abstract class OffsetItem implements Comparable {
             if(getProcess() != null) {
                 infoJson.put("process", getProcess());
             }
+            if(getType() != null) {
+                infoJson.put("type", getType());
+            }
+            if(getType() != null) {
+                infoJson.put("score", getScore());
+            }
             return infoJson;
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -130,23 +128,29 @@ public abstract class OffsetItem implements Comparable {
 
     public List<String> getCssClasses() {
         ArrayList<String> classes = new ArrayList<>();
-        boolean resolved = getResolvedToVertexId() != null && getResolvedToEdgeId() != null;
-        if (resolved) {
-            classes.add("resolved");
+
+        if (!"sent".equals(this.getType())) {
+            boolean resolved = getResolvedToVertexId() != null && getResolvedToEdgeId() != null;
+            if (resolved) {
+                classes.add("resolved");
+            }
+
+            TermMentionFor termMentionFor = getTermMentionFor();
+            boolean resolvable = !resolved && termMentionFor == null;
+            if (resolvable) {
+                classes.add("resolvable");
+            } else if (!resolved) {
+                classes.add("jref");
+            }
+            if (resolvable || resolved) {
+                classes.add("res");
+            }
         }
-        TermMentionFor termMentionFor = getTermMentionFor();
-        boolean resolvable = !resolved && termMentionFor == null;
-        if (resolvable) {
-            classes.add("resolvable");
-        } else if (!resolved) {
-            classes.add("jref");
-        }
-        if (resolvable || resolved) {
-            classes.add("res");
-        }
+
         if (getClassIdentifier() != null) {
             classes.add(getClassIdentifier());
         }
+
         return classes;
     }
 

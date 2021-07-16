@@ -70,6 +70,7 @@ public class EntityHighlighterTest {
     private static final String PROPERTY_KEY = "";
     private static final String PERSON_IRI = "test/person";
     private static final String LOCATION_IRI = "test/location";
+    private static final String ORGANIZATION_IRI = "test/organization";
 
     InMemoryGraph graph;
 
@@ -354,7 +355,7 @@ public class EntityHighlighterTest {
             StringBuilder selector = new StringBuilder(".text");
             for (int i = 0; i < expectedDepth; i++) {
                 selector.append(" .res");
-                String depthSelector = selector.toString() + "{";
+                String depthSelector = selector + "{";
                 assertTrue("Style contains: " + depthSelector, style.contains(depthSelector));
             }
         } else {
@@ -366,6 +367,27 @@ public class EntityHighlighterTest {
         return createTermMention(outVertex, sign, conceptIri, start, end, null, null);
     }
 
+    private Vertex createSentimentSection(Vertex outVertex, String sentiment, double score, int start, int end) {
+        TermMentionBuilder tmb = new TermMentionBuilder()
+                .outVertex(outVertex)
+                .propertyKey(PROPERTY_KEY)
+                .propertyName(BcSchema.TEXT.getPropertyName())
+                .start(start)
+                .end(end)
+                .title(sentiment)
+                .type("sent")
+                .score(score)
+                .visibilityJson("")
+                .process(getClass().getSimpleName());
+
+        if ("positive".equals(sentiment))
+            tmb.style("background-color: #00ff00; opacity: "+score);
+        else
+            tmb.style("background-color: #ff0000; opacity: "+score);
+
+        return tmb.save(graph, visibilityTranslator, user, authorizations);
+    }
+
     private Vertex createTermMention(Vertex outVertex, String sign, String conceptIri, int start, int end, Vertex resolvedToVertex, Edge resolvedEdge) {
         TermMentionBuilder tmb = new TermMentionBuilder()
                 .outVertex(outVertex)
@@ -374,6 +396,7 @@ public class EntityHighlighterTest {
                 .conceptName(conceptIri)
                 .start(start)
                 .end(end)
+                .type("ent")
                 .title(sign)
                 .visibilityJson("")
                 .process(getClass().getSimpleName());
@@ -389,6 +412,7 @@ public class EntityHighlighterTest {
                 .propertyKey(PROPERTY_KEY)
                 .propertyName(BcSchema.TEXT.getPropertyName())
                 .conceptName(conceptIri)
+                .type("ent")
                 .start(start)
                 .end(end)
                 .title(sign)
@@ -587,5 +611,30 @@ public class EntityHighlighterTest {
         List<String> results = new ArrayList<>();
         Collections.addAll(results, strings);
         return results;
+    }
+
+    @Test
+    public void testSentiment() throws Exception {
+        Vertex outVertex = graph.addVertex("1", visibility, authorizations, CONCEPT_TYPE_THING);
+        ArrayList<Vertex> terms = new ArrayList<>();
+
+
+        terms.add(createSentimentSection(outVertex, "positive", 0.4, 0, 281));
+        terms.add(createSentimentSection(outVertex, "negative", 0.6, 282, 614));
+
+        terms.add(createTermMention(outVertex, "PSD", ORGANIZATION_IRI, 16, 19));
+        terms.add(createTermMention(outVertex, "Liviu Dragnea", ORGANIZATION_IRI, 20, 33));
+        terms.add(createTermMention(outVertex, "Tribunalul Giurgiu", ORGANIZATION_IRI, 360, 378));
+        terms.add(createTermMention(outVertex, "Flavia Teodosiu", ORGANIZATION_IRI, 379, 394));
+        terms.add(createTermMention(outVertex, "Înalta Curte de Casație și Justiție", ORGANIZATION_IRI, 577, 612));
+
+        List<OffsetItem> termAndTermMetadata = new EntityHighlighter().convertTermMentionsToOffsetItems(terms, "", authorizations);
+        String text = "Fostul lider al PSD Liviu Dragnea, care va fi pus în libertate joi după ce instanța a decis eliberarea sa condiționată, va avea mai multe interdicții stabilite de către instanța supremă odată cu pronunțarea deciziei de condamnare la 3 ani și jumătate de închisoare, în 27 mai 2019.\n";
+        text += "Decizia de eliberare condiționată a fostului lider al PSD a fost luată joi de Tribunalul Giurgiu.";
+        text += "Flavia Teodosiu, avocata lui Liviu Dragnea, a declarat pentru HotNews.ro că instanța nu a stabilit interdicții suplimentare pentru fostul lider al PSD și că vor fi în vigoare doar cele stabilite de Înalta Curte de Casație și Justiție.\n";
+        text += "Liviu Dragnea se află în penitenciar din 27 mai 2019, când a fost condamnat definitiv de instanţa supremă la 3 ani şi 6 luni de închisoare.\n";
+
+        String highlightedText = EntityHighlighter.getHighlightedText(text, termAndTermMetadata);
+        System.out.println(highlightedText);
     }
 }

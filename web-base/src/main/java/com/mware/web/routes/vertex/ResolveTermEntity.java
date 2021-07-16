@@ -183,6 +183,7 @@ public class ResolveTermEntity implements ParameterizedHandler {
                 .start(mentionStart)
                 .end(mentionEnd)
                 .title(title)
+                .type("ent")
                 .snippet(sourceInfo == null ? null : sourceInfo.snippet)
                 .conceptName(conceptId)
                 .visibilityJson(visibilityJson)

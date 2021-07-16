@@ -102,6 +102,21 @@ public class VertexOffsetItem extends OffsetItem {
         return BcSchema.TERM_MENTION_CONCEPT_TYPE.getPropertyValue(termMention);
     }
 
+    @Override
+    public String getType() {
+        return BcSchema.TERM_MENTION_TYPE.getPropertyValue(termMention);
+    }
+
+    @Override
+    public String getStyle() {
+        return BcSchema.TERM_MENTION_STYLE.getPropertyValue(termMention);
+    }
+
+    @Override
+    public Double getScore() {
+        return BcSchema.TERM_MENTION_SCORE.getPropertyValue(termMention);
+    }
+
     public String getSnippet() {
         return SourceInfoSnippetSanitizer.sanitizeSnippet(
                 BcSchema.TERM_MENTION_SNIPPET.getPropertyValue(termMention, null)

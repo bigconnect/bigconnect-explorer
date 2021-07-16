@@ -213,7 +213,7 @@ public class EntityHighlighter {
             }
             out.write("}");
             if (depth == 1) {
-                out.write(selector.toString() + ".resolvable");
+                out.write(selector + ".resolvable");
                 out.write("{");
                 out.write("border-image-source: repeating-linear-gradient(to right, transparent, transparent 1px, rgb(0,0,0) 1px, rgb(0,0,0) 3px);");
                 out.write("}");
@@ -296,6 +296,15 @@ public class EntityHighlighter {
             out.write(" class=\"");
             out.write(StringUtils.join(item.getCssClasses(), " "));
             out.write("\"");
+
+            if (item.getScore() != null) {
+                out.write(" data-score=\"" + item.getScore() + "\"");
+            }
+
+            if (!StringUtils.isEmpty(item.getType())) {
+                out.write(" data-type=\"" + item.getType() + "\"");
+            }
+
             if (item.getTitle() != null) {
                 out.write(" title=\"");
                 out.write(StringEscapeUtils.escapeXml11(item.getTitle()));
@@ -315,6 +324,11 @@ public class EntityHighlighter {
             } else if (classIdentifier != null) {
                 out.write(" data-ref=\"" + classIdentifier + "\"");
             }
+
+            if (!StringUtils.isEmpty(item.getStyle())) {
+                out.write(" style=\"" + item.getStyle() + "\"");
+            }
+
             out.write(">");
         } else {
             out.write("</span>");
