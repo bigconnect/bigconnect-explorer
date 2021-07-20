@@ -487,11 +487,11 @@ define([
             // position popovers for workspaces and activity
             if(data.name === 'workspaces') {
                 let $popover = $(this.attr.workspacesPopoverSelector),
-                    pos = this.$node.find('.workspaces').parent().position(),
-                    popoverWidth = this.$node.find('.workspaces').parent().outerWidth();
+                    pos = this.$node.find('.workspaces').position(),
+                    workspacesPaneWidth = 585;
 
-                    // $popover.css('left', pos.left - (popoverWidth/2) + 'px');
-                    $popover.css('right',  popoverWidth + 'px');
+                    $popover.css('left', (pos.left - workspacesPaneWidth/2 + 70)+ 'px');
+                    // $popover.css('right',  popoverWidth + 'px');
 
             } else if(data.name === 'activity') {
                 let $popover = $(this.attr.activityPopoverSelector),
