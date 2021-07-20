@@ -363,6 +363,7 @@ define([
                         placementHint: 'top',
                         tooltip: item.title,
                         anchorCss: {},
+                        extraClass: ''
                     }, item.options),
                     newItemInner = $('<a>')
                         .text(item.title)
@@ -370,6 +371,7 @@ define([
                         .append(item.icon ? `<i class="material-icons">${item.icon}</i>` : ''),
                     newItem = $('<li>')
                         .addClass(cls)
+                        .addClass(options.extraClass)
                         .attr('data-identifier', item.identifier)
                         .append(newItemInner),
                     container = self.$node.find('.menu-' + options.placementHint),
