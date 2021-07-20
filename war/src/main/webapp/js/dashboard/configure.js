@@ -67,7 +67,7 @@ define([
                 report = config.item.configuration.report || extension.report,
                 addDefaultConfiguration = !extension.options ||
                     extension.options.preventDefaultConfig !== true;
-
+            config.teardownOnTap = !extension.noTeardownOnTap;
             this.extension = extension;
             this.components = [];
 
