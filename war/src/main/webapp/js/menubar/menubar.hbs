@@ -4,7 +4,7 @@
             <section class="navbar-brand" href="javascript:void(0)"><img src="img/menubar_logo.svg"></section>
         </div>
 
-        <div class="navbar-collapse collapse">
+        <div class="navbar-collapse collapse menu-top">
             <ul class="nav navbar-nav">
                 <li class="dashboard"><a>{{ i18n 'menubar.icons.dashboard' }}</a></li>
                 <li class="ingest"><a>{{ i18n 'menubar.icons.ingest' }}</a></li>
@@ -26,6 +26,7 @@
             </div>
 
             <ul class="nav navbar-nav navbar-right">
+                <li class="workspaces"><a><i class="material-icons">dashboard</i></a></li>
                 <li class="activity"><a><i class="material-icons">group_work</i></a></li>
                 {{#if isAdmin }}
                     <li class="admin"><a><i class="material-icons">settings</i></a></li>
@@ -39,11 +40,6 @@
                     </ul>
                 </li>
             </ul>
-            <div class="navbar-form navbar-right">
-                <h3 class="workspace-name workspaces">
-                    <i class="material-icons">dashboard</i>
-                </h3>
-            </div>
         </div>
     </div>
 </nav>

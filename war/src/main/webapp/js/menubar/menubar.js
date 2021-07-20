@@ -47,10 +47,13 @@ define([
     const enableCypherLabLink = config['cypher.lab'] || "true";
 
     // Add class name of <li> buttons here
-    var BUTTONS = 'dashboard ingest search workspaces admin activity logout products user-profile'.split(' '),
+    const
+        BUTTONS = 'dashboard ingest search workspaces admin activity logout products user-profile'.split(' '),
+
         PANE_AUXILIARY = {
             products: { name: 'products-full', action: { type: 'full', componentPath: 'product/ProductDetailContainer' } }
         },
+
         TOOLTIPS = {
             activity: i18n('menubar.icons.activity.tooltip'),
             ingest: i18n('menubar.icons.ingest.tooltip'),
@@ -90,15 +93,23 @@ define([
             var self = this,
                 isSwitch = false;
 
-            if (DISABLE_ACTIVE_SWITCH.indexOf(name) === -1) {
+            var itemName = name;
+            if (name in self.extensions) {
+                const action = self.extensions[name].action;
+                if (action.type === 'default') {
+                    itemName = action.pane;
+                }
+            }
+
+            if (DISABLE_ACTIVE_SWITCH.indexOf(itemName) === -1) {
                 MUTALLY_EXCLUSIVE_SWITCHES.forEach(function(exclusive, i) {
-                    if (exclusive.names.indexOf(name) !== -1 && exclusive.options.allowCollapse === false) {
+                    if (exclusive.names.indexOf(itemName) !== -1 && exclusive.options.allowCollapse === false) {
                         isSwitch = true;
                     }
                 });
             }
             var icon = this.select(sel);
-            if (!_.contains(DISABLE_HIDE_TOOLTIP_ON_CLICK, name)) {
+            if (!_.contains(DISABLE_HIDE_TOOLTIP_ON_CLICK, itemName)) {
                 icon.tooltip('hide');
             }
 
@@ -106,15 +117,12 @@ define([
                 icon.toggleClass('toggled');
             } else {
                 requestAnimationFrame(function() {
-                    var data = { name: name };
-                    if (name in self.extensions) {
-                        data.action = self.extensions[name].action;
-                    }
+                    var data = { name: itemName };
                     if (data.action && data.action.type === 'url') {
                         flashIcon(icon);
                         window.open(data.action.url);
                     } else {
-                        var aux = PANE_AUXILIARY[name];
+                        var aux = PANE_AUXILIARY[itemName];
                         if (aux) {
                             if (!icon.hasClass('active-aux') && icon.hasClass('only-open-auxiliary')) {
                                 self.trigger(document, 'menubarToggleDisplay', {
@@ -148,8 +156,7 @@ define([
             events[sel] = menubarItemHandler(name);
         });
 
-        var self = this,
-            extensions = {};
+        var extensions = {};
 
         /**
          * Add additional icons into the menubar that can open a slide out
@@ -157,7 +164,7 @@ define([
          * dashboard.
          *
          * For placement hints options, these are the built-in identifiers:
-         * `dashboard`, `search`, `workspaces` (cases), `products`, `admin`,
+         * `dashboard`, `search`, `workspaces`, `products`, `admin`,
          * `activity`, `logout`.
          *
          * All `pane` type extensions will automatically save/restore pane
@@ -166,7 +173,7 @@ define([
          * @param {string} title The text to display under the icon
          * @param {string} identifier The unique identifier for this item.
          * Should be valid CSS classname.
-         * @param {string} icon Url to the icon to display
+         * @param {string} icon material-icons name of the icon to display
          * @param {object} action The unique identifier for this item
          * @param {string} action.componentPath The path to a Flight or React
          * component
@@ -355,20 +362,16 @@ define([
                     options = $.extend({
                         placementHint: 'top',
                         tooltip: item.title,
-                        anchorCss: {}
+                        anchorCss: {},
                     }, item.options),
+                    newItemInner = $('<a>')
+                        .text(item.title)
+                        .css(options.anchorCss)
+                        .append(item.icon ? `<i class="material-icons">${item.icon}</i>` : ''),
                     newItem = $('<li>')
                         .addClass(cls)
                         .attr('data-identifier', item.identifier)
-                        .append(
-                            $('<a>')
-                            .text(item.title)
-                            .css(
-                                $.extend({
-                                    'background-image': 'url("' + item.icon + '")'
-                                }, options.anchorCss)
-                            )
-                        ),
+                        .append(newItemInner),
                     container = self.$node.find('.menu-' + options.placementHint),
                     placementHint = options.placementHintAfter || options.placementHintBefore,
                     $placement = placementHint && container.find('.' + placementHint)
