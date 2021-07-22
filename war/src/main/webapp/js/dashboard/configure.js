@@ -178,6 +178,7 @@ define([
                         extension: this.extension,
                         report: item.configuration.report || this.extension.report,
                         item: item,
+                        parentNode: self.$node
                     })
                     .behavior({
                         configurationChanged: (attacher, data) => {
