@@ -39,7 +39,7 @@ define([
     'configuration/plugins/registry',
     'util/popovers/withPopover',
     'util/component/attacher'
-], function(
+], function (
     defineComponent,
     registry,
     withPopover,
@@ -55,15 +55,17 @@ define([
 
     function ConfigPopover() {
 
-        this.before('teardown', function() {
-            this.components.forEach(attacher => { attacher.teardown() });
+        this.before('teardown', function () {
+            this.components.forEach(attacher => {
+                attacher.teardown()
+            });
             this.$node.closest('.card-toolbar').removeClass('active');
         })
 
-        this.before('initialize', function(node, config) {
+        this.before('initialize', function (node, config) {
             config.template = '/dashboard/configureTpl.hbs';
             var paths = config.configurationPaths || [],
-                extension = _.findWhere(extensions, { identifier: config.item.extensionId }),
+                extension = _.findWhere(extensions, {identifier: config.item.extensionId}),
                 report = config.item.configuration.report || extension.report,
                 addDefaultConfiguration = !extension.options ||
                     extension.options.preventDefaultConfig !== true;
@@ -98,15 +100,15 @@ define([
 
             config.empty = paths.length === 0;
 
-            this.after('setupWithTemplate', function() {
+            this.after('setupWithTemplate', function () {
                 var self = this,
                     item = this.attr.item;
 
                 this.$node.closest('.card-toolbar').addClass('active');
-                this.on(this.popover, 'redirectEventToItem', function(event, data) {
+                this.on(this.popover, 'redirectEventToItem', function (event, data) {
                     this.$node.closest('.grid-stack-item').find('.item-content').trigger(data.name, data.data);
                 });
-                this.on(this.$node.closest('.grid-stack-item').find('.item-content'), 'redirectEventToConfiguration', function(event, data) {
+                this.on(this.$node.closest('.grid-stack-item').find('.item-content'), 'redirectEventToConfiguration', function (event, data) {
                     this.popover.find('.popover-content > div').trigger(data.name, data.data);
                 })
                 this.on(this.popover, 'configurationChanged', this.onConfigurationChanged);
@@ -114,7 +116,7 @@ define([
             });
         });
 
-        this.onConfigurationChanged = function(event, data) {
+        this.onConfigurationChanged = function (event, data) {
             this.trigger('configurationChanged', data);
 
             if (data.options && data.options.changed === 'item.title') return;
@@ -136,18 +138,18 @@ define([
             }
         };
 
-        this.updateComponents = function(data) {
+        this.updateComponents = function (data) {
             this.components.forEach((attacher) => {
                 attacher.params(data).attach({
-                   teardown: true,
-                   teardownOptions: {
-                      react: false
-                   }
+                    teardown: true,
+                    teardownOptions: {
+                        react: false
+                    }
                 });
             });
         };
 
-        this.teardownConfigPath = function(path) {
+        this.teardownConfigPath = function (path) {
             this.components = _.chain(this.components)
                 .map((attacher) => {
                     if (attacher.path() === path) {
@@ -162,11 +164,12 @@ define([
                 .value();
         }
 
-        this.renderConfigurations = function(paths) {
-            const item = this.attr.item;
-            const root = this.popover.find('.popover-content');
+        this.renderConfigurations = function (paths) {
+            const item = this.attr.item,
+                self = this,
+                root = this.popover.find('.popover-content');
 
-            return Promise.map(paths, (path) => {
+            Promise.map(paths, (path) => {
                 const node = $('<div>').data('path', path).appendTo(root);
 
                 return Attacher().node(node)
@@ -174,17 +177,21 @@ define([
                     .params({
                         extension: this.extension,
                         report: item.configuration.report || this.extension.report,
-                        item: item
+                        item: item,
                     })
                     .behavior({
                         configurationChanged: (attacher, data) => {
                             this.onConfigurationChanged(null, data);
+                        },
+                        close: (attacher) => {
+                            attacher.teardown();
+                            self.teardown();
                         }
                     })
                     .attach();
             }).then((components) => {
-               this.components.push(...components);
-               this.positionDialog();
+                this.components.push(...components);
+                this.positionDialog();
             });
         };
 
