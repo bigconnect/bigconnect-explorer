@@ -947,7 +947,8 @@ define([
                             reportConfiguration: reportConfiguration,
                             report: report,
                             extension: extension,
-                            item: item
+                            item: item,
+                            wrapper: self
                         })
                         .behavior({
                             showError: self.onShowError.bind(self),
