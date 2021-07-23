@@ -40,8 +40,9 @@ define([
     './activity/activity',
     './menubar.hbs',
     'admin/admin',
-    'util/requirejs/promise!util/service/propertiesPromise'
-], function(defineComponent, registry, Activity, template, AdminList, config) {
+    'util/requirejs/promise!util/service/propertiesPromise',
+    'util/component/attacher',
+], function(defineComponent, registry, Activity, template, AdminList, config, Attacher) {
     'use strict';
 
     const enableCypherLabLink = config['cypher.lab'] || "true";
@@ -198,7 +199,7 @@ define([
                 return ('title' in e) &&
                     ('identifier' in e) &&
                     ('action' in e) &&
-                    ('icon' in e);
+                    ('icon' in e || 'componentPath' in e);
             },
             'https://docs.bigconnect.io/developer-guide/plugin-development/web-plugins/extension-point-reference-1/menu-bar'
         );
@@ -365,18 +366,30 @@ define([
                         anchorCss: {},
                         extraClass: ''
                     }, item.options),
+                    container = self.$node.find('.menu-' + options.placementHint),
+                    placementHint = options.placementHintAfter || options.placementHintBefore,
+                    $placement = placementHint && container.find('.' + placementHint);
+
+                let newItemInner;
+
+                if (item.componentPath) {
+                    newItemInner = $('<a></a>');
+                    Attacher().node(newItemInner)
+                        .path(item.componentPath)
+                        .params({ item })
+                        .attach({ teardown: true, empty: true });
+                } else {
                     newItemInner = $('<a>')
                         .text(item.title)
                         .css(options.anchorCss)
-                        .append(item.icon ? `<i class="material-icons">${item.icon}</i>` : ''),
-                    newItem = $('<li>')
+                        .append(item.icon ? `<i class="material-icons">${item.icon}</i>` : '');
+                }
+
+                const newItem = $('<li>')
                         .addClass(cls)
                         .addClass(options.extraClass)
                         .attr('data-identifier', item.identifier)
-                        .append(newItemInner),
-                    container = self.$node.find('.menu-' + options.placementHint),
-                    placementHint = options.placementHintAfter || options.placementHintBefore,
-                    $placement = placementHint && container.find('.' + placementHint)
+                        .append(newItemInner);
 
                 if ($placement) {
                     if ($placement.length) {
