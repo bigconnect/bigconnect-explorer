@@ -373,7 +373,8 @@ define([
                 let newItemInner;
 
                 if (item.componentPath) {
-                    newItemInner = $('<a></a>');
+                    newItemInner = $('<a>')
+                        .css(options.anchorCss);
                     Attacher().node(newItemInner)
                         .path(item.componentPath)
                         .params({ item })
