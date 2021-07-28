@@ -51,7 +51,9 @@ define([
             EQUALS: '=',
             IN: 'in',
             LESS_THAN: '<',
+            LESS_THAN_EQUAL: '<=',
             GREATER_THAN: '>',
+            GREATER_THAN_EQUAL: '>=',
             BETWEEN: 'range'
     };
 
@@ -455,16 +457,25 @@ define([
                     PREDICATES.EQUALS
                 ].concat(standardPredicates);
 
-                case 'date':
+                case 'date': return [
+                    PREDICATES.LESS_THAN,
+                    PREDICATES.LESS_THAN_EQUAL,
+                    PREDICATES.GREATER_THAN,
+                    PREDICATES.GREATER_THAN_EQUAL,
+                    PREDICATES.BETWEEN,
+                    PREDICATES.EQUALS
+                ].concat(standardPredicates);
+
                 case 'currency':
                 case 'double':
                 case 'integer':
                 case 'number': return [
-                        PREDICATES.LESS_THAN,
-                        PREDICATES.GREATER_THAN,
-                        PREDICATES.BETWEEN,
-                        PREDICATES.EQUALS
-                    ].concat(standardPredicates);
+                    PREDICATES.LESS_THAN,
+                    PREDICATES.LESS_THAN_EQUAL,
+                    PREDICATES.GREATER_THAN,
+                    PREDICATES.GREATER_THAN_EQUAL,
+                    PREDICATES.EQUALS
+                ].concat(standardPredicates);
 
                 default:
                     throw new Error('Unknown datatype: ' + property.dataType);
