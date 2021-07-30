@@ -233,13 +233,33 @@ define([
                                                             disabled={property.systemProperty}
                                                             onChange={(e) => { this.setPropertyState('dataType', e.target.value)} }
                                                     >
-                                                        <option value="string">String</option>
-                                                        <option value="integer">Integer</option>
-                                                        <option value="double">Double</option>
-                                                        <option value="currency">Currency</option>
-                                                        <option value="date">Date</option>
                                                         <option value="boolean">Boolean</option>
+                                                        <option value="booleanArray">Boolean Array</option>
+                                                        <option value="byte">Byte</option>
+                                                        <option value="byteArray">Byte Array</option>
+                                                        <option value="char">Char</option>
+                                                        <option value="charArray">Char Array</option>
+                                                        <option value="date">Date</option>
+                                                        <option value="dateArray">Date Array</option>
+                                                        <option value="string">String</option>
+                                                        <option value="stringArray">String Array</option>
+                                                        <option value="double">Double</option>
+                                                        <option value="doubleArray">Double Array</option>
+                                                        <option value="duration">Duration</option>
+                                                        <option value="durationArray">Duration Array</option>
+                                                        <option value="float">Float</option>
+                                                        <option value="floatArray">Float Array</option>
+                                                        <option value="integer">Integer</option>
+                                                        <option value="integerArray">Integer Array</option>
+                                                        <option value="short">Short</option>
+                                                        <option value="shortArray">Short Array</option>
+                                                        <option value="long">Long</option>
+                                                        <option value="longArray">Long Array</option>
                                                         <option value="geoLocation">GeoLocation (lat,lon)</option>
+                                                        <option value="geocircle">GeoCircle</option>
+                                                        <option value="geoline">GeoLine</option>
+                                                        <option value="georect">GeoRect</option>
+                                                        <option value="geopolygon">GeoPolygon</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -495,7 +515,7 @@ define([
                                                         <option value="bytes">Size (Bytes)</option>
                                                         <option value="dateOnly">Date (no Time)</option>
                                                         <option value="heading">Heading</option>
-                                                        <option value="geoLocation">Geo-Location</option>
+                                                        <option value="geoLocation">GeoLocation</option>
                                                     </select>
                                                 </div>
                                             </div>

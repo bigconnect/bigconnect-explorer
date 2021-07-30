@@ -393,6 +393,7 @@ define([
                 } else if (propertyDetails) {
                     var isCompoundField = propertyDetails.dependentPropertyIris &&
                         propertyDetails.dependentPropertyIris.length,
+                        dataType = propertyDetails.dataType,
                         fieldComponent;
 
                     if (isCompoundField) {
@@ -407,6 +408,12 @@ define([
                         fieldComponent = 'fields/compound/compound';
                     } else if (propertyDetails.displayType === 'duration') {
                         fieldComponent = 'fields/duration';
+                    } else if (dataType.endsWith('Array') || dataType === 'geopolygon' || dataType === 'georect' || dataType === 'geoline' || dataType === 'geocircle') {
+                        fieldComponent = 'fields/string';
+                    } else if (dataType === 'byte' || dataType === 'short' || dataType === 'char' || dataType === 'long' || dataType === 'integer') {
+                        fieldComponent = 'fields/integer';
+                    } else if (dataType === 'double' || dataType === 'float') {
+                        fieldComponent = 'fields/double';
                     } else {
                         fieldComponent = propertyDetails.possibleValues ?
                             'fields/restrictValues' : 'fields/' + propertyDetails.dataType;

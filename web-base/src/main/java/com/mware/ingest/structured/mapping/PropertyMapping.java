@@ -144,7 +144,7 @@ public class PropertyMapping {
                 return new BooleanPropertyMapping(visibilityTranslator, workspaceId, propertyMapping);
             } else if (schemaProperty.getDataType() == PropertyType.GEO_LOCATION) {
                 return new GeoPointPropertyMapping(visibilityTranslator, workspaceId, propertyMapping);
-            } else if (schemaProperty.getDataType() == PropertyType.CURRENCY ||
+            } else if (schemaProperty.getDataType() == PropertyType.FLOAT ||
                     schemaProperty.getDataType() == PropertyType.DOUBLE ||
                     schemaProperty.getDataType() == PropertyType.INTEGER) {
                 return new NumericPropertyMapping(schemaProperty, visibilityTranslator, workspaceId, propertyMapping);
@@ -182,7 +182,7 @@ public class PropertyMapping {
             return new BooleanPropertyMapping(visibilityTranslator, workspaceId, mapping);
         } else if (schemaProperty.getDataType() == PropertyType.GEO_LOCATION) {
             return new GeoPointPropertyMapping(visibilityTranslator, workspaceId, mapping);
-        } else if (schemaProperty.getDataType() == PropertyType.CURRENCY ||
+        } else if (schemaProperty.getDataType() == PropertyType.FLOAT ||
                 schemaProperty.getDataType() == PropertyType.DOUBLE ||
                 schemaProperty.getDataType() == PropertyType.INTEGER) {
             return new NumericPropertyMapping(schemaProperty, visibilityTranslator, workspaceId, mapping);

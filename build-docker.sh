@@ -2,4 +2,4 @@
 
 mvn clean
 
-docker build -t bigconnect/bigconnect-explorer:4.2.1 .
+docker build -t bigconnect/bigconnect-explorer:4.2.2 .
