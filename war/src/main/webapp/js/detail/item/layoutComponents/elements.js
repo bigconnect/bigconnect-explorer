@@ -38,7 +38,7 @@ define([
     'detail/toolbar/toolbar',
     'util/vertex/formatters'
 ], function(Toolbar, F) {
-    'use strict';
+    'use strict';http://localhost:8888/#v=v470570209512&w=WORKSPACE_447507965765
 
     return [
         {

@@ -62,9 +62,8 @@ define([
             options: [
                 { type: 'integer', label: i18n('ontology.property.dataformat.number.integer') },
                 { type: 'double', label: i18n('ontology.property.dataformat.number.double') },
-                { type: 'currency', label: i18n('ontology.property.dataformat.number.currency') },
-                { type: 'double', displayType: 'duration', label: i18n('ontology.property.dataformat.number.duration') },
-                { type: 'integer', displayType: 'bytes', label: i18n('ontology.property.dataformat.number.bytes') }
+                { type: 'duration', displayType: 'duration', label: i18n('ontology.property.dataformat.number.duration') },
+                { type: 'long', displayType: 'bytes', label: i18n('ontology.property.dataformat.number.bytes') }
             ]
         },
         {

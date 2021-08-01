@@ -1,4 +1,3 @@
-
 /*
  * This file is part of the BigConnect project.
  *
@@ -92,15 +91,12 @@ define(['util/withFormFieldErrors'], function(withFormFieldErrors) {
                     self.trigger('opened');
                 }
             });
-            var form = node.find('.form'),
-                outerHeight = form.outerHeight(true),
-                tempScrollTo = $('<div>')
+            var tempScrollTo = $('<div>')
                     .css({ height: outerHeight + 'px' })
                     .insertBefore(node);
             // Add placeholder node that doesn't animate height which
             // could confuse the browsers scrollTo logic
             scrollToNode(tempScrollTo);
-            node.css({ height: outerHeight + 'px' });
         };
 
         this.after('teardown', function() {
