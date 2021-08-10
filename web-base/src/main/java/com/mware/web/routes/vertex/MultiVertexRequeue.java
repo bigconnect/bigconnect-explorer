@@ -47,6 +47,7 @@ import com.mware.ge.Graph;
 import com.mware.ge.Property;
 import com.mware.ge.Vertex;
 import com.mware.ge.query.Compare;
+import com.mware.ge.query.builder.GeQueryBuilders;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
@@ -82,7 +83,7 @@ public class MultiVertexRequeue implements ParameterizedHandler {
         Iterable<Vertex> vertices;
 
         if (!StringUtils.isEmpty(conceptType)) {
-            vertices = graph.query(authorizations).hasConceptType(conceptType).vertices();
+            vertices = graph.query(GeQueryBuilders.hasConceptType(conceptType), authorizations).vertices();
         } else {
             vertices = graph.getVertices(authorizations);
         }

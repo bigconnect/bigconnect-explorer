@@ -3,7 +3,6 @@
   "description": "BigConnect Explorer",
   "author": "MWARE SOLUTIONS SRL",
   "license": "AGPL-3.0-only",
-
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@mware/bootstrap": "3.3.8",
@@ -116,7 +115,6 @@
     "react-hot-loader": "^4.13.0",
     "redux-devtools": "^3.4.1"
   },
-
   "scripts": {
     "postinstall": "grunt deps"
   }

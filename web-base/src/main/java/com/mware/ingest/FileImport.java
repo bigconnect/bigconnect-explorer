@@ -70,6 +70,7 @@ import com.mware.core.util.RowKeyHelper;
 import com.mware.core.util.ServiceLoaderUtil;
 import com.mware.ge.*;
 import com.mware.ge.query.QueryResultsIterable;
+import com.mware.ge.query.builder.GeQueryBuilders;
 import com.mware.ge.values.storable.ByteArray;
 import com.mware.ge.values.storable.DefaultStreamingPropertyValue;
 import com.mware.ge.values.storable.StreamingPropertyValue;
@@ -87,7 +88,10 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import static com.mware.core.model.properties.RawObjectSchema.CONTENT_HASH;
+import static com.mware.ge.query.builder.GeQueryBuilders.hasFilter;
 import static com.mware.ge.util.IterableUtils.toList;
+import static com.mware.ge.values.storable.Values.stringValue;
 
 @Singleton
 public class FileImport {
@@ -391,7 +395,7 @@ public class FileImport {
             }
             List<BcPropertyUpdate> changedProperties = new ArrayList<>();
             BcSchema.RAW.updateProperty(changedProperties, null, vertexBuilder, rawValue, defaultPropertyMetadata);
-            RawObjectSchema.CONTENT_HASH.updateProperty(changedProperties, null, vertexBuilder, MULTI_VALUE_KEY, hash, defaultPropertyMetadata);
+            CONTENT_HASH.updateProperty(changedProperties, null, vertexBuilder, MULTI_VALUE_KEY, hash, defaultPropertyMetadata);
 
             String fileName = Strings.isNullOrEmpty(originalFilename) ? f.getName() : originalFilename;
             BcSchema.FILE_NAME.updateProperty(changedProperties, null, vertexBuilder, MULTI_VALUE_KEY, fileName, propertyMetadata);
@@ -563,11 +567,10 @@ public class FileImport {
     }
 
     private Vertex findExistingVertexWithHash(String hash, Authorizations authorizations) {
-        try (
-                QueryResultsIterable<Vertex> results = this.graph.query(authorizations)
-                        .has(RawObjectSchema.CONTENT_HASH.getPropertyName(), Values.stringValue(hash))
-                        .vertices()
-        ) {
+        try (QueryResultsIterable<Vertex> results = this.graph.query(
+                hasFilter(CONTENT_HASH.getPropertyName(), stringValue(hash)),
+                authorizations
+        ).vertices()) {
             Iterator<Vertex> existingVertices = results.iterator();
             if (existingVertices.hasNext()) {
                 return existingVertices.next();

@@ -45,6 +45,8 @@ import com.mware.core.util.BcLoggerFactory;
 import com.mware.ge.*;
 import com.mware.ge.mutation.ElementMutation;
 import com.mware.ge.query.QueryResultsIterable;
+import com.mware.ge.query.builder.GeQueryBuilder;
+import com.mware.ge.query.builder.GeQueryBuilders;
 import com.mware.ge.util.ConvertingIterable;
 import com.mware.ge.values.storable.Values;
 import com.mware.ontology.BehaviourSchema;
@@ -82,8 +84,7 @@ public class GeBehaviourRepository implements BehaviourRepository {
 
     @Override
     public Iterable<Behaviour> getAllBehaviours() {
-        try (QueryResultsIterable<Vertex> vertices = graph.query(authorizations)
-                .hasConceptType(BEHAVIOUR_CONCEPT_NAME)
+        try (QueryResultsIterable<Vertex> vertices = graph.query(GeQueryBuilders.hasConceptType(BEHAVIOUR_CONCEPT_NAME), authorizations)
                 .vertices()) {
             return new ConvertingIterable<Vertex, Behaviour>(vertices) {
                 @Override
@@ -108,10 +109,10 @@ public class GeBehaviourRepository implements BehaviourRepository {
 
     @Override
     public Behaviour findByName(String name) {
-        Iterable<Vertex> vertices = graph.query(authorizations)
-                .has(BehaviourSchema.BH_NAME.getPropertyName(), Values.stringValue(name))
-                .hasConceptType(BEHAVIOUR_CONCEPT_NAME)
-                .vertices();
+        GeQueryBuilder qb = GeQueryBuilders.boolQuery()
+                .and(GeQueryBuilders.hasConceptType(BEHAVIOUR_CONCEPT_NAME))
+                .and(GeQueryBuilders.hasFilter(BehaviourSchema.BH_NAME.getPropertyName(), Values.stringValue(name)));
+        Iterable<Vertex> vertices = graph.query(qb, authorizations).vertices();
         Vertex vertex = singleOrDefault(vertices, null);
         if (vertex != null)
             return createBehaviourFromVertex(vertex);

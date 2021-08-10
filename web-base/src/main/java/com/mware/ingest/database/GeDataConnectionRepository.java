@@ -55,6 +55,8 @@ import com.mware.core.util.BcLoggerFactory;
 import com.mware.ge.*;
 import com.mware.ge.mutation.ExistingElementMutation;
 import com.mware.ge.query.QueryResultsIterable;
+import com.mware.ge.query.builder.GeQueryBuilder;
+import com.mware.ge.query.builder.GeQueryBuilders;
 import com.mware.ge.util.ConvertingIterable;
 import com.mware.ge.values.storable.Values;
 import com.mware.ontology.DataConnectionSchema;
@@ -71,8 +73,11 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static com.mware.ge.query.builder.GeQueryBuilders.hasConceptType;
 import static com.mware.ge.util.IterableUtils.singleOrDefault;
 import static com.mware.ge.util.StreamUtils.stream;
+import static com.mware.ontology.DataConnectionSchema.DATA_CONNECTION_CONCEPT_NAME;
+import static com.mware.ontology.DataConnectionSchema.DC_NAME;
 
 public class GeDataConnectionRepository implements DataConnectionRepository {
     private static final BcLogger LOGGER = BcLoggerFactory.getLogger(GeDataConnectionRepository.class);
@@ -120,10 +125,8 @@ public class GeDataConnectionRepository implements DataConnectionRepository {
 
     @Override
     public Iterable<DataConnection> getAllDataConnections() {
-        try (QueryResultsIterable<Vertex> vertices = graph.query(authorizations)
-                .hasConceptType(DataConnectionSchema.DATA_CONNECTION_CONCEPT_NAME)
-                .vertices()) {
-            return new ConvertingIterable<Vertex, DataConnection>(vertices) {
+        try (QueryResultsIterable<Vertex> vertices = graph.query(hasConceptType(DATA_CONNECTION_CONCEPT_NAME), authorizations).vertices()) {
+            return new ConvertingIterable<>(vertices) {
                 @Override
                 protected DataConnection convert(Vertex vertex) {
                     return createDataConnectionFromVertex(vertex);
@@ -142,10 +145,10 @@ public class GeDataConnectionRepository implements DataConnectionRepository {
 
     @Override
     public DataConnection findByName(String dataConnectionName) {
-        Iterable<Vertex> vertices = graph.query(authorizations)
-                .has(DataConnectionSchema.DC_NAME.getPropertyName(), Values.stringValue(dataConnectionName))
-                .hasConceptType(DataConnectionSchema.DATA_CONNECTION_CONCEPT_NAME)
-                .vertices();
+        GeQueryBuilder qb = GeQueryBuilders.boolQuery()
+                .and(GeQueryBuilders.hasConceptType(DATA_CONNECTION_CONCEPT_NAME))
+                .and(GeQueryBuilders.hasFilter(DC_NAME.getPropertyName(), Values.stringValue(dataConnectionName)));
+        Iterable<Vertex> vertices = graph.query(qb, authorizations).vertices();
         Vertex vertex = singleOrDefault(vertices, null);
         if (vertex == null) {
             return null;
@@ -169,8 +172,8 @@ public class GeDataConnectionRepository implements DataConnectionRepository {
         description = StringUtils.trimIfNull(description);
 
         String id = GRAPH_DC_ID_PREFIX + graph.getIdGenerator().nextId();
-        VertexBuilder builder = graph.prepareVertex(id, VISIBILITY.getVisibility(), DataConnectionSchema.DATA_CONNECTION_CONCEPT_NAME);
-        DataConnectionSchema.DC_NAME.setProperty(builder, name, VISIBILITY.getVisibility());
+        VertexBuilder builder = graph.prepareVertex(id, VISIBILITY.getVisibility(), DATA_CONNECTION_CONCEPT_NAME);
+        DC_NAME.setProperty(builder, name, VISIBILITY.getVisibility());
         DataConnectionSchema.DC_DESCRIPTION.setProperty(builder, description, VISIBILITY.getVisibility());
         DataConnectionSchema.DC_DRIVER_CLASS.setProperty(builder, driverClass, VISIBILITY.getVisibility());
         DataConnectionSchema.DC_DRIVER_PROPS.setProperty(builder, driverProperties, VISIBILITY.getVisibility());
@@ -192,7 +195,7 @@ public class GeDataConnectionRepository implements DataConnectionRepository {
         Vertex vertex = graph.getVertex(id, FetchHints.ALL, authorizations);
         ExistingElementMutation<Vertex> mutation = vertex.prepareMutation();
 
-        DataConnectionSchema.DC_NAME.setProperty(mutation, name, VISIBILITY.getVisibility());
+        DC_NAME.setProperty(mutation, name, VISIBILITY.getVisibility());
         DataConnectionSchema.DC_DESCRIPTION.setProperty(mutation, description, VISIBILITY.getVisibility());
         DataConnectionSchema.DC_DRIVER_CLASS.setProperty(mutation, driverClass, VISIBILITY.getVisibility());
         DataConnectionSchema.DC_DRIVER_PROPS.setProperty(mutation, driverProperties, VISIBILITY.getVisibility());

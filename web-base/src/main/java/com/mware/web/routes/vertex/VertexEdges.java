@@ -48,6 +48,9 @@ package com.mware.web.routes.vertex;
  import com.mware.ge.*;
  import com.mware.ge.query.QueryResultsIterable;
  import com.mware.ge.query.VertexQuery;
+ import com.mware.ge.query.builder.BoolQueryBuilder;
+ import com.mware.ge.query.builder.GeQueryBuilder;
+ import com.mware.ge.query.builder.GeQueryBuilders;
  import com.mware.web.framework.ParameterizedHandler;
  import com.mware.web.framework.annotations.Handle;
  import com.mware.web.framework.annotations.Optional;
@@ -90,11 +93,14 @@ public class VertexEdges implements ParameterizedHandler {
             }
         }
 
-        VertexQuery edgesQuery = vertex.query(authorizations);
+        BoolQueryBuilder qb = GeQueryBuilders.boolQuery()
+                .skip(offset)
+                .limit(size);
         if (!Strings.isNullOrEmpty(edgeLabel)) {
-            edgesQuery.hasEdgeLabel(edgeLabel);
+            qb.and(GeQueryBuilders.hasEdgeLabel(edgeLabel));
         }
 
+        VertexQuery edgesQuery = vertex.query(qb, authorizations);
         Direction direction = Direction.valueOf(directionStr.toUpperCase());
         edgesQuery.hasDirection(direction);
 
@@ -102,10 +108,7 @@ public class VertexEdges implements ParameterizedHandler {
             edgesQuery.hasOtherVertexId(relatedVertexId);
         }
 
-        try (QueryResultsIterable<Edge> edges = edgesQuery
-                .skip(offset)
-                .limit(size)
-                .edges()) {
+        try (QueryResultsIterable<Edge> edges = edgesQuery.edges()) {
             ClientApiVertexEdges result = new ClientApiVertexEdges();
 
             for (Edge edge : edges) {

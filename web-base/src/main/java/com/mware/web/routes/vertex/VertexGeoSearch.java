@@ -48,6 +48,7 @@ import com.mware.ge.Graph;
 import com.mware.ge.Vertex;
 import com.mware.ge.query.GeoCompare;
 import com.mware.ge.query.QueryResultsIterable;
+import com.mware.ge.query.builder.GeQueryBuilders;
 import com.mware.ge.values.storable.Values;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
@@ -82,10 +83,10 @@ public class VertexGeoSearch implements ParameterizedHandler {
             if (property.getDataType() != PropertyType.GEO_LOCATION) {
                 continue;
             }
-
-            QueryResultsIterable<Vertex> vertices = graph.query(authorizations).
-                    has(property.getName(), GeoCompare.WITHIN, Values.geoCircleValue(latitude, longitude, radius)).
-                    vertices();
+            QueryResultsIterable<Vertex> vertices = graph.query(
+                    GeQueryBuilders.hasFilter(property.getName(), GeoCompare.WITHIN, Values.geoCircleValue(latitude, longitude, radius)),
+                    authorizations
+            ).vertices();
             for (Vertex vertex : vertices) {
                 results.getElements().add(ClientApiConverter.toClientApiVertex(vertex, workspaceId, authorizations));
             }
