@@ -1,4 +1,3 @@
-
 /*
  * This file is part of the BigConnect project.
  *
@@ -72,7 +71,7 @@ define([
                 dateString = F.date.dateString(new Date()),
                 timeString = '00:00';
 
-            this.displayTime = this.attr.property.displayType !== 'dateOnly';
+            this.displayTime = this.attr.property.displayType !== 'dateOnly' && this.attr.property.dataType !== 'localDate';
             this.currentTimezone = F.timezone.currentTimezone();
 
             this.$node.html(template({

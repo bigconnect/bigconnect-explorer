@@ -75,7 +75,7 @@ define([
         this.after('initialize', function() {
             var self = this;
 
-            this.displayTime = this.attr.property.displayType !== 'dateOnly';
+            this.displayTime = this.attr.property.displayType !== 'dateOnly' && this.attr.property.dataType !== 'localDate';
             this.$node.html(template({
                 units: this.getUnits()
             }));

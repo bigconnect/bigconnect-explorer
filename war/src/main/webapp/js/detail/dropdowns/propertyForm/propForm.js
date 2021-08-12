@@ -414,6 +414,8 @@ define([
                         fieldComponent = 'fields/integer';
                     } else if (dataType === 'double' || dataType === 'float') {
                         fieldComponent = 'fields/double';
+                    } else if (dataType === 'localDate' || dataType === 'localDateTime' || dataType === 'date' || dataType === 'dateTime') {
+                        fieldComponent = 'fields/date';
                     } else {
                         fieldComponent = propertyDetails.possibleValues ?
                             'fields/restrictValues' : 'fields/' + propertyDetails.dataType;

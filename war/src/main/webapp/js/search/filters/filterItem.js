@@ -38,23 +38,23 @@ define([
     'flight/lib/component',
     'util/ontology/propertySelect',
     './filterItemTpl.hbs'
-], function(
+], function (
     defineComponent,
     FieldSelection,
     template) {
     'use strict';
 
     const PREDICATES = {
-            HAS: 'has',
-            HAS_NOT: 'hasNot',
-            CONTAINS: '~',
-            EQUALS: '=',
-            IN: 'in',
-            LESS_THAN: '<',
-            LESS_THAN_EQUAL: '<=',
-            GREATER_THAN: '>',
-            GREATER_THAN_EQUAL: '>=',
-            BETWEEN: 'range'
+        HAS: 'has',
+        HAS_NOT: 'hasNot',
+        CONTAINS: '~',
+        EQUALS: '=',
+        IN: 'in',
+        LESS_THAN: '<',
+        LESS_THAN_EQUAL: '<=',
+        GREATER_THAN: '>',
+        GREATER_THAN_EQUAL: '>=',
+        BETWEEN: 'range'
     };
 
     const GEO_PREDICATES = {
@@ -81,20 +81,20 @@ define([
             currentPropertySelector: '.current-property',
             removeSelector: '.header button.remove-icon',
             predicateSelector: '.current-property .header .dropdown .dropdown-menu li a',
-			
-			upSelector:'.header button.group-icon-up',
-			downSelector:'.header button.group-icon-down',
-			leftSelector:'.header button.group-icon-left',
-			rightSelector:'.header button.group-icon-right',
-			groupSelector: '.header button.group-icon-group'
+
+            upSelector: '.header button.group-icon-up',
+            downSelector: '.header button.group-icon-down',
+            leftSelector: '.header button.group-icon-left',
+            rightSelector: '.header button.group-icon-right',
+            groupSelector: '.header button.group-icon-group'
         });
 
-        this.before('teardown', function() {
+        this.before('teardown', function () {
             this.select('fieldSelector').teardownAllComponents();
-            this.trigger('filterItemChanged', { removed: true });
+            this.trigger('filterItemChanged', {removed: true});
         });
 
-        this.after('initialize', function() {
+        this.after('initialize', function () {
             this.on('propertychange', this.onPropertyChanged);
             this.on('propertyselected', this.onPropertySelected);
             this.on('propertyinvalid', this.onPropertyInvalid);
@@ -102,11 +102,11 @@ define([
             this.on('click', {
                 predicateSelector: this.onPredicateClick,
                 removeSelector: this.onRemoveRow,
-				upSelector: this.onMoveUp,
-				downSelector: this.onMoveDown,
-				leftSelector: this.onMoveLeft,
-				rightSelector: this.onMoveRight,
-				groupSelector: this.onGroupField
+                upSelector: this.onMoveUp,
+                downSelector: this.onMoveDown,
+                leftSelector: this.onMoveLeft,
+                rightSelector: this.onMoveRight,
+                groupSelector: this.onGroupField
             });
 
             this.$node.html(template({}));
@@ -119,11 +119,11 @@ define([
             }
         });
 
-        this.predicateNeedsValues = function() {
+        this.predicateNeedsValues = function () {
             return (this.filter.predicate !== PREDICATES.HAS && this.filter.predicate !== PREDICATES.HAS_NOT);
         };
 
-        this.isValid = function() {
+        this.isValid = function () {
             var hasPredicateAndProperty = this.filter.predicate && (this.filter.propertyId || this.filter.dataType);
             if (hasPredicateAndProperty) {
                 var propertyFieldRequired = this.predicateNeedsValues(),
@@ -140,14 +140,14 @@ define([
             return false;
         };
 
-        this.triggerChange = function() {
+        this.triggerChange = function () {
             let valid = this.isValid();
-            const { values, ...filter } = this.filter;
+            const {values, ...filter} = this.filter;
 
             if (this.predicateNeedsValues()) {
 
                 if (this.filter.predicate === PREDICATES.BETWEEN) {
-                    filter.values = _.sortBy(this.filter.values, function(val) {
+                    filter.values = _.sortBy(this.filter.values, function (val) {
                         if (_.isObject(val) &&
                             ('amount' in val) && ('unit' in val) &&
                             '_date' in val) {
@@ -164,7 +164,7 @@ define([
                     filter.values = this.filter.values.slice(0, 1);
                 }
 
-                valid = valid && _.every(filter.values, function(v) {
+                valid = valid && _.every(filter.values, function (v) {
                     return !_.isUndefined(v) && !(_.isObject(v) && _.isEmpty(v));
                 });
             }
@@ -173,8 +173,8 @@ define([
 
             // Omit all underscore keys
             if (filter.values) {
-                filter.values = filter.values.map(function(val) {
-                    return _.isObject(val) ? _.omit(val, function(val, key) {
+                filter.values = filter.values.map(function (val) {
+                    return _.isObject(val) ? _.omit(val, function (val, key) {
                         return (/^_/).test(key);
                     }) : val;
                 });
@@ -186,7 +186,7 @@ define([
             });
         };
 
-        this.onFilterProperties = function(event, filter) {
+        this.onFilterProperties = function (event, filter) {
             if ($(event.target).is(this.$node)) {
                 if (!filter) {
                     this.listFilter = null;
@@ -198,53 +198,53 @@ define([
             }
         };
 
-        this.onRemoveRow = function(event, data) {
-			var $before = this.$node.prev();
-			if ($before.hasClass('logical-operators-li')) {
-				$before.remove();
-			}
-			this.teardown();
-			this.removeEmptyOperators();
-			this.removeEmptyGroups();
+        this.onRemoveRow = function (event, data) {
+            var $before = this.$node.prev();
+            if ($before.hasClass('logical-operators-li')) {
+                $before.remove();
+            }
+            this.teardown();
+            this.removeEmptyOperators();
+            this.removeEmptyGroups();
         };
-		
-		this.removeEmptyOperators = function() {
-			var $operator = $(".header-control-filters").next();
-			if ($operator.hasClass("logical-operators-li")) {
-				$operator.remove();
-			}
-			
-			$(".field-group-ul").each(
-				function() {
-					var elem = $(this);
-					if (elem.children().length <= 2 ) {
-						elem.find('.logical-operators-li').remove();
-						var $filter = elem.find('.filter');
-						$filter.insertBefore(elem.parent());
-					}
-				}
-			);
-		}
-		
-		this.removeEmptyGroups = function(){
-			$(".field-group-ul").each(
-				function() {
-					var elem = $(this);
-					if (elem.children().length == 0) {
-						elem.parent().remove();
-					}
-				}
-			);
-		}
-		
-        this.onPredicateClick = function(event) {
+
+        this.removeEmptyOperators = function () {
+            var $operator = $(".header-control-filters").next();
+            if ($operator.hasClass("logical-operators-li")) {
+                $operator.remove();
+            }
+
+            $(".field-group-ul").each(
+                function () {
+                    var elem = $(this);
+                    if (elem.children().length <= 2) {
+                        elem.find('.logical-operators-li').remove();
+                        var $filter = elem.find('.filter');
+                        $filter.insertBefore(elem.parent());
+                    }
+                }
+            );
+        }
+
+        this.removeEmptyGroups = function () {
+            $(".field-group-ul").each(
+                function () {
+                    var elem = $(this);
+                    if (elem.children().length == 0) {
+                        elem.parent().remove();
+                    }
+                }
+            );
+        }
+
+        this.onPredicateClick = function (event) {
             var $anchor = $(event.target);
             this.filter.predicate = $anchor.data('value');
             $anchor.closest('.dropdown').find('.dropdown-toggle').text($anchor.text());
             this.attachFields().done();
         };
 
-        this.onPropertyChanged = function(event, data) {
+        this.onPropertyChanged = function (event, data) {
             event.stopPropagation();
             var index = $(event.target).closest('.configuration').index();
             if (this.filter.predicate === PREDICATES.BETWEEN) {
@@ -261,11 +261,11 @@ define([
             this.triggerChange();
         };
 
-        this.onPropertySelected = function(event, data) {
+        this.onPropertySelected = function (event, data) {
             this.setCurrentProperty(data);
         };
 
-        this.onPropertyInvalid = function(event, data) {
+        this.onPropertyInvalid = function (event, data) {
             var index = $(event.target).closest('.configuration').index();
             if (this.filter.predicate === PREDICATES.BETWEEN) {
                 if (this.filter.values && index < this.filter.values.length) {
@@ -278,7 +278,7 @@ define([
             this.triggerChange();
         };
 
-        this.setCurrentProperty = function(data) {
+        this.setCurrentProperty = function (data) {
             var self = this,
                 property = data.property,
                 hasProperty = !!property;
@@ -315,7 +315,7 @@ define([
                 .end()
                 .find('.dropdown-menu')
                 .html(this.predicateItemsForProperty(property))
-                .each(function() {
+                .each(function () {
                     var selected = $(this).find('.selected a');
                     if (!selected.length) {
                         selected = $(this).children('li').first().find('a');
@@ -339,7 +339,7 @@ define([
             }
         };
 
-        this.focusField = function() {
+        this.focusField = function () {
             if (_.isEmpty(this.filter.values) && this.predicateNeedsValues()) {
                 var index = 0;
                 if (!_.isUndefined(this.filter.values[0]) &&
@@ -351,7 +351,7 @@ define([
             }
         };
 
-        this.attachFields = function() {
+        this.attachFields = function () {
             var self = this,
                 fieldComponent,
                 property = this.currentProperty,
@@ -361,7 +361,7 @@ define([
                 fieldComponent = 'fields/compound/compound';
             } else if (property.displayType === 'duration') {
                 fieldComponent = 'fields/duration';
-            } else if (property.dataType === 'date') {
+            } else if (property.dataType === 'date' || property.dataType === 'localDate' || property.dataType === 'dateTime' || property.dataType === 'localDateTime') {
                 fieldComponent = 'search/filters/dateField';
             } else if (property.dataType === 'directory/entity') {
                 fieldComponent = 'search/filters/directoryEntityField';
@@ -369,9 +369,9 @@ define([
                 fieldComponent = property.possibleValues ? 'fields/restrictValuesMulti' : 'fields/' + property.dataType;
             }
 
-            return Promise.require(fieldComponent).then(function(PropertyFieldItem) {
+            return Promise.require(fieldComponent).then(function (PropertyFieldItem) {
                 var node = self.select('fieldSelector'),
-                    nodesRendered = _.reduce(node.toArray(), function(sum, el) {
+                    nodesRendered = _.reduce(node.toArray(), function (sum, el) {
                         return sum + ($(el).lookupComponent(PropertyFieldItem) ? 1 : 0);
                     }, 0),
                     fieldsToRender = 1 - nodesRendered;
@@ -406,7 +406,7 @@ define([
                 if (isCompoundField) {
                     throw new Error('Compound properties not supported in filters.');
                 } else {
-                    node.each(function(i, el) {
+                    node.each(function (i, el) {
                         PropertyFieldItem.attachTo(el, {
                             onlySearchable: true,
                             focus: false,
@@ -419,19 +419,20 @@ define([
                 self.triggerChange();
             });
         };
-        this.predicatesForProperty = function(property) {
+        this.predicatesForProperty = function (property) {
             var standardPredicates = [PREDICATES.HAS, PREDICATES.HAS_NOT];
 
             if (property.possibleValues) {
                 return [PREDICATES.IN].concat(standardPredicates);
             }
 
-             if (property.title.startsWith('dataType:')) {
+            if (property.title.startsWith('dataType:')) {
                 switch (property.dataType) {
-                    case 'geoLocation': return [
-                           GEO_PREDICATES.WITHIN,
-                           GEO_PREDICATES.DISJOINT
-                       ].concat(standardPredicates);
+                    case 'geoLocation':
+                        return [
+                            GEO_PREDICATES.WITHIN,
+                            GEO_PREDICATES.DISJOINT
+                        ].concat(standardPredicates);
                     default:
                         throw new Error('Unknown datatype: ' + property.dataType);
 
@@ -439,55 +440,62 @@ define([
             }
 
             switch (property.dataType) {
-                case 'string': return [
+                case 'string':
+                    return [
                         PREDICATES.CONTAINS,
                         PREDICATES.EQUALS
                     ].concat(standardPredicates);
 
-                case 'geoLocation': return [
+                case 'geoLocation':
+                    return [
                         GEO_PREDICATES.WITHIN,
                         GEO_PREDICATES.DISJOINT
                     ].concat(standardPredicates);
 
-                case 'boolean': return [
+                case 'boolean':
+                    return [
                         PREDICATES.EQUALS
                     ].concat(standardPredicates);
 
-                case 'directory/entity': return [
-                    PREDICATES.EQUALS
-                ].concat(standardPredicates);
+                case 'date':
+                case 'dateTime':
+                case 'localDate':
+                case 'localDateTime':
+                    return [
+                        PREDICATES.LESS_THAN,
+                        PREDICATES.LESS_THAN_EQUAL,
+                        PREDICATES.GREATER_THAN,
+                        PREDICATES.GREATER_THAN_EQUAL,
+                        PREDICATES.BETWEEN,
+                        PREDICATES.EQUALS
+                    ].concat(standardPredicates);
 
-                case 'date': return [
-                    PREDICATES.LESS_THAN,
-                    PREDICATES.LESS_THAN_EQUAL,
-                    PREDICATES.GREATER_THAN,
-                    PREDICATES.GREATER_THAN_EQUAL,
-                    PREDICATES.BETWEEN,
-                    PREDICATES.EQUALS
-                ].concat(standardPredicates);
-
+                case 'byte':
+                case 'short':
                 case 'currency':
                 case 'double':
                 case 'integer':
-                case 'number': return [
-                    PREDICATES.LESS_THAN,
-                    PREDICATES.LESS_THAN_EQUAL,
-                    PREDICATES.GREATER_THAN,
-                    PREDICATES.GREATER_THAN_EQUAL,
-                    PREDICATES.EQUALS
-                ].concat(standardPredicates);
+                case 'long':
+                case 'number':
+                    return [
+                        PREDICATES.LESS_THAN,
+                        PREDICATES.LESS_THAN_EQUAL,
+                        PREDICATES.GREATER_THAN,
+                        PREDICATES.GREATER_THAN_EQUAL,
+                        PREDICATES.EQUALS
+                    ].concat(standardPredicates);
 
                 default:
                     throw new Error('Unknown datatype: ' + property.dataType);
             }
         };
 
-        this.predicateItemsForProperty = function(property) {
+        this.predicateItemsForProperty = function (property) {
             if (!property) return '';
 
             var self = this;
 
-            return $.map(this.predicatesForProperty(property), function(predicate, i) {
+            return $.map(this.predicatesForProperty(property), function (predicate, i) {
                 var displayText = (
                         property.displayType &&
                         i18n(true, 'search.filters.predicates.' + property.dataType + '.' + property.displayType + '.' + predicate, property.displayName)
@@ -497,14 +505,14 @@ define([
                 return $('<li><a></a></li>')
                     .toggleClass('selected', self.filter.predicate ? self.filter.predicate === predicate : i === 0)
                     .find('a')
-                        .text(displayText)
-                        .attr('title', displayText)
-                        .data('value', predicate)
+                    .text(displayText)
+                    .attr('title', displayText)
+                    .data('value', predicate)
                     .end();
             });
         };
 
-        this.createFieldSelection = function() {
+        this.createFieldSelection = function () {
             const properties = [
                 ..._.sortBy(this.attr.properties, 'displayName'),
                 {
@@ -522,29 +530,29 @@ define([
                 placeholder: i18n('search.filters.add_filter.placeholder'),
                 rollupCompound: false,
                 hideCompound: true,
-                filter: { ...this.attr.listFilter, userVisible: true }
+                filter: {...this.attr.listFilter, userVisible: true}
             });
         };
 
-		
-		this.onMoveUp = function (event, data) {
-			this.trigger("moveUpField", data);
-		}
-		
-		this.onMoveDown = function (event, data) {
-			this.trigger("moveDownField", data);
-		}
-		
-		this.onMoveLeft = function (event, data) {
-			this.trigger("moveLeftField", data);
-		}
 
-		this.onMoveRight = function (event, data) {
-			this.trigger("moveRightField", data);
-		}
+        this.onMoveUp = function (event, data) {
+            this.trigger("moveUpField", data);
+        }
 
-		this.onGroupField = function (event, data) {
-			this.trigger("groupField", data);
-		}
+        this.onMoveDown = function (event, data) {
+            this.trigger("moveDownField", data);
+        }
+
+        this.onMoveLeft = function (event, data) {
+            this.trigger("moveLeftField", data);
+        }
+
+        this.onMoveRight = function (event, data) {
+            this.trigger("moveRightField", data);
+        }
+
+        this.onGroupField = function (event, data) {
+            this.trigger("groupField", data);
+        }
     }
 });
