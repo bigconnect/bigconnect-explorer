@@ -1011,7 +1011,7 @@ define([
             },
             dateTimeStringServer: function(dateStr, timezone) {
                 var dateTz = FORMATTERS.timezone.date(dateStr, timezone || FORMATTERS.timezone.currentTimezone().name);
-                return dateTz.tz('Etc/UTC').format(SERVER_DATE + ' ' + SERVER_TIME + ' [UTC]');
+                return dateTz.tz('Etc/UTC').format();
             },
             dateInServerFormat: function(dateStr, timezone) {
                 if (/^\s*$/.test(dateStr)) {

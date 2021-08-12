@@ -466,7 +466,7 @@ public class WebSchemaCreator {
                 .concepts(dataSource)
                 .name(DataConnectionSchema.DS_LAST_IMPORT_DATE.getPropertyName())
                 .displayName("Last Import Run")
-                .type(PropertyType.DATE)
+                .type(PropertyType.DATETIME)
                 .save();
 
         schemaFactory.newConceptProperty()

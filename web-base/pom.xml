@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.bigconnect</groupId>
         <artifactId>web-group</artifactId>
-        <version>4.3.0</version>
+        <version>4.3.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>web-base</artifactId>

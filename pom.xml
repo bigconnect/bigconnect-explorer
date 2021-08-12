@@ -5,7 +5,7 @@
     <parent>
         <artifactId>root</artifactId>
         <groupId>io.bigconnect</groupId>
-        <version>4.3.0</version>
+        <version>4.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +21,7 @@
     </scm>
 
     <properties>
-        <bigconnect.dw.version>4.3.0</bigconnect.dw.version>
+        <bigconnect.dw.version>4.3.0-SNAPSHOT</bigconnect.dw.version>
         <bigconnect.cypherlab.version>4.2.0</bigconnect.cypherlab.version>
         <atmosphere.version>2.5.9</atmosphere.version>
         <tomcat.version>8.5.23</tomcat.version>
@@ -36,7 +36,6 @@
     <modules>
         <module>web-base</module>
         <module>war</module>
-        <module>tomcat-server</module>
     </modules>
 
     <repositories>

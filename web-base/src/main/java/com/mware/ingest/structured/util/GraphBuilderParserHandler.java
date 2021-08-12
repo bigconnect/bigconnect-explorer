@@ -393,7 +393,7 @@ public class GraphBuilderParserHandler extends BaseStructuredFileParserHandler {
 
             PropertyMapping propertyMapping;
             PropertyType detectedType = existingProp.getDataType();
-            if (PropertyType.DATE.equals(detectedType))
+            if (PropertyType.DATETIME.equals(detectedType))
                 propertyMapping = new DatePropertyMapping();
             else if (PropertyType.INTEGER.equals(detectedType) || PropertyType.DOUBLE.equals(detectedType))
                 propertyMapping = new NumericPropertyMapping(existingProp);

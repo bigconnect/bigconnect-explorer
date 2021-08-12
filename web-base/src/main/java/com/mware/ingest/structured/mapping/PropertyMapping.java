@@ -138,7 +138,7 @@ public class PropertyMapping {
                 throw new BcException("Property " + propertyName + " was not found in the ontology.");
             }
 
-            if (schemaProperty.getDataType() == PropertyType.DATE) {
+            if (schemaProperty.getDataType() == PropertyType.DATETIME) {
                 return new DatePropertyMapping(visibilityTranslator, workspaceId, propertyMapping);
             } else if (schemaProperty.getDataType() == PropertyType.BOOLEAN) {
                 return new BooleanPropertyMapping(visibilityTranslator, workspaceId, propertyMapping);
@@ -176,7 +176,7 @@ public class PropertyMapping {
             throw new BcException("Property " + propertyName + " was not found in the ontology.");
         }
 
-        if (schemaProperty.getDataType() == PropertyType.DATE) {
+        if (schemaProperty.getDataType() == PropertyType.DATETIME) {
             return new DatePropertyMapping(visibilityTranslator, workspaceId, mapping);
         } else if (schemaProperty.getDataType() == PropertyType.BOOLEAN) {
             return new BooleanPropertyMapping(visibilityTranslator, workspaceId, mapping);

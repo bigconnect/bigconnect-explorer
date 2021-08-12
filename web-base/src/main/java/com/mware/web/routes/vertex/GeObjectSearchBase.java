@@ -307,7 +307,7 @@ public abstract class GeObjectSearchBase {
             Comparator<HistogramBucket> comparator = (HistogramBucket o1, HistogramBucket o2) -> {
                 if(PropertyType.DOUBLE.equals(schemaProperty.getDataType()) || PropertyType.INTEGER.equals(schemaProperty.getDataType()))
                     return Double.valueOf(o1.getKey().toString()).compareTo(Double.valueOf(o2.getKey().toString()));
-                else if(PropertyType.DATE.equals(schemaProperty.getDataType())) {
+                else if(PropertyType.DATETIME.equals(schemaProperty.getDataType())) {
                     String strT1 = tryConvertToTime(o1.getKey().toString());
                     String strT2 = tryConvertToTime(o2.getKey().toString());
                     int compare = 0;
@@ -329,7 +329,7 @@ public abstract class GeObjectSearchBase {
                 String firstKey = histogramBucket.getKey().toString();
                 String firstLabel = firstKey;
                 String firstValue = firstKey;
-                if (PropertyType.DATE.equals(schemaProperty.getDataType())) {
+                if (PropertyType.DATETIME.equals(schemaProperty.getDataType())) {
                     firstLabel = getReadableDate(firstKey);
                     firstValue = tryConvertToTime(firstKey);
                 }
@@ -343,7 +343,7 @@ public abstract class GeObjectSearchBase {
                 }
 
                 if (secondKey != null) {
-                    if (PropertyType.DATE.equals(schemaProperty.getDataType())) {
+                    if (PropertyType.DATETIME.equals(schemaProperty.getDataType())) {
                         secondLabel = getReadableDate(secondKey);
                         secondValue = tryConvertToTime(secondKey);
                     } else {
