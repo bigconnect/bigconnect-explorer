@@ -277,7 +277,7 @@ define([
                 justificationMetadata = property.metadata &&
                     property.metadata[ONTOLOGY_CONSTANTS.PROP_JUSTIFICATION];
 
-            if (justificationMetadata && justificationMetadata.justificationText) {
+            if (justificationMetadata) {
                 justification.push({
                     justificationText: justificationMetadata
                 })
@@ -302,7 +302,7 @@ define([
                 }
             } else {
                 this.renderJustification(justification);
-                if ((!justificationMetadata || !('justificationText' in justificationMetadata))) {
+                if (!justificationMetadata) {
                     this.dataRequest(
                         F.vertex.isVertex(element) ? 'vertex' : 'edge',
                         'propertyDetails',
