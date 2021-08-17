@@ -100,7 +100,7 @@ define([
             if (sourceInfo) {
                 params.value.sourceInfo = sourceInfo;
             } else if (justificationMetadata) {
-                params.value.justificationText = justificationMetadata.justificationText;
+                params.value.justificationText = justificationMetadata;
             }
 
             this.attacher = Attacher()

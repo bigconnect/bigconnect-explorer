@@ -319,7 +319,9 @@ define([
                 ),
                 previousValues = disablePreviousValuePrompt !== true && F.vertex.props(this.attr.data, propertyName),
                 previousValuesUniquedByKey = previousValues && _.unique(previousValues, _.property('key')),
-                previousValuesUniquedByKeyUpdateable = _.where(previousValuesUniquedByKey, {updateable: true});
+                previousValuesUniquedByKeyUpdateable = _.where(previousValuesUniquedByKey, {updateable: true}),
+                justificationText = property.metadata &&
+                    property.metadata[ONTOLOGY_CONSTANTS.PROP_JUSTIFICATION];
 
 
             this.currentValue = this.attr.attemptToCoerceValue || previousValue;
@@ -377,7 +379,7 @@ define([
 
             button.attr('disabled', true);
 
-            this.dataRequest('ontology', 'properties').done(function(properties) {
+            this.dataRequest('ontology', 'properties').done((properties) => {
                 var propertyDetails = properties.byTitle[propertyName];
                 if (!propertyDetails.deleteable) {
                     deleteButton.hide();
@@ -435,7 +437,7 @@ define([
                         }
 
                         Justification.attachTo(justification, {
-                            justificationText: self.attr.justificationText,
+                            justificationText: justificationText,
                             sourceInfo: self.attr.sourceInfo
                         });
 
