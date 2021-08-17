@@ -133,6 +133,7 @@ define([
                 </div>
             );
         },
+
         onMerge() {
             const {
                 artifactId, propertyName, propertyKey,
