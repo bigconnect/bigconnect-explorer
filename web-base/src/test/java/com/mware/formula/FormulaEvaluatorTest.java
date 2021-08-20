@@ -51,6 +51,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -84,9 +85,9 @@ public class FormulaEvaluatorTest {
         String timeZone = "America/New_York";
         userContext = new FormulaEvaluator.UserContext(locale, null, timeZone, null);
 
-        final String ontologyJson = IOUtils.toString(FormulaEvaluatorTest.class.getResourceAsStream("ontology.json"), "utf-8");
-        final String configurationJson = IOUtils.toString(FormulaEvaluatorTest.class.getResourceAsStream("configuration.json"), "utf-8");
-        final String vertexJson = IOUtils.toString(FormulaEvaluatorTest.class.getResourceAsStream("vertex.json"), "utf-8");
+        final String ontologyJson = IOUtils.toString(FormulaEvaluatorTest.class.getResourceAsStream("ontology.json"), StandardCharsets.UTF_8);
+        final String configurationJson = IOUtils.toString(FormulaEvaluatorTest.class.getResourceAsStream("configuration.json"), StandardCharsets.UTF_8);
+        final String vertexJson = IOUtils.toString(FormulaEvaluatorTest.class.getResourceAsStream("vertex.json"), StandardCharsets.UTF_8);
 
         evaluator = new FormulaEvaluator(configuration, schemaRepository) {
             @Override
@@ -159,21 +160,18 @@ public class FormulaEvaluatorTest {
         assertEquals("Prop A Value, Prop B Value", evaluator.evaluateTitleFormula(null, userContext, authorizations));
 
         for (int i = 0; i < threads.length; i++) {
-            threads[i] = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        // prime this thread for evaluation
-                        evaluator.evaluateTitleFormula(null, userContext, null);
-                        threadsReadyCount.incrementAndGet();
-                        block.acquire(); // wait to run the look
-                        for (int i = 0; i < 20; i++) {
-                            System.out.println(Thread.currentThread().getName() + " - " + i);
-                            assertEquals("Prop A Value, Prop B Value", evaluator.evaluateTitleFormula(null, userContext, authorizations));
-                        }
-                    } catch (Exception ex) {
-                        throw new RuntimeException("Could not run", ex);
+            threads[i] = new Thread(() -> {
+                try {
+                    // prime this thread for evaluation
+                    evaluator.evaluateTitleFormula(null, userContext, null);
+                    threadsReadyCount.incrementAndGet();
+                    block.acquire(); // wait to run the look
+                    for (int i1 = 0; i1 < 20; i1++) {
+                        System.out.println(Thread.currentThread().getName() + " - " + i1);
+                        assertEquals("Prop A Value, Prop B Value", evaluator.evaluateTitleFormula(null, userContext, authorizations));
                     }
+                } catch (Exception ex) {
+                    throw new RuntimeException("Could not run", ex);
                 }
             });
             threads[i].setName(FormulaEvaluatorTest.class.getSimpleName() + "-testThreading-" + i);

@@ -576,13 +576,13 @@ public class EntityHighlighterTest {
 
         String highlightedText = EntityHighlighter.getHighlightedText(text, offsetItems);
         String expectedText =
-                "<span class=\"This is\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">" +
-                    "<span class=\"This\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">This</span> " +
-                    "<span class=\"is a\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\" data-ref-id=\"id\">is</span>" +
+                "<span class=\"This is\" data-score=\"0.0\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">" +
+                    "<span class=\"This\" data-score=\"0.0\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">This</span> " +
+                    "<span class=\"is a\" data-score=\"0.0\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\" data-ref-id=\"id\">is</span>" +
                 "</span>" +
-                "<span class=\"is a\" data-ref=\"id\"> a</span>" +
+                "<span class=\"is a\" data-score=\"0.0\" data-ref=\"id\"> a</span>" +
                 " test " +
-                "<span class=\"sentence\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">sentence</span>";
+                "<span class=\"sentence\" data-score=\"0.0\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">sentence</span>";
 
         assertMatchStyleAndMeta(expectedText, highlightedText, 2);
     }

@@ -71,15 +71,15 @@ public class VertexSearchRunnerTest extends SearchRunnerTestBase {
     }
 
     @Test
-    public void testSearchRelated() throws Exception {
-        ElementBuilder<Vertex> v1Mutation = graph.prepareVertex("v1", visibility, "testConcept");
-        ElementBuilder<Vertex> v2Mutation = graph.prepareVertex("v2", visibility, "testConcept");
-        ElementBuilder<Vertex> v3Mutation = graph.prepareVertex("v3", visibility,"testConcept");
-        Vertex v1 = v1Mutation.save(authorizations);
-        Vertex v2 = v2Mutation.save(authorizations);
-        Vertex v3 = v3Mutation.save(authorizations);
-        graph.addEdge("e1", v1, v2, "label1", visibility, authorizations);
-        graph.addEdge("e2", v1, v3, "label1", visibility, authorizations);
+    public void testSearchRelated() {
+        Vertex v1 = graph.prepareVertex("v1", visibility, "testConcept")
+                .save(authorizations);
+        Vertex v2 = graph.prepareVertex("v2", visibility, "testConcept")
+                .save(authorizations);
+        Vertex v3 = graph.prepareVertex("v3", visibility,"testConcept")
+                .save(authorizations);
+        graph.addEdge("v1v2", v1, v2, "label1", visibility, authorizations);
+        graph.addEdge("v1v3", v1, v3, "label1", visibility, authorizations);
         graph.flush();
 
         Map<String, Object> parameters = new HashMap<>();
@@ -92,7 +92,7 @@ public class VertexSearchRunnerTest extends SearchRunnerTestBase {
     }
 
     @Test
-    public void testSearch() throws Exception {
+    public void testSearch() {
         graph.prepareVertex("v1", visibility, SchemaConstants.CONCEPT_TYPE_THING)
                 .addPropertyValue("k1", "name", stringValue("Joe"), visibility)
                 .save(authorizations);
