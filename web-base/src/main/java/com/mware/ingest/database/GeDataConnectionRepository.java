@@ -126,7 +126,7 @@ public class GeDataConnectionRepository implements DataConnectionRepository {
     @Override
     public Iterable<DataConnection> getAllDataConnections() {
         try (QueryResultsIterable<Vertex> vertices = graph.query(hasConceptType(DATA_CONNECTION_CONCEPT_NAME), authorizations).vertices()) {
-            return new ConvertingIterable<>(vertices) {
+            return new ConvertingIterable<Vertex, DataConnection>(vertices) {
                 @Override
                 protected DataConnection convert(Vertex vertex) {
                     return createDataConnectionFromVertex(vertex);
