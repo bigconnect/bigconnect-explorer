@@ -36,7 +36,6 @@
     <modules>
         <module>web-base</module>
         <module>war</module>
-        <module>tomcat-server</module>
     </modules>
 
     <repositories>
