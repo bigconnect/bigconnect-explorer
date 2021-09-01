@@ -114,6 +114,10 @@ define([
             return ajax('GET', '/admin/plugins');
         },
 
+        enablePlugin: function(clazz, enabled) {
+            return ajax('POST', '/admin/plugins/enable', { clazz, enabled });
+        },
+
         systemNotificationCreate: function(options) {
             if ('endDate' in options && !options.endDate) {
                 delete options.endDate;

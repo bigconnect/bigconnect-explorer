@@ -43,6 +43,8 @@ import com.mware.core.bootstrap.InjectHelper;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcAccessDeniedException;
 import com.mware.core.exception.BcException;
+import com.mware.core.model.plugin.PluginStateRepository;
+import com.mware.core.user.SystemUser;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
 import com.mware.core.util.ServiceLoaderUtil;
@@ -54,11 +56,9 @@ import com.mware.web.framework.handlers.StaticResourceHandler;
 import com.mware.web.privilegeFilters.*;
 import com.mware.web.routes.Download;
 import com.mware.web.routes.Index;
-import com.mware.web.routes.admin.AdminList;
-import com.mware.web.routes.admin.DeleteElements;
-import com.mware.web.routes.admin.PluginList;
-import com.mware.web.routes.admin.RestoreElements;
+import com.mware.web.routes.admin.*;
 import com.mware.web.routes.behaviour.*;
+import com.mware.web.routes.config.Plugin;
 import com.mware.web.routes.dashboard.*;
 import com.mware.web.routes.dataload.*;
 import com.mware.web.routes.dataset.DatasetList;
@@ -317,6 +317,7 @@ public class Router extends HttpServlet {
 
             app.get("/admin/all", authenticator, csrfProtector, AdminPrivilegeFilter.class, AdminList.class);
             app.get("/admin/plugins", authenticator, csrfProtector, AdminPrivilegeFilter.class, PluginList.class);
+            app.post("/admin/plugins/enable", authenticator, csrfProtector, AdminPrivilegeFilter.class, EnableDisablePlugin.class);
             app.post("/admin/ontologyPropertySave", authenticator, csrfProtector, AdminPrivilegeFilter.class, OntologyManagerPropertySave.class);
             app.post("/admin/ontologyPropertyDelete", authenticator, csrfProtector, AdminPrivilegeFilter.class, OntologyManagerPropertyDelete.class);
             app.post("/admin/ontologyProperyAddExisting", authenticator, csrfProtector, AdminPrivilegeFilter.class, OntologyManagerPropertyAddExisting.class);
@@ -360,10 +361,13 @@ public class Router extends HttpServlet {
 
 
             List<WebAppPlugin> webAppPlugins = toList(ServiceLoaderUtil.load(WebAppPlugin.class, configuration));
+            PluginStateRepository pluginStateRepository = InjectHelper.getInstance(PluginStateRepository.class);
             for (WebAppPlugin webAppPlugin : webAppPlugins) {
                 LOGGER.info("Loading webapp plugin: %s", webAppPlugin.getClass().getName());
                 try {
-                    webAppPlugin.init(app, servletContext, authenticatorInstance);
+                    pluginStateRepository.registerPlugin(webAppPlugin.getClass().getName(), webAppPlugin.systemPlugin(), new SystemUser());
+                    if (pluginStateRepository.isEnabled(webAppPlugin.getClass().getName()))
+                        webAppPlugin.init(app, servletContext, authenticatorInstance);
                 } catch (Exception e) {
                     throw new BcException("Could not initialize webapp plugin: " + webAppPlugin.getClass().getName(), e);
                 }

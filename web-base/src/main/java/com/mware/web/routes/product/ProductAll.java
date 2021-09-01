@@ -41,9 +41,11 @@ import com.google.inject.Singleton;
 import com.mware.core.bootstrap.InjectHelper;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcResourceNotFoundException;
+import com.mware.core.model.plugin.PluginStateRepository;
 import com.mware.core.user.User;
 import com.mware.product.Product;
 import com.mware.product.WorkProductService;
+import com.mware.web.WebAppPlugin;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.model.ClientApiProducts;
@@ -53,20 +55,24 @@ import com.mware.workspace.WebWorkspaceRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Singleton
 public class ProductAll implements ParameterizedHandler {
     private final WebWorkspaceRepository webWorkspaceRepository;
     private final Configuration configuration;
+    private final PluginStateRepository pluginStateRepository;
 
     @Inject
     public ProductAll(
             WebWorkspaceRepository webWorkspaceRepository,
-            Configuration configuration
+            Configuration configuration,
+            PluginStateRepository pluginStateRepository
     ) {
         this.webWorkspaceRepository = webWorkspaceRepository;
         this.configuration = configuration;
+        this.pluginStateRepository = pluginStateRepository;
     }
 
     @Handle
@@ -80,7 +86,11 @@ public class ProductAll implements ParameterizedHandler {
         }
         String lastActiveProductId = webWorkspaceRepository.getLastActiveProductId(workspaceId, user);
 
-        List<String> types = InjectHelper.getInjectedServices(WorkProductService.class, configuration).stream()
+        List<String> types = InjectHelper.getInjectedServices(WebAppPlugin.class, configuration)
+                .stream()
+                .filter(plugin -> pluginStateRepository.isEnabled(plugin.getClass().getName()))
+                .map(WebAppPlugin::getWorkProductService)
+                .filter(Objects::nonNull)
                 .map(WorkProductService::getKind)
                 .collect(Collectors.toList());
 

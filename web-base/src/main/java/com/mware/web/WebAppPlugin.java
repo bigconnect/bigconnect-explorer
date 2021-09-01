@@ -36,10 +36,19 @@
  */
 package com.mware.web;
 
+import com.mware.product.WorkProductService;
 import com.mware.web.framework.Handler;
 
 import javax.servlet.ServletContext;
 
 public interface WebAppPlugin {
     void init(WebApp app, ServletContext servletContext, Handler authenticationHandler);
+
+    default boolean systemPlugin() {
+        return false;
+    }
+
+    default WorkProductService getWorkProductService() {
+        return null;
+    }
 }
