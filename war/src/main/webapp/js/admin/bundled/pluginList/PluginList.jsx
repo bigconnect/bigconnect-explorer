@@ -38,142 +38,14 @@ define([
     'react',
     'prop-types',
     'create-react-class',
-], function(React, PropTypes, createReactClass) {
+    'antd'
+], function(React, PropTypes, createReactClass, antd) {
     'use strict';
+
+    const {List, Switch, message, Tag, Space} = antd;
 
     const DetailKeys = 'fileName className projectVersion builtBy builtOn gitRevision'.split(' ');
     const TypeDateKeys = 'builtOn'.split(' ');
-
-    const PluginItem = function({item, api}) {
-        var details = DetailKeys.map(function(key) {
-                    if (_.contains(TypeDateKeys, key) && (key in item)) {
-                        item[key] = api.formatters.date.dateTimeString(item[key]);
-                    }
-                    return { display: formatKeyForDisplay(key), value: item[key] }
-                })
-                .filter(function(item) {
-                    return !!item.value;
-                })
-
-        return (
-            <li>
-                <h1 className="name">{item.name}</h1>
-                <h2 className="description">{item.description}</h2>
-                <dl>
-                {details.map(function({display, value}) {
-                    return [<dt>{display}</dt>, <dd title={value}>{value}</dd>]
-                })}
-                </dl>
-            </li>
-        )
-    };
-
-    const PluginSection = createReactClass({
-        getInitialState: function() {
-            return { expanded: false }
-        },
-        toggleCollapsed: function(event) {
-            this.setState({ expanded: !this.state.expanded })
-        },
-        render: function() {
-            var api = this.props.api,
-                pluginItems = this.props.items.map(function(item) {
-                    var key = item.className || item.fileName || item.name;
-                    return <PluginItem api={api} key={key} item={item} />
-                }),
-                sectionClassName = 'collapsible has-badge-number',
-                name = formatKeyForDisplay(this.props.name);
-            if (this.props.items.length === 0) {
-                sectionClassName += ' disabled'
-            }
-            if (this.state.expanded) {
-                sectionClassName += ' expanded';
-            }
-
-            return (
-                <section onClick={this.toggleCollapsed} className={sectionClassName}>
-                    <h1 className="collapsible-header">
-                        <strong title={name}>{name} ({this.props.items.length})</strong>
-                    </h1>
-                    <div>
-                        <ol className="inner-list">
-                            {pluginItems}
-                        </ol>
-                    </div>
-                </section>
-            )
-        },
-        propTypes: {
-            name: PropTypes.string.isRequired,
-            items: PropTypes.array.isRequired
-        }
-    });
-
-    const PluginList = createReactClass({
-        getInitialState: function() {
-            return {
-                loading: true,
-                plugins: []
-            }
-        },
-        componentWillUnmount: function() {
-            this.request.cancel();
-        },
-        componentDidMount: function() {
-            var self = this;
-            this.request = this.props.bcApi.v1.dataRequest('admin', 'plugins')
-                .then(function(plugins) {
-                    self.setState({ loading: false, plugins: plugins })
-                })
-                .catch(function(error) {
-                    self.setState({ loading: false, error: error.statusText || error.message })
-                })
-        },
-        render: function() {
-            let state = this.state,
-                api = this.props.bcApi.v1;
-
-            let pluginsComponent = (<div/>);
-
-            if (state.loading) {
-                pluginsComponent = (
-                    <ul className="nav nav-list">
-                      <li className="nav-header">Plugins<span className="badge loading"></span></li>
-                    </ul>
-                )
-            } else if (state.error) {
-                pluginsComponent = (
-                    <ul className="nav nav-list">
-                      <li className="nav-header">{state.error}</li>
-                    </ul>
-                )
-            } else {
-                pluginsComponent = _.sortBy(Object.keys(state.plugins), function (name) {
-                        return name.toLowerCase();
-                    }).map(function (plugin) {
-                        return <PluginSection api={api} key={plugin} name={plugin} items={state.plugins[plugin]}/>;
-                    });
-            }
-            return (
-                <div className="panel">
-                    <div className="panel-heading">
-                        <div className="panel-heading-title">Registered plugins</div>
-                        <div className="panel-heading-subtitle text-muted">
-                            Browse registered and active BigConnect plugins
-                        </div>
-                    </div>
-
-                    <div className="panel-body p-a-4">
-                        <div className="admin-plugin-list">
-                            {pluginsComponent}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-    });
-
-    return PluginList;
 
     function formatKeyForDisplay(key) {
         if (key.length > 1) {
@@ -183,5 +55,142 @@ define([
         }
         return key;
     }
+
+    const PluginSection = createReactClass({
+        propTypes: {
+            name: PropTypes.string.isRequired,
+            items: PropTypes.array.isRequired,
+            reload: PropTypes.func.isRequired
+        },
+
+        getInitialState: function() {
+            return { loading: false }
+        },
+
+        enablePlugin(it, checked) {
+            this.setState({ loading: true });
+            this.request = this.props.api.dataRequest('admin', 'enablePlugin', it.item.className, checked)
+                .then(() => {
+                    this.setState({ loading: false })
+                    this.props.reload();
+                })
+                .catch((error) => {
+                    message.error('Error changing plugin state. Please contact the System Administrator.');
+                })
+        },
+
+        renderItem(it) {
+            const { item, api } = it,
+                name = item.systemPlugin ? `${item.name} (SYSTEM PLUGIN)` : item.name;
+
+            const details = DetailKeys.map(function(key) {
+                    if (_.contains(TypeDateKeys, key) && (key in item)) {
+                        item[key] = api.formatters.date.dateTimeString(item[key]);
+                    }
+                    return { display: formatKeyForDisplay(key), value: item[key] }
+                }).filter(function(item) {
+                    return !!item.value;
+                })
+            return (
+                <List.Item>
+                    <List.Item.Meta
+                        avatar={
+                            <Switch checkedChildren='Enabled' unCheckedChildren='Disabled'
+                                    checked={it.item.enabled}
+                                    disabled={it.item.systemPlugin}
+                                    loading={this.state.loading}
+                                    onChange={(checked) => this.enablePlugin(it, checked)}/>
+                        }
+                        title={
+                            <Space>
+                                <span>{item.name}</span>
+                                {item.systemPlugin ? (<Tag color="orange">system</Tag>) : <span/>}
+                            </Space>
+                        }
+                        description={item.description}
+                    />
+                </List.Item>
+            )
+        },
+
+        render() {
+            var api = this.props.api,
+                pluginItems =  this.props.items.map(function(item) {
+                    var key = item.className || item.fileName || item.name;
+                    return { api, key, item }
+                }),
+                name = formatKeyForDisplay(this.props.name);
+
+            return (
+                <List
+                    className='m-t-3'
+                    style={{ backgroundColor: '#ffffff' }}
+                    size='small'
+                    header={<div>{name} ({this.props.items.length})</div>}
+                    bordered
+                    dataSource={pluginItems}
+                    renderItem={this.renderItem}
+                />
+            )
+        }
+    });
+
+    return createReactClass({
+        getInitialState: function () {
+            return {
+                plugins: []
+            }
+        },
+
+        loadData() {
+            this.request = this.props.bcApi.v1.dataRequest('admin', 'plugins')
+                .then((plugins) => {
+                    this.setState({plugins: plugins})
+                })
+                .catch((error) => {
+                    this.setState({error: error.statusText || error.message})
+                })
+        },
+
+        componentWillUnmount: function () {
+            this.request.cancel();
+        },
+
+        componentDidMount: function () {
+            this.loadData();
+        },
+
+        render: function () {
+            let state = this.state,
+                api = this.props.bcApi.v1;
+
+            let pluginsComponent;
+
+            if (state.error) {
+                pluginsComponent = (
+                    <ul className="nav nav-list">
+                        <li className="nav-header">{state.error}</li>
+                    </ul>
+                )
+            } else {
+                pluginsComponent = _.sortBy(Object.keys(state.plugins), (name) => name.toLowerCase())
+                    .map((plugin) => (<PluginSection api={api} key={plugin} name={plugin} items={state.plugins[plugin]} reload={this.loadData}/>));
+            }
+            return (
+                <>
+                    <div className="panel">
+                        <div className="panel-heading">
+                            <div className="panel-heading-title">Registered plugins</div>
+                            <div className="panel-heading-subtitle text-muted">
+                                Browse registered and active BigConnect plugins
+                            </div>
+                        </div>
+                    </div>
+
+                    {pluginsComponent}
+                </>
+            );
+        }
+    });
 });
 

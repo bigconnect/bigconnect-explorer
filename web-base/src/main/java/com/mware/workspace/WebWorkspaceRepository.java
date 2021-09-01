@@ -48,6 +48,7 @@ import com.mware.core.model.clientapi.dto.ClientApiWorkspace;
 import com.mware.core.model.graph.ElementUpdateContext;
 import com.mware.core.model.graph.GraphRepository;
 import com.mware.core.model.graph.GraphUpdateContext;
+import com.mware.core.model.plugin.PluginStateRepository;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.properties.WorkspaceSchema;
 import com.mware.core.model.properties.types.StringBcProperty;
@@ -72,6 +73,7 @@ import com.mware.ge.*;
 import com.mware.ge.values.storable.*;
 import com.mware.ontology.WebWorkspaceSchema;
 import com.mware.product.*;
+import com.mware.web.WebAppPlugin;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONObject;
 
@@ -99,6 +101,7 @@ public class WebWorkspaceRepository {
     private final Configuration configuration;
     private final VisibilityTranslator visibilityTranslator;
     private final GraphRepository graphRepository;
+    private final PluginStateRepository pluginStateRepository;
 
     private Collection<WorkProductService> workProductServices;
     private Collection<WebWorkspaceListener> webWorkspaceListeners;
@@ -112,7 +115,8 @@ public class WebWorkspaceRepository {
             VisibilityTranslator visibilityTranslator,
             Configuration configuration,
             GraphAuthorizationRepository graphAuthorizationRepository,
-            GraphRepository graphRepository
+            GraphRepository graphRepository,
+            PluginStateRepository pluginStateRepository
     ) {
         this.graph = graph;
         this.webQueueRepository = webQueueRepository;
@@ -121,6 +125,7 @@ public class WebWorkspaceRepository {
         this.visibilityTranslator = visibilityTranslator;
         this.configuration = configuration;
         this.graphRepository = graphRepository;
+        this.pluginStateRepository = pluginStateRepository;
 
         graphAuthorizationRepository.addAuthorizationToGraph(VISIBILITY_PRODUCT_STRING);
     }
@@ -856,7 +861,12 @@ public class WebWorkspaceRepository {
             if (configuration == null) {
                 throw new BcException("Configuration not injected");
             } else {
-                workProductServices = InjectHelper.getInjectedServices(WorkProductService.class, configuration);
+                workProductServices = InjectHelper.getInjectedServices(WebAppPlugin.class, configuration)
+                        .stream()
+                        .filter(plugin -> pluginStateRepository.isEnabled(plugin.getClass().getName()))
+                        .map(WebAppPlugin::getWorkProductService)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
             }
         }
         Optional<WorkProductService> foundProductService = workProductServices.stream()
