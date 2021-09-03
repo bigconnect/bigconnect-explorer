@@ -1,3 +1,4 @@
+
 /*
  * This file is part of the BigConnect project.
  *
@@ -49,24 +50,7 @@ define(['util/withFormFieldErrors'], function(withFormFieldErrors) {
             if (this.attr.disableDropdownFeatures) return;
             var self = this,
                 node = this.$node,
-                scrollParent = node.scrollParent(),
-                syncScrollTop = true,
-                scrollToNode = function(tempNode) {
-                    var nodeEl = tempNode[0];
-                    if (nodeEl.scrollIntoViewIfNeeded) {
-                        nodeEl.scrollIntoViewIfNeeded();
-                    } else if (nodeEl.scrollInfoView) {
-                        nodeEl.scrollIntoView();
-                    }
-                    var scrollTop = scrollParent.scrollTop();
-                    nodeEl.parentNode.removeChild(nodeEl);
-                    requestAnimationFrame(function syncScroll() {
-                        scrollParent.scrollTop(scrollTop);
-                        if (syncScrollTop) {
-                            requestAnimationFrame(syncScroll);
-                        }
-                    })
-                };
+                syncScrollTop = true;
 
             if (node.outerWidth() <= 0) {
                 // Fix issue where dropdown is zero width/height
@@ -91,12 +75,12 @@ define(['util/withFormFieldErrors'], function(withFormFieldErrors) {
                     self.trigger('opened');
                 }
             });
-            var tempScrollTo = $('<div>')
-                    .css({ height: outerHeight + 'px' })
-                    .insertBefore(node);
+            var form = node.find('.form'),
+                outerHeight = form.outerHeight(true);
+
             // Add placeholder node that doesn't animate height which
             // could confuse the browsers scrollTo logic
-            scrollToNode(tempScrollTo);
+            node.css({ height: outerHeight + 'px' });
         };
 
         this.after('teardown', function() {
