@@ -114,7 +114,6 @@ public class ApplicationBootstrap implements ServletContextListener {
             LOGGER.info("Running application with configuration:\n%s", config);
 
             setupInjector(context, config);
-            verifyGraphVersion();
             setupGraphAuthorizations();
             setupOntology();
             startBcProcesses(config);
@@ -159,11 +158,6 @@ public class ApplicationBootstrap implements ServletContextListener {
         InjectHelper.getInstance(ExternalResourceRunnerProcess.class);
         InjectHelper.getInstance(LongRunningProcessRunnerProcess.class);
         InjectHelper.getInstance(SystemNotificationProcess.class);
-    }
-
-    private void verifyGraphVersion() {
-        GraphRepository graphRepository = InjectHelper.getInstance(GraphRepository.class);
-        graphRepository.verifyVersion();
     }
 
     @Override
