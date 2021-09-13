@@ -39,6 +39,7 @@ package com.mware.web;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.mware.config.WebOptions;
 import com.mware.core.bootstrap.InjectHelper;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcAccessDeniedException;
@@ -159,7 +160,7 @@ public class Router extends HttpServlet {
             app.get("/map/marker/image", csrfProtector, MapMarkerImage.class);  // TODO combine with /resource
 
             if (!(geocoderRepository instanceof DefaultGeocoderRepository)) {
-                configuration.set(Configuration.WEB_GEOCODER_ENABLED, true);
+                configuration.set(WebOptions.WEB_GEOCODER_ENABLED.name(), true);
                 app.get("/map/geocode", authenticator, GetGeocoder.class);
             }
 

@@ -37,6 +37,7 @@
 package com.mware.web.parameterProviders;
 
 import com.google.common.base.Preconditions;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcAccessDeniedException;
 import com.mware.core.exception.BcException;
@@ -263,10 +264,7 @@ public abstract class BcBaseParameterProvider<T> extends ParameterProvider<T> {
             if (timeZone == null || timeZone.trim().length() == 0) {
                 timeZone = getOptionalParameter(request, TIME_ZONE_PARAMETER_NAME);
                 if (timeZone == null || timeZone.trim().length() == 0) {
-                    timeZone = this.configuration.get(
-                            Configuration.DEFAULT_TIME_ZONE,
-                            TimeZone.getDefault().getDisplayName()
-                    );
+                    timeZone = this.configuration.get(WebOptions.DEFAULT_TIME_ZONE);
                 }
             }
         }

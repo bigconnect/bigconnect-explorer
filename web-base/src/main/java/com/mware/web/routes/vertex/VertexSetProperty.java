@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcException;
 import com.mware.core.ingest.dataworker.ElementOrPropertyStatus;
@@ -126,10 +127,7 @@ public class VertexSetProperty extends SetPropertyBase implements ParameterizedH
         this.workspaceHelper  = workspaceHelper;
         this.graphRepository = graphRepository;
         this.aclProvider = aclProvider;
-        this.autoPublishComments = configuration.getBoolean(
-                Configuration.COMMENTS_AUTO_PUBLISH,
-                Configuration.DEFAULT_COMMENTS_AUTO_PUBLISH
-        );
+        this.autoPublishComments = configuration.get(WebOptions.COMMENTS_AUTO_PUBLISH);
         this.auditService = auditService;
     }
 

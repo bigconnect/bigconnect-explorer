@@ -38,6 +38,7 @@ package com.mware.web;
 
 import com.google.inject.Injector;
 import com.mware.config.BcResourceBundleManager;
+import com.mware.config.WebOptions;
 import com.mware.core.bootstrap.InjectHelper;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcException;
@@ -116,7 +117,7 @@ public class WebApp extends App {
         this.defaultResultWriterFactory = InjectHelper.getInstance(BcDefaultResultWriterFactory.class);
 
         Configuration config = injector.getInstance(Configuration.class);
-        this.devMode = config.getBoolean(Configuration.DEV_MODE, Configuration.DEV_MODE_DEFAULT);
+        this.devMode = config.get(WebOptions.DEV_MODE);
 
         if (!isDevModeEnabled()) {
             String pluginsCssRoute = "plugins.css";

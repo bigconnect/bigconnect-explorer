@@ -218,10 +218,10 @@ public class ApplicationBootstrap implements ServletContextListener {
     }
 
     private void addMultiPartConfig(Configuration config, ServletRegistration.Dynamic servlet) {
-        String location = config.get(Configuration.MULTIPART_LOCATION, Configuration.DEFAULT_MULTIPART_LOCATION);
-        long maxFileSize = config.getLong(Configuration.MULTIPART_MAX_FILE_SIZE, Configuration.DEFAULT_MULTIPART_MAX_FILE_SIZE);
-        long maxRequestSize = config.getLong(Configuration.MULTIPART_MAX_REQUEST_SIZE, Configuration.DEFAULT_MULTIPART_MAX_REQUEST_SIZE);
-        int fileSizeThreshold = config.getInt(Configuration.MULTIPART_FILE_SIZE_THRESHOLD, Configuration.DEFAULT_MULTIPART_FILE_SIZE_THRESHOLD);
+        String location = config.get(WebOptions.MULTIPART_LOCATION);
+        long maxFileSize = config.get(WebOptions.MULTIPART_MAX_FILE_SIZE);
+        long maxRequestSize = config.get(WebOptions.MULTIPART_MAX_REQUEST_SIZE);
+        int fileSizeThreshold = config.get(WebOptions.MULTIPART_FILE_SIZE_THRESHOLD);
 
         servlet.setMultipartConfig(
                 new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold)

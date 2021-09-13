@@ -38,6 +38,7 @@ package com.mware.web.routes.edge;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcException;
 import com.mware.core.model.properties.BcSchema;
@@ -78,8 +79,7 @@ public class EdgeDeleteProperty implements ParameterizedHandler {
         this.workspaceHelper = workspaceHelper;
         this.schemaRepository = schemaRepository;
         this.aclProvider = aclProvider;
-        this.autoPublishComments = configuration.getBoolean(Configuration.COMMENTS_AUTO_PUBLISH,
-                Configuration.DEFAULT_COMMENTS_AUTO_PUBLISH);
+        this.autoPublishComments = configuration.get(WebOptions.COMMENTS_AUTO_PUBLISH);
     }
 
     @Handle

@@ -38,6 +38,7 @@ package com.mware.web.routes.edge;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
 import com.mware.core.ingest.dataworker.ElementOrPropertyStatus;
 import com.mware.core.model.clientapi.dto.ClientApiEdge;
@@ -103,8 +104,7 @@ public class EdgeSetProperty extends SetPropertyBase implements ParameterizedHan
         this.workspaceRepository = workspaceRepository;
         this.graphRepository = graphRepository;
         this.aclProvider = aclProvider;
-        this.autoPublishComments = configuration.getBoolean(Configuration.COMMENTS_AUTO_PUBLISH,
-                Configuration.DEFAULT_COMMENTS_AUTO_PUBLISH);
+        this.autoPublishComments = configuration.get(WebOptions.COMMENTS_AUTO_PUBLISH);
     }
 
     @Handle

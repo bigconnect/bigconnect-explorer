@@ -5,6 +5,8 @@ import com.mware.core.config.OptionHolder;
 import com.mware.security.ACLProvider;
 import com.mware.security.AllowAllAclProvider;
 
+import java.util.TimeZone;
+
 import static com.mware.core.config.OptionChecker.disallowEmpty;
 import static com.mware.core.config.OptionChecker.positiveInt;
 
@@ -14,6 +16,62 @@ public class WebOptions extends OptionHolder {
             "",
             String.class,
             null
+    );
+
+    public static final ConfigOption<String> DEFAULT_TIME_ZONE = new ConfigOption<>(
+            "default.timeZone",
+            "",
+            String.class,
+            TimeZone.getDefault().getDisplayName()
+    );
+
+    public static final ConfigOption<Boolean> COMMENTS_AUTO_PUBLISH = new ConfigOption<>(
+            "comments.autoPublish",
+            "",
+            Boolean.class,
+            false
+    );
+
+    public static final ConfigOption<String> MULTIPART_LOCATION = new ConfigOption<>(
+            "multipart.location",
+            "Where to store temporary uploaded files",
+            String.class,
+            System.getProperty("java.io.tmpdir")
+    );
+
+    public static final ConfigOption<Long> MULTIPART_MAX_FILE_SIZE = new ConfigOption<>(
+            "multipart.maxFileSize",
+            "Maximum files size in bytes for file upload",
+            Long.class,
+            512 * 1024 * 1024L // 512mb
+    );
+
+    public static final ConfigOption<Long> MULTIPART_MAX_REQUEST_SIZE = new ConfigOption<>(
+            "multipart.maxRequestSize",
+            "Maximum request size in bytes for file upload",
+            Long.class,
+            1024 * 1024 * 1024L // 1Gb
+    );
+
+    public static final ConfigOption<Integer> MULTIPART_FILE_SIZE_THRESHOLD = new ConfigOption<>(
+            "multipart.fileSizeThreshold",
+            "",
+            Integer.class,
+            0
+    );
+
+    public static final ConfigOption<Boolean> WEB_GEOCODER_ENABLED = new ConfigOption<>(
+            "web.ui.geocoder.enabled",
+            "",
+            Boolean.class,
+            false
+    );
+
+    public static final ConfigOption<Boolean> DEV_MODE = new ConfigOption<>(
+            "devMode",
+            "",
+            Boolean.class,
+            true
     );
 
     public static final ConfigOption<Integer> AUTH_TOKEN_EXPIRATION_IN_MINS = new ConfigOption<>(
