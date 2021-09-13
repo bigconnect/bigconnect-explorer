@@ -37,6 +37,7 @@
 package com.mware.web;
 
 import com.google.inject.Inject;
+import com.mware.config.WebOptions;
 import com.mware.core.bootstrap.InjectHelper;
 import com.mware.core.config.Configuration;
 
@@ -51,9 +52,9 @@ public class CacheServletFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         InjectHelper.inject(this);
-        String maxAgeString = this.configuration.get("web.cacheServletFilter.maxAge", null);
-        if (maxAgeString != null) {
-            maxAge = Integer.parseInt(maxAgeString);
+        Integer maxAge = this.configuration.get(WebOptions.CACHE_FILTER_MAX_AGE);
+        if (maxAge != null) {
+            this.maxAge = maxAge;
         }
     }
 

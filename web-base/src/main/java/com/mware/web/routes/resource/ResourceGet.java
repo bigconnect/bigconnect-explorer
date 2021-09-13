@@ -71,7 +71,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class ResourceGet implements ParameterizedHandler {
     private final SchemaRepository ontologyRepository;
-    private final boolean disableTint;
+    private final boolean disableTint = false;
 
     private static Pattern hexPattern = Pattern.compile("^#.*$");
     private static Pattern rgbPattern = Pattern.compile("^\\s*rgb\\((\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)\\s*$");
@@ -82,7 +82,6 @@ public class ResourceGet implements ParameterizedHandler {
             Configuration configuration
     ) {
         this.ontologyRepository = ontologyRepository;
-        this.disableTint = configuration.getBoolean(ResourceGet.class.getName() + ".disableTint", false);
     }
 
     @Handle

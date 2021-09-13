@@ -38,6 +38,7 @@ package com.mware.http;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
 import com.mware.core.config.FileConfigurationLoader;
 import com.mware.core.exception.BcException;
@@ -48,19 +49,19 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Singleton
 public class CachingHttpRepository extends HttpRepository {
     private static final BcLogger LOGGER = BcLoggerFactory.getLogger(CachingHttpRepository.class);
-    public static final String CONFIG_CACHE_DIR = "cachingHttp.cacheDir";
     private static final String INDEX_FILE_NAME = "index";
     private File cacheDir;
 
     @Inject
     public CachingHttpRepository(Configuration configuration) {
         super(configuration);
-        String cacheDirString = configuration.get(CONFIG_CACHE_DIR, getDefaultHttpCacheDir());
+        String cacheDirString = configuration.get(WebOptions.CACHE_HTTP_REPOSITORY_DIR);
         cacheDir = new File(cacheDirString);
         if (!cacheDir.exists()) {
             if (!cacheDir.mkdirs()) {
@@ -70,31 +71,16 @@ public class CachingHttpRepository extends HttpRepository {
         LOGGER.info("Using cache dir: %s", cacheDir.getAbsolutePath());
     }
 
-    private String getDefaultHttpCacheDir() {
-        File bcDir = new File(FileConfigurationLoader.getDefaultBcDir());
-        return new File(bcDir, "httpCache").getAbsolutePath();
-    }
-
     @Override
     public byte[] get(final String url) {
         String cacheMd5 = DigestUtils.md5Hex(url);
-        return withCache(url, cacheMd5, new WithCache() {
-            @Override
-            public byte[] doIt() {
-                return CachingHttpRepository.super.get(url);
-            }
-        });
+        return withCache(url, cacheMd5, () -> CachingHttpRepository.super.get(url));
     }
 
     @Override
     public byte[] post(final String url, final List<Parameter> formParameters) {
         String cacheMd5 = DigestUtils.md5Hex(url + createQueryString(formParameters));
-        return withCache(url, cacheMd5, new WithCache() {
-            @Override
-            public byte[] doIt() {
-                return CachingHttpRepository.super.post(url, formParameters);
-            }
-        });
+        return withCache(url, cacheMd5, () -> CachingHttpRepository.super.post(url, formParameters));
     }
 
     private byte[] withCache(String url, String cacheMd5, WithCache withCache) {
@@ -108,7 +94,7 @@ public class CachingHttpRepository extends HttpRepository {
             LOGGER.debug("cache miss: %s: %s", url, cachedFile.getAbsolutePath());
             byte[] data = withCache.doIt();
             FileUtils.writeByteArrayToFile(cachedFile, data);
-            FileUtils.writeStringToFile(indexFile, cacheMd5 + " " + url + "\n", true);
+            FileUtils.writeStringToFile(indexFile, cacheMd5 + " " + url + "\n", StandardCharsets.UTF_8,true);
             return data;
         } catch (IOException e) {
             throw new BcException("Could not read cache file: " + cachedFile.getAbsolutePath(), e);

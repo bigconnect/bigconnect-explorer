@@ -85,7 +85,6 @@ import static com.mware.core.config.FileConfigurationLoader.ENV_BC_DIR;
 public class ApplicationBootstrap implements ServletContextListener {
     private static BcLogger LOGGER;
 
-    public static final String CONFIG_HTTP_TRANSPORT_GUARANTEE = "http.transportGuarantee";
     public static final String APP_CONFIG_LOADER = "application.config.loader";
     public static final String BC_SERVLET_NAME = "bc";
     public static final String ATMOSPHERE_SERVLET_NAME = "atmosphere";
@@ -138,7 +137,7 @@ public class ApplicationBootstrap implements ServletContextListener {
     }
 
     private void startBcProcesses(Configuration config) {
-        boolean enableWebContainerProcesses = config.getBoolean("com.mware.web.ApplicationBootstrap.enableWebContainerProcesses", true);
+        boolean enableWebContainerProcesses = config.get(WebOptions.ENABLE_WEB_PROCESSES);
         if (!enableWebContainerProcesses) {
             return;
         }
@@ -284,7 +283,7 @@ public class ApplicationBootstrap implements ServletContextListener {
 
     private void addSecurityConstraint(ServletRegistration.Dynamic servletRegistration, Configuration config) {
         ServletSecurity.TransportGuarantee transportGuarantee = ServletSecurity.TransportGuarantee.CONFIDENTIAL;
-        String constraintType = config.get(CONFIG_HTTP_TRANSPORT_GUARANTEE, null);
+        String constraintType = config.get(WebOptions.HTTP_TRANSPORT_GUARANTEE);
         if (constraintType != null) {
             transportGuarantee = ServletSecurity.TransportGuarantee.valueOf(constraintType);
         }

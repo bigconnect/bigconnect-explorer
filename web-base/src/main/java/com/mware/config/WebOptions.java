@@ -5,10 +5,12 @@ import com.mware.bigconnect.ffmpeg.ArtifactThumbnailRepositoryProps;
 import com.mware.core.config.ConfigOption;
 import com.mware.core.config.OptionHolder;
 import com.mware.core.model.properties.BcSchema;
+import com.mware.core.model.user.UserPropertyPrivilegeRepository;
 import com.mware.security.ACLProvider;
 import com.mware.security.AllowAllAclProvider;
 import com.mware.web.WebConfiguration;
 
+import javax.servlet.annotation.ServletSecurity;
 import java.util.TimeZone;
 
 import static com.mware.core.config.OptionChecker.*;
@@ -45,6 +47,45 @@ public class WebOptions extends OptionHolder {
             "",
             String.class,
             null
+    );
+
+    public static final ConfigOption<Integer> CACHE_FILTER_MAX_AGE = new ConfigOption<>(
+            "web.cacheServletFilter.maxAge",
+            "",
+            Integer.class,
+            3600
+    );
+
+    public static final ConfigOption<String> CACHE_HTTP_REPOSITORY_DIR = new ConfigOption<>(
+            "cachingHttp.cacheDir",
+            "",
+            String.class,
+            "${BIGCONNECT_DIR}/datastore/httpCache"
+    );
+
+    public static final ConfigOption<String> DEFAULT_PRIVILEGES = new ConfigOption<>(
+            UserPropertyPrivilegeRepository.class.getName()+".defaultPrivileges",
+            "",
+            String.class,
+            "READ,COMMENT,EDIT,PUBLISH,SEARCH_SAVE_GLOBAL,HISTORY_READ,ADMIN,ONTOLOGY_ADD,ONTOLOGY_PUBLISH"
+    );
+
+    public static final ConfigOption<String> HTTP_TRANSPORT_GUARANTEE = new ConfigOption<>(
+            "http.transportGuarantee",
+            "",
+            allowValues(
+                    ServletSecurity.TransportGuarantee.NONE.name(),
+                    ServletSecurity.TransportGuarantee.CONFIDENTIAL.name()
+            ),
+            String.class,
+            ServletSecurity.TransportGuarantee.NONE.name()
+    );
+
+    public static final ConfigOption<Boolean> ENABLE_WEB_PROCESSES = new ConfigOption<>(
+            "com.mware.web.ApplicationBootstrap.enableWebContainerProcesses",
+            "",
+            Boolean.class,
+            true
     );
 
     public static final ConfigOption<Boolean> SHOW_VERSION_COMMENTS = new ConfigOption<>(
@@ -322,6 +363,22 @@ public class WebOptions extends OptionHolder {
             "https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     );
 
+    public static final ConfigOption<String> MAP_PROVIDER_BING_KEY = new ConfigOption<>(
+            "web.ui.map.provider.BingMaps.key",
+            "",
+            disallowEmpty(),
+            String.class,
+            "REPLACE_ME"
+    );
+
+    public static final ConfigOption<String> MAP_PROVIDER_BING_IMAGERY = new ConfigOption<>(
+            "web.ui.map.provider.BingMaps.imagerySet",
+            "",
+            disallowEmpty(),
+            String.class,
+            "AerialWithLabels"
+    );
+
     public static final ConfigOption<Boolean> DEV_MODE = new ConfigOption<>(
             "devMode",
             "",
@@ -337,9 +394,16 @@ public class WebOptions extends OptionHolder {
             60
     );
 
+    /**
+     * Sets the X-Frame-Options HTTP response header. Possible values:
+     *   DENY           - The page cannot be displayed in a frame, regardless of the site attempting to do so.
+     *   SAMEORIGIN     - The page can only be displayed in a frame on the same origin as the page itself.
+     *   ALLOW-FROM uri - The page can only be displayed in a frame on the specified origin.
+     * See https://developer.mozilla.org/en-US/docs/Web/HTTP/X-Frame-Options
+     */
     public static final ConfigOption<String> WEB_RESPONSE_HEADER_X_FRAME_OPTIONS = new ConfigOption<>(
             "web.response.header.X-Frame-Options",
-            "",
+            "Sets the X-Frame-Options HTTP response header",
             String.class,
             "DENY"
     );
