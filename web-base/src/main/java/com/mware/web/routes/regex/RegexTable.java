@@ -40,8 +40,8 @@ package com.mware.web.routes.regex;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.model.clientapi.dto.ClientApiRegexes;
+import com.mware.core.model.regex.GeRegexRepository;
 import com.mware.core.model.regex.Regex;
-import com.mware.core.model.regex.RegexRepository;
 import com.mware.core.user.User;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
@@ -53,10 +53,10 @@ import static com.mware.ge.util.IterableUtils.toList;
 
 @Singleton
 public class RegexTable implements ParameterizedHandler {
-    private RegexRepository regexRepository;
+    private GeRegexRepository regexRepository;
 
     @Inject
-    public RegexTable(RegexRepository regexRepository) {
+    public RegexTable(GeRegexRepository regexRepository) {
         this.regexRepository = regexRepository;
     }
 

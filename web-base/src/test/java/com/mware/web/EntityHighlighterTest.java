@@ -40,7 +40,6 @@ import com.google.common.collect.Lists;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.termMention.TermMentionBuilder;
 import com.mware.core.model.termMention.TermMentionRepository;
-import com.mware.core.security.DirectVisibilityTranslator;
 import com.mware.core.security.VisibilityTranslator;
 import com.mware.core.user.User;
 import com.mware.ge.*;
@@ -80,7 +79,7 @@ public class EntityHighlighterTest {
 
     private Visibility visibility;
 
-    private VisibilityTranslator visibilityTranslator = new DirectVisibilityTranslator();
+    private VisibilityTranslator visibilityTranslator = new VisibilityTranslator();
 
     @Before
     public void setUp() {

@@ -38,7 +38,7 @@ package com.mware.web.routes.regex;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mware.core.model.regex.RegexRepository;
+import com.mware.core.model.regex.GeRegexRepository;
 import com.mware.core.user.User;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
@@ -49,10 +49,10 @@ import org.apache.commons.lang.StringUtils;
 
 @Singleton
 public class RegexDelete implements ParameterizedHandler {
-    private RegexRepository regexRepository;
+    private GeRegexRepository regexRepository;
 
     @Inject
-    public RegexDelete(RegexRepository regexRepository) {
+    public RegexDelete(GeRegexRepository regexRepository) {
         this.regexRepository = regexRepository;
     }
 

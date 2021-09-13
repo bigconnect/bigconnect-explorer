@@ -36,8 +36,10 @@
  */
 package com.mware.web.auth;
 
+import com.mware.config.WebOptions;
 import com.mware.core.bootstrap.InjectHelper;
 import com.mware.core.config.Configuration;
+import com.mware.core.config.options.CoreOptions;
 import com.mware.core.exception.BcException;
 import com.mware.core.model.user.GeUser;
 import com.mware.core.model.user.UserRepository;
@@ -74,21 +76,21 @@ public class AuthTokenFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         tokenValidityDurationInMinutes = Long.parseLong(
-                getRequiredInitParameter(filterConfig, AUTH_TOKEN_EXPIRATION_IN_MINS)
+                getRequiredInitParameter(filterConfig, WebOptions.AUTH_TOKEN_EXPIRATION_IN_MINS.name())
         );
 
         if (tokenValidityDurationInMinutes < MIN_AUTH_TOKEN_EXPIRATION_MINS) {
-            throw new BcException("Configuration: " + "'" +  AUTH_TOKEN_EXPIRATION_IN_MINS + "' " +
+            throw new BcException("Configuration: " + "'" +  WebOptions.AUTH_TOKEN_EXPIRATION_IN_MINS.name() + "' " +
                 "must be at least " + MIN_AUTH_TOKEN_EXPIRATION_MINS + " minute(s)"
             );
         }
 
         tokenExpirationToleranceInSeconds = Integer.parseInt(
-                getRequiredInitParameter(filterConfig, Configuration.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS)
+                getRequiredInitParameter(filterConfig, CoreOptions.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS.name())
         );
 
-        String keyPassword = getRequiredInitParameter(filterConfig, AUTH_TOKEN_PASSWORD);
-        String keySalt = getRequiredInitParameter(filterConfig, AUTH_TOKEN_SALT);
+        String keyPassword = getRequiredInitParameter(filterConfig, CoreOptions.AUTH_TOKEN_PASSWORD.name());
+        String keySalt = getRequiredInitParameter(filterConfig, CoreOptions.AUTH_TOKEN_SALT.name());
         userRepository = InjectHelper.getInstance(UserRepository.class);
 
         try {

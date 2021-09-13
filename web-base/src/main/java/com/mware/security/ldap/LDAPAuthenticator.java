@@ -39,6 +39,7 @@ package com.mware.security.ldap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcException;
 import com.mware.core.util.BcLogger;
@@ -63,7 +64,7 @@ import java.util.Set;
 public class LDAPAuthenticator {
     private static BcLogger LOGGER = BcLoggerFactory.getLogger(LDAPAuthenticator.class);
 
-    private boolean ldapEnabled;
+    private final boolean ldapEnabled;
     private String ldapUrl;
     private String ldapAdminUser;
     private String ldapAdminPassword;
@@ -83,29 +84,29 @@ public class LDAPAuthenticator {
         this.ldapEnabled = configuration.getBoolean("ldap.enabled", false);
 
         if (ldapEnabled) {
-            this.ldapUrl = Optional.ofNullable(configuration.get("ldap.url", null))
+            this.ldapUrl = Optional.ofNullable(configuration.get(WebOptions.LDAP_URL))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.url' config property not found"));
-            this.ldapAdminUser = Optional.ofNullable(configuration.get("ldap.admin.user", null))
+            this.ldapAdminUser = Optional.ofNullable(configuration.get(WebOptions.LDAP_ADMIN_USER))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.admin.user' config property not found"));
-            this.ldapAdminPassword = Optional.ofNullable(configuration.get("ldap.admin.password", null))
+            this.ldapAdminPassword = Optional.ofNullable(configuration.get(WebOptions.LDAP_ADMIN_PASSWORD))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.admin.password' config property not found"));
-            this.ldapAdminAttribute = Optional.ofNullable(configuration.get("ldap.admin.attribute", "isAdmin"))
+            this.ldapAdminAttribute = Optional.ofNullable(configuration.get(WebOptions.LDAP_ADMIN_ATTR))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.admin.attribute' config property not found"));
-            this.ldapUserClass = Optional.ofNullable(configuration.get("ldap.user.class", null))
+            this.ldapUserClass = Optional.ofNullable(configuration.get(WebOptions.LDAP_USER_CLASS))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.user.class' config property not found"));
-            this.ldapUserameAttr = Optional.ofNullable(configuration.get("ldap.username.attr", null))
+            this.ldapUserameAttr = Optional.ofNullable(configuration.get(WebOptions.LDAP_USERNAME_ATTR))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.username.attr' config property not found"));
-            this.ldapUserContainer = Optional.ofNullable(configuration.get("ldap.user.container", null))
+            this.ldapUserContainer = Optional.ofNullable(configuration.get(WebOptions.LDAP_USER_CONTAINER))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.user.container' config property not found"));
-            this.ldapGroupMembershipAttr = Optional.ofNullable(configuration.get("ldap.group.membership.attr", null))
+            this.ldapGroupMembershipAttr = Optional.ofNullable(configuration.get(WebOptions.LDAP_GROUP_MEMBER_ATTR))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.group.membership.attr' config property not found"));
-            this.ldapGroupClass = Optional.ofNullable(configuration.get("ldap.group.class", null))
+            this.ldapGroupClass = Optional.ofNullable(configuration.get(WebOptions.LDAP_GROUP_CLASS))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.group.class' config property not found"));
-            this.ldapGroupContainer = Optional.ofNullable(configuration.get("ldap.group.container", null))
+            this.ldapGroupContainer = Optional.ofNullable(configuration.get(WebOptions.LDAP_GROUP_CONTAINER))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.group.container' config property not found"));
-            this.ldapGroupnameAttr = Optional.ofNullable(configuration.get("ldap.groupname.attr", null))
+            this.ldapGroupnameAttr = Optional.ofNullable(configuration.get(WebOptions.LDAP_GROUP_NAME_ATTR))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.groupname.attr' config property not found"));
-            this.ldapAdminAttrValue = Optional.ofNullable(configuration.get("ldap.admin.attr.value", null))
+            this.ldapAdminAttrValue = Optional.ofNullable(configuration.get(WebOptions.LDAP_ADMIN_ATTR_VAL))
                     .orElseThrow(() -> new GeException("LDAP Authentication is enabled, but 'ldap.admin.attr.value' config property not found"));
         }
     }

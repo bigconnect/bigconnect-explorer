@@ -38,8 +38,6 @@ package com.mware.workspace;
 
 import com.mware.core.config.Configuration;
 import com.mware.core.model.clientapi.dto.VisibilityJson;
-import com.mware.core.model.schema.SchemaConstants;
-import com.mware.core.model.schema.SchemaRepository;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.role.AuthorizationRepository;
 import com.mware.core.model.schema.SchemaRepository;
@@ -52,7 +50,6 @@ import com.mware.core.model.workQueue.Priority;
 import com.mware.core.model.workQueue.WebQueueRepository;
 import com.mware.core.model.workQueue.WorkQueueRepository;
 import com.mware.core.model.workspace.WorkspaceRepository;
-import com.mware.core.security.DirectVisibilityTranslator;
 import com.mware.core.security.VisibilityTranslator;
 import com.mware.core.user.User;
 import com.mware.ge.Authorizations;
@@ -118,7 +115,7 @@ public class WorkspaceHelperTest {
         termMentionVisibility = new Visibility(TermMentionRepository.VISIBILITY_STRING);
         authorizations = graph.createAuthorizations(TermMentionRepository.VISIBILITY_STRING, WORKSPACE_ID);
         authorizationsRepository = new InMemoryGraphAuthorizationRepository();
-        visibilityTranslator = new DirectVisibilityTranslator();
+        visibilityTranslator = new VisibilityTranslator();
         termMentionRepository = new TermMentionRepository(graph, authorizationsRepository);
 
         when(schemaRepository.getRelationshipNameByIntent("entityHasImage", PUBLIC))

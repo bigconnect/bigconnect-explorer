@@ -42,7 +42,6 @@ import com.mware.core.exception.BcException;
 import com.mware.core.exception.BcResourceNotFoundException;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.properties.MediaBcSchema;
-import com.mware.core.model.properties.RawObjectSchema;
 import com.mware.core.util.LimitInputStream;
 import com.mware.ge.Authorizations;
 import com.mware.ge.Graph;
@@ -59,11 +58,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class VertexRaw implements ParameterizedHandler {

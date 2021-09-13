@@ -37,7 +37,7 @@
 package com.mware.web.auth;
 
 import com.mware.core.bootstrap.InjectHelper;
-import com.mware.core.config.Configuration;
+import com.mware.core.config.options.CoreOptions;
 import com.mware.core.exception.BcException;
 import com.mware.core.model.user.UserRepository;
 import com.mware.core.security.AuthToken;
@@ -53,8 +53,6 @@ import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.mware.core.config.Configuration.AUTH_TOKEN_PASSWORD;
-import static com.mware.core.config.Configuration.AUTH_TOKEN_SALT;
 
 public class AuthTokenWebSocketInterceptor implements AtmosphereInterceptor {
     private static final BcLogger LOGGER = BcLoggerFactory.getLogger(AuthTokenWebSocketInterceptor.class);
@@ -65,11 +63,11 @@ public class AuthTokenWebSocketInterceptor implements AtmosphereInterceptor {
 
     @Override
     public void configure(AtmosphereConfig config) {
-        String keyPassword = config.getInitParameter(AUTH_TOKEN_PASSWORD);
-        checkNotNull(keyPassword, "AtmosphereConfig init parameter '" + AUTH_TOKEN_PASSWORD + "' was not set.");
-        String keySalt = config.getInitParameter(AUTH_TOKEN_SALT);
-        checkNotNull(keySalt, "AtmosphereConfig init parameter '" + AUTH_TOKEN_SALT + "' was not set.");
-        tokenExpirationToleranceInSeconds = config.getInitParameter(Configuration.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS, 0);
+        String keyPassword = config.getInitParameter(CoreOptions.AUTH_TOKEN_PASSWORD.name());
+        checkNotNull(keyPassword, "AtmosphereConfig init parameter '" + CoreOptions.AUTH_TOKEN_PASSWORD.name() + "' was not set.");
+        String keySalt = config.getInitParameter(CoreOptions.AUTH_TOKEN_SALT.name());
+        checkNotNull(keySalt, "AtmosphereConfig init parameter '" + CoreOptions.AUTH_TOKEN_SALT.name() + "' was not set.");
+        tokenExpirationToleranceInSeconds = config.getInitParameter(CoreOptions.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS.name(), 0);
         userRepository = InjectHelper.getInstance(UserRepository.class);
 
         try {

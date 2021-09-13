@@ -39,12 +39,9 @@ package com.mware.config;
 import com.google.inject.Binder;
 import com.google.inject.Scopes;
 import com.mware.core.bootstrap.BcBootstrap;
+import com.mware.core.bootstrap.BcBootstrap.StaticProvider;
 import com.mware.core.bootstrap.BootstrapBindingProvider;
 import com.mware.core.config.Configuration;
-import com.mware.core.model.search.GeSearchRepository;
-import com.mware.core.model.search.SearchRepository;
-import com.mware.core.util.BcLogger;
-import com.mware.core.util.BcLoggerFactory;
 import com.mware.ge.cypher.connection.DefaultNetworkConnectionTracker;
 import com.mware.ge.cypher.connection.NetworkConnectionTracker;
 import com.mware.geocoder.DefaultGeocoderRepository;
@@ -56,32 +53,28 @@ import com.mware.ingest.database.GeDataConnectionRepository;
 import com.mware.search.behaviour.BehaviourRepository;
 import com.mware.search.behaviour.GeBehaviourRepository;
 import com.mware.security.ACLProvider;
-import com.mware.security.AllowAllAclProvider;
 
 public class ApplicationBindingProvider implements BootstrapBindingProvider {
-    private static BcLogger LOGGER = BcLoggerFactory.getLogger(ApplicationBindingProvider.class);
-
     @Override
     public void addBindings(Binder binder, Configuration configuration) {
-        LOGGER.info("Create Web bindings");
+        binder.bind(ACLProvider.class)
+                .toProvider(BcBootstrap.getConfigurableProvider(configuration, WebOptions.ACL_PROVIDER_REPOSITORY))
+                .in(Scopes.SINGLETON);
 
         binder.bind(DataConnectionRepository.class)
-                .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, GeDataConnectionRepository.class))
-                .in(Scopes.SINGLETON);
-        binder.bind(ACLProvider.class)
-                .toProvider(BcBootstrap.getConfigurableProvider(configuration, Configuration.ACL_PROVIDER_REPOSITORY, AllowAllAclProvider.class))
+                .toProvider(new StaticProvider<>(GeDataConnectionRepository.class))
                 .in(Scopes.SINGLETON);
         binder.bind(HttpRepository.class)
-                .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, CachingHttpRepository.class))
+                .toProvider(new StaticProvider<>(CachingHttpRepository.class))
                 .in(Scopes.SINGLETON);
         binder.bind(BehaviourRepository.class)
-                .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, GeBehaviourRepository.class))
+                .toProvider(new StaticProvider<>(GeBehaviourRepository.class))
                 .in(Scopes.SINGLETON);
         binder.bind(GeocoderRepository.class)
-                .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, DefaultGeocoderRepository.class))
+                .toProvider(new StaticProvider<>(DefaultGeocoderRepository.class))
                 .in(Scopes.SINGLETON);
         binder.bind(NetworkConnectionTracker.class)
-                .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, DefaultNetworkConnectionTracker.class))
+                .toProvider(new StaticProvider<>(DefaultNetworkConnectionTracker.class))
                 .in(Scopes.SINGLETON);
     }
 }

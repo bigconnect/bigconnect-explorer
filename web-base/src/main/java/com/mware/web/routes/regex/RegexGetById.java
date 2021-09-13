@@ -40,8 +40,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.exception.BcResourceNotFoundException;
 import com.mware.core.model.clientapi.dto.ClientApiRegex;
+import com.mware.core.model.regex.GeRegexRepository;
 import com.mware.core.model.regex.Regex;
-import com.mware.core.model.regex.RegexRepository;
 import com.mware.core.user.User;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
@@ -49,10 +49,10 @@ import com.mware.web.framework.annotations.Required;
 
 @Singleton
 public class RegexGetById implements ParameterizedHandler {
-    private RegexRepository regexRepository;
+    private GeRegexRepository regexRepository;
 
     @Inject
-    public RegexGetById(RegexRepository regexRepository) {
+    public RegexGetById(GeRegexRepository regexRepository) {
         this.regexRepository = regexRepository;
     }
 
@@ -63,10 +63,9 @@ public class RegexGetById implements ParameterizedHandler {
     ) throws Exception {
         Regex dc = regexRepository.findRegexById(id);
         if (dc == null) {
-            throw new BcResourceNotFoundException("Regex with id="+id+" was not found");
+            throw new BcResourceNotFoundException("Regex with id=" + id + " was not found");
         }
 
-        ClientApiRegex clientApi = regexRepository.toClientApi(dc);
-        return clientApi;
+        return regexRepository.toClientApi(dc);
     }
 }

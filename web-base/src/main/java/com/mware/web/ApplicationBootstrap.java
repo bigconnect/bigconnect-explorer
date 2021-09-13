@@ -37,10 +37,12 @@
 package com.mware.web;
 
 import com.google.inject.Injector;
+import com.mware.config.WebOptions;
 import com.mware.core.bootstrap.BcBootstrap;
 import com.mware.core.bootstrap.InjectHelper;
 import com.mware.core.config.Configuration;
 import com.mware.core.config.ConfigurationLoader;
+import com.mware.core.config.options.CoreOptions;
 import com.mware.core.exception.BcException;
 import com.mware.core.ingest.video.VideoFrameInfo;
 import com.mware.core.lifecycle.LifeSupportService;
@@ -107,7 +109,6 @@ public class ApplicationBootstrap implements ServletContextListener {
                 throw new RuntimeException("The environment variable "+ENV_BC_DIR+" is not set. Aborting.");
 
             Map<String, String> initParameters = new HashMap<>(getInitParametersAsMap(context));
-            initParameters.putAll(Configuration.DEFAULTS);
             initParameters.putAll(WebConfiguration.DEFAULTS);
             Configuration config = ConfigurationLoader.load(context.getInitParameter(APP_CONFIG_LOADER), initParameters);
             LOGGER = BcLoggerFactory.getLogger(ApplicationBootstrap.class);
@@ -174,7 +175,7 @@ public class ApplicationBootstrap implements ServletContextListener {
         LOGGER.debug("setupInjector");
         InjectHelper.inject(this, BcBootstrap.bootstrapModuleMaker(config), config);
 
-        if(config.getBoolean(Configuration.TRACE_ENABLED, Configuration.DEFAULT_TRACE_ENABLED)) {
+        if(config.get(CoreOptions.TRACE_ENABLED)) {
             TraceRepository traceRepository = InjectHelper.getInstance(TraceRepository.class);
             traceRepository.enable();
         }
@@ -244,9 +245,9 @@ public class ApplicationBootstrap implements ServletContextListener {
         servlet.setInitParameter(ApplicationConfig.DROP_ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "true");
         servlet.setInitParameter(ApplicationConfig.WEBSOCKET_MAXTEXTSIZE, "1048576");
         servlet.setInitParameter(ApplicationConfig.WEBSOCKET_MAXBINARYSIZE, "1048576");
-        servlet.setInitParameter(Configuration.AUTH_TOKEN_PASSWORD, config.get(Configuration.AUTH_TOKEN_PASSWORD, null));
-        servlet.setInitParameter(Configuration.AUTH_TOKEN_SALT, config.get(Configuration.AUTH_TOKEN_SALT, null));
-        servlet.setInitParameter(Configuration.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS, config.get(Configuration.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS, null));
+        servlet.setInitParameter(CoreOptions.AUTH_TOKEN_PASSWORD.name(), config.get(CoreOptions.AUTH_TOKEN_PASSWORD));
+        servlet.setInitParameter(CoreOptions.AUTH_TOKEN_SALT.name(), config.get(CoreOptions.AUTH_TOKEN_SALT));
+        servlet.setInitParameter(CoreOptions.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS.name(), config.get(CoreOptions.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS).toString());
 
         addSecurityConstraint(servlet, config);
     }
@@ -259,10 +260,10 @@ public class ApplicationBootstrap implements ServletContextListener {
 
     private void addAuthTokenFilter(ServletContext context, Configuration config) {
         FilterRegistration.Dynamic filter = context.addFilter(AUTH_TOKEN_FILTER_NAME, AuthTokenFilter.class);
-        filter.setInitParameter(Configuration.AUTH_TOKEN_PASSWORD, config.get(Configuration.AUTH_TOKEN_PASSWORD, null));
-        filter.setInitParameter(Configuration.AUTH_TOKEN_SALT, config.get(Configuration.AUTH_TOKEN_SALT, null));
-        filter.setInitParameter(Configuration.AUTH_TOKEN_EXPIRATION_IN_MINS, config.get(Configuration.AUTH_TOKEN_EXPIRATION_IN_MINS, null));
-        filter.setInitParameter(Configuration.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS, config.get(Configuration.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS, null));
+        filter.setInitParameter(CoreOptions.AUTH_TOKEN_PASSWORD.name(), config.get(CoreOptions.AUTH_TOKEN_PASSWORD));
+        filter.setInitParameter(CoreOptions.AUTH_TOKEN_SALT.name(), config.get(CoreOptions.AUTH_TOKEN_SALT));
+        filter.setInitParameter(CoreOptions.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS.name(), config.get(CoreOptions.AUTH_TOKEN_EXPIRATION_TOLERANCE_IN_SECS).toString());
+        filter.setInitParameter(WebOptions.AUTH_TOKEN_EXPIRATION_IN_MINS.name(), config.get(WebOptions.AUTH_TOKEN_EXPIRATION_IN_MINS).toString());
         filter.setAsyncSupported(true);
         filter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), false, "/*");
     }

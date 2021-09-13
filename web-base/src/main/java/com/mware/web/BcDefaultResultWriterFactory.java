@@ -39,6 +39,7 @@ package com.mware.web;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcException;
 import com.mware.core.model.clientapi.dto.ClientApiObject;
@@ -79,7 +80,7 @@ public class BcDefaultResultWriterFactory implements ResultWriterFactory {
     ) {
         this.aclProvider = aclProvider;
         this.workspaceRepository = workspaceRepository;
-        this.responseHeaderXFrameOptions = configuration.get(Configuration.WEB_RESPONSE_HEADER_X_FRAME_OPTIONS, null);
+        this.responseHeaderXFrameOptions = configuration.get(WebOptions.WEB_RESPONSE_HEADER_X_FRAME_OPTIONS);
     }
 
     @Override

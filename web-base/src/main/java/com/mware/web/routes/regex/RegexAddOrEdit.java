@@ -39,8 +39,8 @@ package com.mware.web.routes.regex;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.exception.BcException;
+import com.mware.core.model.regex.GeRegexRepository;
 import com.mware.core.model.regex.Regex;
-import com.mware.core.model.regex.RegexRepository;
 import com.mware.core.user.User;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
@@ -51,11 +51,11 @@ import com.mware.web.model.ClientApiSuccess;
 
 @Singleton
 public class RegexAddOrEdit implements ParameterizedHandler {
-    private final RegexRepository regexRepository;
+    private final GeRegexRepository regexRepository;
 
     @Inject
     public RegexAddOrEdit(
-            RegexRepository regexRepository
+            GeRegexRepository regexRepository
     ) {
         this.regexRepository = regexRepository;
     }

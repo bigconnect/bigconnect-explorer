@@ -38,6 +38,7 @@ package com.mware.web.parameterProviders;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
 import com.mware.web.framework.HandlerChain;
 import com.mware.web.framework.parameterProviders.ParameterProvider;
@@ -57,7 +58,7 @@ public class BaseUrlParameterProviderFactory extends ParameterProviderFactory<St
         parameterProvider = new BcBaseParameterProvider<String>(configuration) {
             @Override
             public String getParameter(HttpServletRequest request, HttpServletResponse response, HandlerChain chain) {
-                String configuredBaseUrl = configuration.get(Configuration.BASE_URL, null);
+                String configuredBaseUrl = configuration.get(WebOptions.BASE_URL);
                 if (configuredBaseUrl != null && configuredBaseUrl.trim().length() > 0) {
                     return configuredBaseUrl;
                 }

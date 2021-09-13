@@ -50,7 +50,6 @@ import com.mware.core.model.workQueue.WorkQueueRepository;
 import com.mware.core.model.workspace.Workspace;
 import com.mware.core.model.workspace.WorkspaceRepository;
 import com.mware.core.security.AuditService;
-import com.mware.core.security.DirectVisibilityTranslator;
 import com.mware.core.security.VisibilityTranslator;
 import com.mware.core.user.User;
 import com.mware.ge.*;
@@ -116,7 +115,7 @@ public class FileImportTest {
                 .dataType(StringValue.class)
                 .textIndexHint(EnumSet.of(TextIndexHint.EXACT_MATCH)).define();
 
-        visibilityTranslator = new DirectVisibilityTranslator();
+        visibilityTranslator = new VisibilityTranslator();
 
         String workspaceId = "junit-workspace";
         authorizations = graph.createAuthorizations(workspaceId);
