@@ -81,7 +81,7 @@ public class LDAPAuthenticator {
 
     @Inject
     public LDAPAuthenticator(Configuration configuration) {
-        this.ldapEnabled = configuration.getBoolean("ldap.enabled", false);
+        this.ldapEnabled = configuration.get(WebOptions.LDAP_ENABLED);
 
         if (ldapEnabled) {
             this.ldapUrl = Optional.ofNullable(configuration.get(WebOptions.LDAP_URL))

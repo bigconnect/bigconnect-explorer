@@ -40,6 +40,7 @@ import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.config.Configuration;
+import com.mware.core.config.options.CoreOptions;
 import com.mware.core.exception.BcException;
 import com.mware.core.model.clientapi.dto.ClientApiImportProperty;
 import com.mware.core.model.workQueue.Priority;
@@ -98,7 +99,6 @@ public class VertexImport implements ParameterizedHandler {
     private Path uploadTempDir;
     private Authorizations authorizations;
     private final boolean autoPublish;
-    public static final String WORKSPACE_AUTO_PUBLISH_KEY = "workspace.autopublish";
 
     @Inject
     public VertexImport(
@@ -114,7 +114,7 @@ public class VertexImport implements ParameterizedHandler {
         this.workspaceRepository = workspaceRepository;
         this.visibilityTranslator = visibilityTranslator;
         this.workspaceHelper = workspaceHelper;
-        this.autoPublish = configuration.getBoolean(WORKSPACE_AUTO_PUBLISH_KEY, false);
+        this.autoPublish = configuration.get(CoreOptions.WORKSPACE_AUTO_PUBLISH);
 
         try {
             String configuredTempDir = configuration.get(TEMP_DIR_CONFIG, null);

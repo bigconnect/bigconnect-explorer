@@ -38,7 +38,9 @@ package com.mware.search;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
+import com.mware.core.config.options.CoreOptions;
 import com.mware.core.model.clientapi.dto.ClientApiElementSearchResponse;
 import com.mware.core.model.clientapi.dto.ClientApiGeObject;
 import com.mware.core.model.clientapi.dto.ClientApiSearchResponse;
@@ -66,7 +68,7 @@ public class CypherSearchRunner extends SearchRunner {
 
     @Inject
     public CypherSearchRunner(Configuration configuration, GeCypherExecutionEngine executionEngine) {
-        this.defaultSearchResultCount = configuration.getInt(Configuration.DEFAULT_SEARCH_RESULT_COUNT, 100);
+        this.defaultSearchResultCount = configuration.get(CoreOptions.DEFAULT_SEARCH_RESULT_COUNT);
         this.executionEngine = executionEngine;
     }
 

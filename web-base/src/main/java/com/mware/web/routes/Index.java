@@ -44,6 +44,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.config.WebOptions;
 import com.mware.core.config.Configuration;
 import com.mware.web.ContentSecurityPolicy;
 import com.mware.web.WebApp;
@@ -86,7 +87,7 @@ public class Index implements ParameterizedHandler {
 
     @Inject
     public Index(Configuration configuration, ContentSecurityPolicy contentSecurityPolicy) {
-        showVersionComments = configuration.getBoolean(WebConfiguration.SHOW_VERSION_COMMENTS, true);
+        showVersionComments = configuration.get(WebOptions.SHOW_VERSION_COMMENTS);
         this.contentSecurityPolicy = contentSecurityPolicy;
     }
 

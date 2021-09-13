@@ -40,6 +40,7 @@ import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.config.Configuration;
+import com.mware.core.config.options.CoreOptions;
 import com.mware.core.exception.BcAccessDeniedException;
 import com.mware.core.exception.BcException;
 import com.mware.core.exception.BcResourceNotFoundException;
@@ -114,7 +115,7 @@ public class WorkspaceHelper {
         this.privilegeRepository = privilegeRepository;
         this.authorizationRepository = authorizationRepository;
         this.entityHasImageIri = schemaRepository.getRelationshipNameByIntent("entityHasImage", SchemaRepository.PUBLIC);
-        this.autoPublish = configuration.getBoolean(WORKSPACE_AUTO_PUBLISH_KEY, false);
+        this.autoPublish = configuration.get(CoreOptions.WORKSPACE_AUTO_PUBLISH);
 
         if (this.entityHasImageIri == null) {
             LOGGER.warn("'entityHasImage' intent has not been defined. Please update your ontology.");

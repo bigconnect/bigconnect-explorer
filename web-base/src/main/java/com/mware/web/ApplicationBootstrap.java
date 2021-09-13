@@ -109,7 +109,6 @@ public class ApplicationBootstrap implements ServletContextListener {
                 throw new RuntimeException("The environment variable "+ENV_BC_DIR+" is not set. Aborting.");
 
             Map<String, String> initParameters = new HashMap<>(getInitParametersAsMap(context));
-            initParameters.putAll(WebConfiguration.DEFAULTS);
             Configuration config = ConfigurationLoader.load(context.getInitParameter(APP_CONFIG_LOADER), initParameters);
             LOGGER = BcLoggerFactory.getLogger(ApplicationBootstrap.class);
             LOGGER.info("Running application with configuration:\n%s", config);
