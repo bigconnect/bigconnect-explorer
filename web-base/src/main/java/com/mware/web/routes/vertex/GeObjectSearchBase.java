@@ -65,6 +65,7 @@ import com.mware.web.framework.annotations.Handle;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import com.mware.web.routes.search.WebSearchOptionsFactory;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONArray;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.ZoneOffset;
@@ -112,11 +113,19 @@ public abstract class GeObjectSearchBase {
                 WebConfiguration.SEARCH_DISABLE_WILDCARD_SEARCH,
                 Boolean.parseBoolean(WebConfiguration.DEFAULTS.get(WebConfiguration.SEARCH_DISABLE_WILDCARD_SEARCH))
         );
-        if ("*".equals(searchOptions.getOptionalParameter("q", String.class)) && disableWildcard) {
-            ClientApiElementSearchResponse results = new ClientApiElementSearchResponse();
-            results.setTotalHits(Long.MIN_VALUE);
-            return results;
-        };
+
+        if (disableWildcard) {
+            String queryString = searchOptions.getOptionalParameter("q", String.class);
+            JSONArray filterJson = searchOptions.getRequiredParameter("filter", JSONArray.class);
+            JSONArray refinementJson = searchOptions.getOptionalParameter("refinement", JSONArray.class);
+
+            if ("*".equals(queryString) && (filterJson.length() == 0 && (refinementJson == null || refinementJson.length() == 0))) {
+                // wildcard search with empty filters and refinements is not allowed
+                ClientApiElementSearchResponse results = new ClientApiElementSearchResponse();
+                results.setTotalHits(-1L);
+                return results;
+            }
+        }
 
         try (QueryResultsIterableSearchResults searchResults = this.searchRunner.run(searchOptions, user, authorizations)) {
             List<ClientApiGeObject> geObjects = convertElementsToClientApi(
