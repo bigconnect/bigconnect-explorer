@@ -60,6 +60,7 @@ import com.mware.ge.query.Query;
 import com.mware.ge.query.QueryResultsIterable;
 import com.mware.ge.query.aggregations.*;
 import com.mware.ge.values.storable.DateTimeValue;
+import com.mware.web.WebConfiguration;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import com.mware.web.routes.search.WebSearchOptionsFactory;
@@ -82,11 +83,13 @@ public abstract class GeObjectSearchBase {
     protected final Graph graph;
     protected final AuditService auditService;
     private final ObjectMapper objectMapper;
+    protected final com.mware.core.config.Configuration configuration;
 
     public GeObjectSearchBase(Graph graph,
                               GeObjectSearchRunnerBase searchRunner,
                               SchemaRepository schemaRepository,
-                              AuditService auditService) {
+                              AuditService auditService,
+                              com.mware.core.config.Configuration configuration) {
         checkNotNull(searchRunner, "searchRunner is required");
         checkNotNull(schemaRepository, "ontologyRepository is required");
         this.searchRunner = searchRunner;
@@ -94,6 +97,7 @@ public abstract class GeObjectSearchBase {
         this.graph = graph;
         this.auditService = auditService;
         this.objectMapper = ObjectMapperFactory.getInstance();
+        this.configuration = configuration;
     }
 
     @Handle
@@ -104,6 +108,16 @@ public abstract class GeObjectSearchBase {
             Authorizations authorizations
     ) throws Exception {
         SearchOptions searchOptions = WebSearchOptionsFactory.create(request, workspaceId);
+        boolean disableWildcard = this.configuration.getBoolean(
+                WebConfiguration.SEARCH_DISABLE_WILDCARD_SEARCH,
+                Boolean.parseBoolean(WebConfiguration.DEFAULTS.get(WebConfiguration.SEARCH_DISABLE_WILDCARD_SEARCH))
+        );
+        if ("*".equals(searchOptions.getOptionalParameter("q", String.class)) && disableWildcard) {
+            ClientApiElementSearchResponse results = new ClientApiElementSearchResponse();
+            results.setTotalHits(Long.MIN_VALUE);
+            return results;
+        };
+
         try (QueryResultsIterableSearchResults searchResults = this.searchRunner.run(searchOptions, user, authorizations)) {
             List<ClientApiGeObject> geObjects = convertElementsToClientApi(
                     searchResults.getQueryResultsIterable(),

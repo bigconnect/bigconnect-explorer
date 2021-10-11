@@ -57,6 +57,7 @@ define([
     'use strict';
 
     var NO_DATA = 'NO_DATA_MARKER',
+        WILDCARD_SERACH_DISABLED = 'WILDCARD_SERACH_DISABLED',
         TOO_MANY_BUCKETS = 'TOO_MANY_BUCKETS',
         TOO_MANY_BUCKETS_HISTOGRAM = 'TOO_MANY_BUCKETS_HISTOGRAM',
         TOO_MANY_BUCKETS_GEOHASH = 'TOO_MANY_BUCKETS_GEOHASH',
@@ -178,6 +179,9 @@ define([
                     } else if (error && error.message === TOO_MANY_BUCKETS_GEOHASH) {
                         type = 'info';
                         message = 'bucket-overload.geohash';
+                    } else if (error && error.message === WILDCARD_SERACH_DISABLED) {
+                        type = 'info';
+                        message = 'wildcard-disabled';
                     } else if (error && error.message === TOO_MANY_BUCKETS_HISTOGRAM) {
                         type = 'info';
                         message = 'bucket-overload.histogram';
@@ -542,6 +546,8 @@ define([
             } else {
                 throw new Error(NO_DATA);
             }
+        } else if (result.totalHits <= 0x7FFFFFFFFFFFFFFF) {
+            throw new Error(WILDCARD_SERACH_DISABLED);
         } else if (resultsFromSearch(result)) {
             return {
                 type: TYPE_ELEMENTS,
