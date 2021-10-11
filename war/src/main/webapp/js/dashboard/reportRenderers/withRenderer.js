@@ -546,7 +546,7 @@ define([
             } else {
                 throw new Error(NO_DATA);
             }
-        } else if (result.totalHits <= 0x7FFFFFFFFFFFFFFF) {
+        } else if (result.totalHits < 0) {
             throw new Error(WILDCARD_SERACH_DISABLED);
         } else if (resultsFromSearch(result)) {
             return {

@@ -114,6 +114,11 @@ define([
                         $searchResults.hide();
                         $refinementsContainer.hide();
                         $panelRefinements.hide();
+                    } else if (result.totalHits < 0) {
+                        $searchHints.hide();
+                        $searchResults.find('.total-hits').text("0");
+                        $searchResults.show().children('.content').scrollTop(0);
+                        $resultsContainer.text(i18n('dashboard.wildcard-disabled'));
                     } else {
                         $searchHints.hide();
                         $searchResults.find('.total-hits').text(result.totalHits);
