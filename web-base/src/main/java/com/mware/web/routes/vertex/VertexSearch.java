@@ -45,6 +45,7 @@ import com.mware.core.model.search.VertexSearchRunner;
 import com.mware.core.security.AuditService;
 import com.mware.ge.Graph;
 import com.mware.web.framework.ParameterizedHandler;
+import com.mware.web.routes.config.Configuration;
 
 @Singleton
 public class VertexSearch extends GeObjectSearchBase implements ParameterizedHandler {
@@ -52,8 +53,9 @@ public class VertexSearch extends GeObjectSearchBase implements ParameterizedHan
     public VertexSearch(Graph graph,
                         SearchRepository searchRepository,
                         SchemaRepository schemaRepository,
-                        AuditService auditService) {
+                        AuditService auditService,
+                        com.mware.core.config.Configuration configuration) {
         super(graph, (GeObjectSearchRunnerBase) searchRepository.findSearchRunnerByUri(VertexSearchRunner.URI),
-                schemaRepository, auditService);
+                schemaRepository, auditService, configuration);
     }
 }

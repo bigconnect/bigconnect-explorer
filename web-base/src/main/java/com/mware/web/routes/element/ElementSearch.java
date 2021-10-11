@@ -54,8 +54,9 @@ public class ElementSearch extends GeObjectSearchBase implements ParameterizedHa
     public ElementSearch(Graph graph,
                          SearchRepository searchRepository,
                          SchemaRepository schemaRepository,
-                         AuditService auditService) {
+                         AuditService auditService,
+                         com.mware.core.config.Configuration configuration) {
         super(graph, (GeObjectSearchRunnerBase) searchRepository.findSearchRunnerByUri(ElementSearchRunner.URI),
-                schemaRepository, auditService);
+                schemaRepository, auditService, configuration);
     }
 }

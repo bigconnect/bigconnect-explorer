@@ -60,8 +60,10 @@ import com.mware.ge.query.Query;
 import com.mware.ge.query.QueryResultsIterable;
 import com.mware.ge.query.aggregations.*;
 import com.mware.ge.values.storable.DateTimeValue;
+import com.mware.web.WebConfiguration;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
+import com.mware.web.routes.config.Configuration;
 import com.mware.web.routes.search.WebSearchOptionsFactory;
 import org.apache.commons.lang.StringUtils;
 
@@ -82,11 +84,13 @@ public abstract class GeObjectSearchBase {
     protected final Graph graph;
     protected final AuditService auditService;
     private final ObjectMapper objectMapper;
+    protected final com.mware.core.config.Configuration configuration;
 
     public GeObjectSearchBase(Graph graph,
                               GeObjectSearchRunnerBase searchRunner,
                               SchemaRepository schemaRepository,
-                              AuditService auditService) {
+                              AuditService auditService,
+                              com.mware.core.config.Configuration configuration) {
         checkNotNull(searchRunner, "searchRunner is required");
         checkNotNull(schemaRepository, "ontologyRepository is required");
         this.searchRunner = searchRunner;
@@ -94,6 +98,7 @@ public abstract class GeObjectSearchBase {
         this.graph = graph;
         this.auditService = auditService;
         this.objectMapper = ObjectMapperFactory.getInstance();
+        this.configuration = configuration;
     }
 
     @Handle
@@ -104,6 +109,16 @@ public abstract class GeObjectSearchBase {
             Authorizations authorizations
     ) throws Exception {
         SearchOptions searchOptions = WebSearchOptionsFactory.create(request, workspaceId);
+        boolean disableWildcard = this.configuration.getBoolean(
+                WebConfiguration.SEARCH_DISABLE_WILDCARD_SEARCH,
+                Boolean.parseBoolean(WebConfiguration.DEFAULTS.get(WebConfiguration.SEARCH_DISABLE_WILDCARD_SEARCH))
+        );
+        if ("*".equals(searchOptions.getOptionalParameter("q", String.class)) && disableWildcard) {
+            ClientApiElementSearchResponse results = new ClientApiElementSearchResponse();
+            results.setTotalHits(Long.MIN_VALUE);
+            return results;
+        };
+
         try (QueryResultsIterableSearchResults searchResults = this.searchRunner.run(searchOptions, user, authorizations)) {
             List<ClientApiGeObject> geObjects = convertElementsToClientApi(
                     searchResults.getQueryResultsIterable(),
@@ -187,28 +202,28 @@ public abstract class GeObjectSearchBase {
             results.setSearchTime(((IterableWithSearchTime) searchResults).getSearchTimeNanoSeconds());
         }
         for (Aggregation aggregation : query.getAggregations()) {
-            results.getAggregates().put(aggregation.getAggregationName(),  toClientApiAggregateResult(searchResults, aggregation, workspaceId));
+            results.getAggregates().put(aggregation.getAggregationName(), toClientApiAggregateResult(searchResults, aggregation, workspaceId));
         }
     }
 
     private AggregateResult toClientApiAggregateResult(QueryResultsIterable<? extends GeObject> searchResults, Aggregation aggregation, String workspaceId) {
         AggregationResult aggResult;
-        String fieldName =  null;
+        String fieldName = null;
         if (aggregation instanceof TermsAggregation) {
             aggResult = searchResults.getAggregationResult(aggregation.getAggregationName(), TermsResult.class);
-            fieldName = ((TermsAggregation)aggregation).getPropertyName();
+            fieldName = ((TermsAggregation) aggregation).getPropertyName();
         } else if (aggregation instanceof GeohashAggregation) {
             aggResult = searchResults.getAggregationResult(aggregation.getAggregationName(), GeohashResult.class);
-            fieldName = ((GeohashAggregation)aggregation).getFieldName();
+            fieldName = ((GeohashAggregation) aggregation).getFieldName();
         } else if (aggregation instanceof HistogramAggregation || aggregation instanceof ChronoFieldAggregation) {
             aggResult = searchResults.getAggregationResult(aggregation.getAggregationName(), HistogramResult.class);
             if (aggregation instanceof HistogramAggregation)
-                fieldName = ((HistogramAggregation)aggregation).getFieldName();
+                fieldName = ((HistogramAggregation) aggregation).getFieldName();
             else if (aggregation instanceof ChronoFieldAggregation)
-                fieldName = ((ChronoFieldAggregation)aggregation).getPropertyName();
+                fieldName = ((ChronoFieldAggregation) aggregation).getPropertyName();
         } else if (aggregation instanceof StatisticsAggregation) {
             aggResult = searchResults.getAggregationResult(aggregation.getAggregationName(), StatisticsResult.class);
-            fieldName = ((StatisticsAggregation)aggregation).getFieldName();
+            fieldName = ((StatisticsAggregation) aggregation).getFieldName();
         } else {
             throw new BcException("Unhandled aggregation type: " + aggregation.getClass().getName());
         }
@@ -303,11 +318,11 @@ public abstract class GeObjectSearchBase {
         result.setFieldType(schemaProperty.getDataType().getText());
         result.setField(fieldName);
         List<HistogramBucket> list = Lists.newArrayList(agg.getBuckets());
-        if(list != null && list.size() > 0) {
+        if (list != null && list.size() > 0) {
             Comparator<HistogramBucket> comparator = (HistogramBucket o1, HistogramBucket o2) -> {
-                if(PropertyType.DOUBLE.equals(schemaProperty.getDataType()) || PropertyType.INTEGER.equals(schemaProperty.getDataType()))
+                if (PropertyType.DOUBLE.equals(schemaProperty.getDataType()) || PropertyType.INTEGER.equals(schemaProperty.getDataType()))
                     return Double.valueOf(o1.getKey().toString()).compareTo(Double.valueOf(o2.getKey().toString()));
-                else if(PropertyType.DATE.equals(schemaProperty.getDataType())) {
+                else if (PropertyType.DATE.equals(schemaProperty.getDataType())) {
                     String strT1 = tryConvertToTime(o1.getKey().toString());
                     String strT2 = tryConvertToTime(o2.getKey().toString());
                     int compare = 0;
@@ -323,7 +338,7 @@ public abstract class GeObjectSearchBase {
             };
             Collections.sort(list, comparator);
 
-            for(int i=0; i < list.size(); i++) {
+            for (int i = 0; i < list.size(); i++) {
 
                 HistogramBucket histogramBucket = list.get(i);
                 String firstKey = histogramBucket.getKey().toString();
@@ -364,11 +379,11 @@ public abstract class GeObjectSearchBase {
 
                 b.setLabel(firstLabel + " - " + secondLabel);
 
-                result.getBuckets().put(firstKey,b);
+                result.getBuckets().put(firstKey, b);
             }
         }
 
-       return result;
+        return result;
     }
 
     private String getReadableDate(String bucketKey) {
@@ -423,7 +438,7 @@ public abstract class GeObjectSearchBase {
                     toClientApiNestedResults(termsBucket.getNestedResults(), workspaceId)
             );
 
-            if("conceptType".equals(fieldName)) {
+            if ("conceptType".equals(fieldName)) {
                 Concept concept = schemaRepository.getConceptByName(termsBucket.getKey().toString(), workspaceId);
                 if (concept != null) {
                     b.setLabel(concept.getDisplayName());

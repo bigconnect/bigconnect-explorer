@@ -53,8 +53,9 @@ public class ExtendedDataSearch extends GeObjectSearchBase implements Parameteri
     public ExtendedDataSearch(Graph graph,
                               SearchRepository searchRepository,
                               SchemaRepository schemaRepository,
-                              AuditService auditService) {
+                              AuditService auditService,
+                              com.mware.core.config.Configuration configuration) {
         super(graph, (GeObjectSearchRunnerBase) searchRepository.findSearchRunnerByUri(ExtendedDataSearchRunner.URI),
-                schemaRepository, auditService);
+                schemaRepository, auditService, configuration);
     }
 }
