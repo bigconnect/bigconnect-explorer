@@ -643,13 +643,8 @@ define([
             this.dataRequest('config', 'properties')
                 .done(function(properties) {
                     if (!query && hasFilters && data.setAsteriskSearchOnEmpty) {
-                        if (properties['search.disableWildcardSearch'] === 'true') {
-                            self.updateClearSearch();
-                            return;
-                        } else {
-                            self.select('querySelector').val('*');
-                            query = self.getQueryVal();
-                        }
+                        self.select('querySelector').val('*');
+                        query = self.getQueryVal();
                     }
 
                     const hasQuery = query && query.length;
