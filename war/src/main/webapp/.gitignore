@@ -9,5 +9,4 @@ test/reports
 libpeerconnection.log
 .idea/*
 *.iml
-yarn.lock
 yarn-error.log
