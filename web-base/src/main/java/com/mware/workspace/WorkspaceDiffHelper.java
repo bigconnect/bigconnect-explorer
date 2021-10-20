@@ -39,6 +39,7 @@ package com.mware.workspace;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.config.Configuration;
 import com.mware.core.exception.BcAccessDeniedException;
 import com.mware.core.model.clientapi.dto.SandboxStatus;
 import com.mware.core.model.lock.LockRepository;
@@ -60,6 +61,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mware.ge.util.IterableUtils.toList;
+import static com.mware.workspace.WorkspaceHelper.WORKSPACE_AUTO_PUBLISH_KEY;
 
 @Singleton
 public class WorkspaceDiffHelper {
@@ -69,6 +71,7 @@ public class WorkspaceDiffHelper {
     private final WebWorkspaceRepository webWorkspaceRepository;
     private final WorkspaceRepository workspaceRepository;
     private final LockRepository lockRepository;
+    private final Boolean autoPublish;
 
     @Inject
     public WorkspaceDiffHelper(
@@ -77,7 +80,8 @@ public class WorkspaceDiffHelper {
             FormulaEvaluator formulaEvaluator,
             WebWorkspaceRepository webWorkspaceRepository,
             WorkspaceRepository workspaceRepository,
-            LockRepository lockRepository
+            LockRepository lockRepository,
+            Configuration configuration
     ) {
         this.graph = graph;
         this.authorizationRepository = authorizationRepository;
@@ -85,6 +89,7 @@ public class WorkspaceDiffHelper {
         this.webWorkspaceRepository = webWorkspaceRepository;
         this.workspaceRepository = workspaceRepository;
         this.lockRepository = lockRepository;
+        this.autoPublish = configuration.getBoolean(WORKSPACE_AUTO_PUBLISH_KEY, false);
     }
 
     @Traced
@@ -101,6 +106,10 @@ public class WorkspaceDiffHelper {
             );
         }
 
+        if (autoPublish) {
+            return new ClientApiWorkspaceDiff();
+        }
+
         return lockRepository.lock(workspaceRepository.getLockName(workspace), () -> {
             List<WorkspaceEntity> workspaceEntities = workspaceRepository.findEntities(workspace, true, user, false, true);
             Iterable<Edge> workspaceEdges = webWorkspaceRepository.findModifiedEdges(workspace, workspaceEntities, true, user);
@@ -109,7 +118,7 @@ public class WorkspaceDiffHelper {
     }
 
     @Traced
-    public ClientApiWorkspaceDiff diff(
+    private ClientApiWorkspaceDiff diff(
             Workspace workspace,
             Iterable<WorkspaceEntity> workspaceEntities,
             Iterable<Edge> workspaceEdges,
