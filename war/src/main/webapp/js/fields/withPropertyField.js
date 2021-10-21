@@ -62,11 +62,17 @@ define([
 
 
         this.before('initialize', function(node, config) {
-            config.placeholder = config.onlySearchable ? (
-                    i18n(true, 'field.' + config.property.dataType + '.displaytype.' + config.property.displayType + '.placeholder') ||
-                    i18n(true, 'field.' + config.property.dataType + '.placeholder') ||
-                    config.property.displayName
-                ) : config.property.displayName;
+            var i18nPlaceholderKey = 'field.'+config.property.title+".placeholder";
+            var i18nPlaceHolder = i18n(i18nPlaceholderKey) === i18nPlaceholderKey ? config.property.displayName : i18n(i18nPlaceholderKey);
+
+            if (config.onlySearchable) {
+                config.placeholder =
+                    i18n('field.' + config.property.dataType + '.displaytype.' + config.property.displayType + '.placeholder') ||
+                    i18n('field.' + config.property.dataType + '.placeholder') ||
+                    i18nPlaceHolder
+            } else {
+                config.placeholder = i18nPlaceHolder
+            }
         });
 
         this.after('initialize', function() {
