@@ -41,14 +41,16 @@ define([
     './formula',
     'util/messages',
     'data/web-worker/store/ontology/selectors',
-    'util/visibility/util'
+    'util/visibility/util',
+    'moment'
 ], function(
     F,
     vertexUrl,
     formula,
     i18n,
     ontologySelectors,
-    visibilityUtil) {
+    visibilityUtil,
+    moment) {
     'use strict';
 
     var _state;
@@ -989,7 +991,7 @@ define([
              *
              * @param {object} vertex
              * @param {string} name Property IRI
-             * @param {string} [key=] Property key, if not given the first is
+             * @param {string} [optionalKey=] Property key, if not given the first is
              * returned
              * @param {object} [optionalOpts=] Options
              * @param {object} [optionalOpts.ignoreDisplayFormula] Ignore any
@@ -1050,9 +1052,9 @@ define([
             /**
              * Return list of all matching properties.
              *
-             * @param {object} element
-             * @param {string} name Property IRI
-             * @param {string} [key=] Property key
+             * @param {object} vertex
+             * @param {string} name Property name
+             * @param {string} [optionalKey] Property key
              * @returns {Array.<object>} All properties matching
              */
             props: function(vertex, name, optionalKey) {
@@ -1094,7 +1096,7 @@ define([
                     formulaString = ontologyProperty.validationFormula,
                     result = true;
                 if (formulaString) {
-                    result = formula(formulaString, vertex, V, propertyKey);
+                    result = formula(formulaString, vertex, V, propertyKey, { additionalScope: { moment: moment } });
                 }
                 return Boolean(result);
             },

@@ -524,7 +524,7 @@ define([
                                             <div className="form-group">
                                                 <label htmlFor="displayFormula" className="col-md-3 control-label">Display Formula</label>
                                                 <div className="col-md-9">
-                                                    <textarea id="displayFormula" rows="5" className="form-control" placeholder="JavaScript snippet with return statement"
+                                                    <textarea id="displayFormula" rows="5" className="form-control" placeholder="JavaScript snippet with return statement. Available functions on the current element: prop(name), propRaw(name)"
                                                               value={property.displayFormula}
                                                               onChange={(e) => { this.setPropertyState('displayFormula', e.target.value) }}
                                                     />
@@ -532,9 +532,9 @@ define([
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="validationFormula" className="col-md-3 control-label">Display Formula</label>
+                                                <label htmlFor="validationFormula" className="col-md-3 control-label">Validation Formula</label>
                                                 <div className="col-md-9">
-                                                    <textarea id="validationFormula" rows="5" className="form-control" placeholder="JavaScript snippet with return statement (true,false)"
+                                                    <textarea id="validationFormula" rows="5" className="form-control" placeholder="JavaScript snippet with return statement (true,false). Available functions on the current element: prop(name), propRaw(name)"
                                                               value={property.validationFormula}
                                                               onChange={(e) => { this.setPropertyState('validationFormula', e.target.value) }}
                                                     />
