@@ -132,7 +132,7 @@ public class EdgeCreate implements ParameterizedHandler {
         auditService.auditGenericEvent(user, workspaceId, AuditEventType.CREATE_EDGE, "id", edge.getId());
 
         webQueueRepository.broadcastPropertyChange(edge, null, null, workspaceId);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 edge,
                 null,
                 null,

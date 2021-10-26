@@ -80,7 +80,7 @@ public class VertexRequeue implements ParameterizedHandler {
         }
 
         webQueueRepository.broadcastPropertyChange(vertex, null, null, null);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 vertex,
                 null,
                 null,

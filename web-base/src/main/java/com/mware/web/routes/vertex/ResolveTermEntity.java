@@ -195,7 +195,7 @@ public class ResolveTermEntity implements ParameterizedHandler {
         this.graph.flush();
         webQueueRepository.pushTextUpdated(artifactId);
         webQueueRepository.broadcastPropertyChange(edge, null, null, null);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 edge,
                 null,
                 null,

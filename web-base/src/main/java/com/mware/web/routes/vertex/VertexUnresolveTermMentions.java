@@ -91,7 +91,7 @@ public class VertexUnresolveTermMentions implements ParameterizedHandler {
         graph.flush();
 
         webQueueRepository.pushTextUpdated(vertexId);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 vertex,
                 null,
                 null,

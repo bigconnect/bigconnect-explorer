@@ -477,7 +477,7 @@ public class WorkspacePublishHelper {
 
             webQueueRepository.broadcastPublishVertexDelete(vertex);
             webQueueRepository.broadcastPropertyChange(vertex, null, null, null);
-            workQueueRepository.pushGraphPropertyQueue(
+            workQueueRepository.pushOnDwQueue(
                     vertex,
                     null,
                     null,
@@ -551,7 +551,7 @@ public class WorkspacePublishHelper {
             if(webQueueRepository.shouldBroadcastGraphPropertyChange(name, Priority.HIGH)) {
                 webQueueRepository.broadcastPropertyChange(element, key, name, null);
             }
-            workQueueRepository.pushGraphPropertyQueue(element, key, name, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
+            workQueueRepository.pushOnDwQueue(element, key, name, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
 
             return;
         }
@@ -583,7 +583,7 @@ public class WorkspacePublishHelper {
                     if(webQueueRepository.shouldBroadcastGraphPropertyChange(name, Priority.HIGH)) {
                         webQueueRepository.broadcastPropertyChange(element, key, name, null);
                     }
-                    workQueueRepository.pushGraphPropertyQueue(element, key, name, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
+                    workQueueRepository.pushOnDwQueue(element, key, name, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
 
                     foundProperty = true;
                 }
@@ -594,7 +594,7 @@ public class WorkspacePublishHelper {
                 if(webQueueRepository.shouldBroadcastGraphPropertyChange(name, Priority.HIGH)) {
                     webQueueRepository.broadcastPropertyChange(element, key, name, null);
                 }
-                workQueueRepository.pushGraphPropertyQueue(element, key, name, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
+                workQueueRepository.pushOnDwQueue(element, key, name, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
 
                 if (publicProperty != null) {
                     element.markPropertyVisible(publicProperty, new Visibility(workspaceId), authorizations);
@@ -620,7 +620,7 @@ public class WorkspacePublishHelper {
                     if(webQueueRepository.shouldBroadcastGraphPropertyChange(name, Priority.HIGH)) {
                         webQueueRepository.broadcastPropertyChange(element, key, name, null);
                     }
-                    workQueueRepository.pushGraphPropertyQueue(
+                    workQueueRepository.pushOnDwQueue(
                             element,
                             key,
                             name,
@@ -720,7 +720,7 @@ public class WorkspacePublishHelper {
 
             webQueueRepository.broadcastPublishEdgeDelete(edge);
             webQueueRepository.broadcastPropertyChange(edge, null, null, null);
-            workQueueRepository.pushGraphPropertyQueue(
+            workQueueRepository.pushOnDwQueue(
                     edge,
                     null,
                     null,

@@ -88,7 +88,7 @@ public abstract class BaseParser {
     protected void flushData(List<ElementMutation<? extends Element>> batchElementBuilders, WorkQueueRepository workQueueRepository, Graph graph, Authorizations authorizations) {
         Iterable<Element> elements = graph.saveElementMutations(batchElementBuilders, authorizations);
 
-        workQueueRepository.pushMultipleGraphPropertyQueue(
+        workQueueRepository.pushMultipleElementOnDwQueue(
                 elements,
                 null,
                 null,

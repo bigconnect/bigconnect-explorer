@@ -228,7 +228,7 @@ public class VertexNew implements ParameterizedHandler {
         auditService.auditGenericEvent(user, workspaceId, AuditEventType.CREATE_VERTEX, "id", vertex.getId());
 
         webQueueRepository.broadcastPropertyChange(vertex, null, null, workspaceId);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 vertex,
                 null,
                 null,
@@ -252,7 +252,7 @@ public class VertexNew implements ParameterizedHandler {
                 if(webQueueRepository.shouldBroadcastGraphPropertyChange(property.propertyName, Priority.HIGH)) {
                     webQueueRepository.broadcastPropertyChange(vertex, property.propertyKey, property.propertyName, workspaceId);
                 }
-                workQueueRepository.pushGraphPropertyQueue(
+                workQueueRepository.pushOnDwQueue(
                         vertex,
                         property.propertyKey,
                         property.propertyName,

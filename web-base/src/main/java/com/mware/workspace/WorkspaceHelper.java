@@ -165,7 +165,7 @@ public class WorkspaceHelper {
 
                 webQueueRepository.broadcastPropertyChange(resolveEdge, null, null, null);
 
-                workQueueRepository.pushGraphPropertyQueue(
+                workQueueRepository.pushOnDwQueue(
                         resolveEdge,
                         null,
                         null,
@@ -266,12 +266,12 @@ public class WorkspaceHelper {
                 if (webQueueRepository.shouldBroadcastGraphPropertyChange(null, priority)) {
                     webQueueRepository.broadcastPropertyChange(edge, null, null, workspaceId);
                 }
-                this.workQueueRepository.pushGraphPropertyQueue(edge, null, null, null, null, priority, ElementOrPropertyStatus.DELETION, beforeDeletionTimestamp);
+                this.workQueueRepository.pushOnDwQueue(edge, null, null, null, null, priority, ElementOrPropertyStatus.DELETION, beforeDeletionTimestamp);
             } else {
                 graph.flush();
                 webQueueRepository.broadcastEdgeDeletion(edge);
                 webQueueRepository.broadcastPropertyChange(edge, null, null, workspaceId);
-                workQueueRepository.pushGraphPropertyQueue(edge, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.HIDDEN, beforeActionTimestamp);
+                workQueueRepository.pushOnDwQueue(edge, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.HIDDEN, beforeActionTimestamp);
             }
         } else {
             graph.softDeleteEdge(edge, authorizations);
@@ -302,13 +302,13 @@ public class WorkspaceHelper {
                 if(webQueueRepository.shouldBroadcast(priority)) {
                     webQueueRepository.broadcastPropertyChange(edge, null, null, null);
                 }
-                workQueueRepository.pushGraphPropertyQueue(edge, null, null, null, null, priority, ElementOrPropertyStatus.DELETION, beforeDeletionTimestamp);
+                workQueueRepository.pushOnDwQueue(edge, null, null, null, null, priority, ElementOrPropertyStatus.DELETION, beforeDeletionTimestamp);
             } else {
                 graph.flush();
 
                 webQueueRepository.broadcastEdgeDeletion(edge);
                 webQueueRepository.broadcastPropertyChange(edge, null, null, null);
-                workQueueRepository.pushGraphPropertyQueue(
+                workQueueRepository.pushOnDwQueue(
                         edge,
                         null, null, null, null,
                         Priority.HIGH,
@@ -454,7 +454,7 @@ public class WorkspaceHelper {
 
                     webQueueRepository.broadcastEdgeDeletion(edge);
                     webQueueRepository.broadcastPropertyChange(edge, null, null, null);
-                    workQueueRepository.pushGraphPropertyQueue(
+                    workQueueRepository.pushOnDwQueue(
                             edge,
                             null, null, null, null,
                             Priority.HIGH,
@@ -490,11 +490,11 @@ public class WorkspaceHelper {
                 graph.deleteVertex(vertex, authorizations);
                 graph.flush();
                 webQueueRepository.broadcastPropertyChange(vertex, null, null, null);
-                workQueueRepository.pushGraphPropertyQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeDeletionTimestamp);
+                workQueueRepository.pushOnDwQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeDeletionTimestamp);
             } else {
                 webQueueRepository.broadcastVerticesDeletion(vertex.getId());
                 webQueueRepository.broadcastPropertyChange(vertex, null, null, null);
-                workQueueRepository.pushGraphPropertyQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.HIDDEN, beforeActionTimestamp);
+                workQueueRepository.pushOnDwQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.HIDDEN, beforeActionTimestamp);
             }
         } else {
             // because we store workspaces with an added visibility we need to delete them with that added authorizations.
@@ -515,11 +515,11 @@ public class WorkspaceHelper {
             if (autoPublish) {
                 long beforeDeletionTimestamp = System.currentTimeMillis() - 1;
                 webQueueRepository.broadcastPropertyChange(vertex, null, null, null);
-                workQueueRepository.pushGraphPropertyQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeDeletionTimestamp);
+                workQueueRepository.pushOnDwQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeDeletionTimestamp);
             } else {
                 webQueueRepository.broadcastVerticesDeletion(vertex.getId());
                 webQueueRepository.broadcastPropertyChange(vertex, null, null, null);
-                workQueueRepository.pushGraphPropertyQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
+                workQueueRepository.pushOnDwQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
             }
         }
 
@@ -587,7 +587,7 @@ public class WorkspaceHelper {
         if(webQueueRepository.shouldBroadcast(priority)) {
             webQueueRepository.broadcastPropertyChange(outVertex, multiValueKey, RawObjectSchema.DETECTED_OBJECT.getPropertyName(), workspaceId);
         }
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 outVertex,
                 multiValueKey,
                 RawObjectSchema.DETECTED_OBJECT.getPropertyName(),

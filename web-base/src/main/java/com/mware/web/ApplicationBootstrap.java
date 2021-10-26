@@ -59,6 +59,8 @@ import com.mware.core.security.BcVisibility;
 import com.mware.core.trace.TraceRepository;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
+import com.mware.ge.GraphConfiguration;
+import com.mware.ge.metric.DropWizardMetricRegistry;
 import com.mware.ontology.WebSchemaCreator;
 import com.mware.web.auth.AuthTokenFilter;
 import com.mware.web.auth.AuthTokenWebSocketInterceptor;
@@ -103,8 +105,8 @@ public class ApplicationBootstrap implements ServletContextListener {
             }
             BcLoggerFactory.setProcessType("web");
 
-            if(StringUtils.isEmpty(System.getenv(ENV_BC_DIR)))
-                throw new RuntimeException("The environment variable "+ENV_BC_DIR+" is not set. Aborting.");
+            if (StringUtils.isEmpty(System.getenv(ENV_BC_DIR)))
+                throw new RuntimeException("The environment variable " + ENV_BC_DIR + " is not set. Aborting.");
 
             Map<String, String> initParameters = new HashMap<>(getInitParametersAsMap(context));
             initParameters.putAll(Configuration.DEFAULTS);
@@ -121,6 +123,11 @@ public class ApplicationBootstrap implements ServletContextListener {
 
             setupWebApp(context, config);
 
+            // start metric registry
+            new DropWizardMetricRegistry(
+                    new GraphConfiguration((Map) config.getSubset(Configuration.GRAPH_PROVIDER))
+            );
+
             Runtime.getRuntime().addShutdownHook(new Thread(() -> contextDestroyed(null)));
 
             System.out.println("BigConnect started");
@@ -134,7 +141,7 @@ public class ApplicationBootstrap implements ServletContextListener {
 
     private void setupOntology() {
         WebSchemaCreator schemaCreator = InjectHelper.getInstance(WebSchemaCreator.class);
-        if(!schemaCreator.isCreated())
+        if (!schemaCreator.isCreated())
             schemaCreator.createOntology();
     }
 
@@ -180,7 +187,7 @@ public class ApplicationBootstrap implements ServletContextListener {
         LOGGER.debug("setupInjector");
         InjectHelper.inject(this, BcBootstrap.bootstrapModuleMaker(config), config);
 
-        if(config.getBoolean(Configuration.TRACE_ENABLED, Configuration.DEFAULT_TRACE_ENABLED)) {
+        if (config.getBoolean(Configuration.TRACE_ENABLED, Configuration.DEFAULT_TRACE_ENABLED)) {
             TraceRepository traceRepository = InjectHelper.getInstance(TraceRepository.class);
             traceRepository.enable();
         }

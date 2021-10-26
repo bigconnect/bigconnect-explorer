@@ -80,7 +80,7 @@ public class EdgeRequeue implements ParameterizedHandler {
         }
 
         webQueueRepository.broadcastPropertyChange(edge, null, null, null);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 edge,
                 null,
                 null,

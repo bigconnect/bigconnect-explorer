@@ -175,7 +175,7 @@ public class EdgeSetProperty extends SetPropertyBase implements ParameterizedHan
         }
 
         webQueueRepository.broadcastPropertyChange(edge, propertyKey, propertyName, workspaceId);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 edge,
                 propertyKey,
                 propertyName,

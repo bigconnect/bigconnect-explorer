@@ -189,7 +189,7 @@ public class ResolveDetectedObject implements ParameterizedHandler {
 
         webQueueRepository.broadcastPropertyChange(edge, null, null, workspaceId);
         webQueueRepository.broadcastPropertyChange(artifactVertex, propertyKey, RawObjectSchema.DETECTED_OBJECT.getPropertyName(), null);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 artifactVertex,
                 propertyKey,
                 RawObjectSchema.DETECTED_OBJECT.getPropertyName(),

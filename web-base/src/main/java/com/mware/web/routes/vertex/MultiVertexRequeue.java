@@ -92,7 +92,7 @@ public class MultiVertexRequeue implements ParameterizedHandler {
         vertices.forEach(v -> {
             if (StringUtils.isEmpty(propertyName)) {
                 webQueueRepository.broadcastPropertyChange(v, null, null, workspaceId);
-                workQueueRepository.pushGraphPropertyQueue(
+                workQueueRepository.pushOnDwQueue(
                         v,
                         null,
                         null,
@@ -106,7 +106,7 @@ public class MultiVertexRequeue implements ParameterizedHandler {
                 Iterable<Property> properties = v.getProperties(propertyName);
                 for (Property property : properties) {
                     webQueueRepository.broadcastPropertyChange(v, property.getKey(), property.getName(), workspaceId);
-                    workQueueRepository.pushGraphPropertyQueue(
+                    workQueueRepository.pushOnDwQueue(
                             v,
                             property.getKey(),
                             property.getName(),

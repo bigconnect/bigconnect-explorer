@@ -183,7 +183,7 @@ public class VertexUploadImage implements ParameterizedHandler {
         graph.flush();
 
         webQueueRepository.broadcastPropertyChange(artifactVertex, null, null, null);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 artifactVertex,
                 null,
                 null,
@@ -194,7 +194,7 @@ public class VertexUploadImage implements ParameterizedHandler {
                 null
         );
         webQueueRepository.broadcastPropertyChange(artifactVertex, null, BcSchema.RAW.getPropertyName(), workspaceId);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 artifactVertex,
                 null,
                 BcSchema.RAW.getPropertyName(),

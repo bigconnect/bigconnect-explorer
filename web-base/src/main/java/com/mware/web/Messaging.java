@@ -36,7 +36,6 @@
  */
 package com.mware.web;
 
-import com.codahale.metrics.Counter;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.mware.core.model.user.UserRepository;
@@ -45,10 +44,11 @@ import com.mware.core.model.workQueue.WebQueueRepository;
 import com.mware.core.model.workspace.Workspace;
 import com.mware.core.model.workspace.WorkspaceRepository;
 import com.mware.core.security.AuditService;
-import com.mware.core.status.JmxMetricsManager;
 import com.mware.core.user.User;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
+import com.mware.ge.Graph;
+import com.mware.ge.metric.Counter;
 import com.mware.product.GetExtendedDataParams;
 import com.mware.product.Product;
 import com.mware.workspace.WebWorkspaceRepository;
@@ -107,7 +107,7 @@ public class Messaging implements AtmosphereHandler {
             if (requestsCounter == null) {
                 LOGGER.error("unexpected transport: " + resource.transport());
             } else {
-                requestsCounter.inc();
+                requestsCounter.increment();
             }
 
             AtmosphereRequest request = resource.getRequest();
@@ -346,9 +346,9 @@ public class Messaging implements AtmosphereHandler {
     }
 
     @Inject
-    public void setMetricsManager(JmxMetricsManager metricsManager) {
+    public void setMetricsRegistry(Graph graph) {
         for (AtmosphereResource.TRANSPORT transport : AtmosphereResource.TRANSPORT.values()) {
-            requestsCounters.put(transport, metricsManager.counter(transport.name()));
+            requestsCounters.put(transport, graph.getMetricsRegistry().getCounter(transport.name()));
         }
     }
 }

@@ -113,7 +113,7 @@ public class WorkspaceUndoHelper {
                     graph.flush();
                     webQueueRepository.broadcastUndoVertexDelete(vertex);
                     webQueueRepository.broadcastPropertyChange(vertex, null, null, null);
-                    workQueueRepository.pushGraphPropertyQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.UNHIDDEN, null);
+                    workQueueRepository.pushOnDwQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.UNHIDDEN, null);
 
                 } else if (SandboxStatusUtil.getSandboxStatus(vertex, workspaceId) == SandboxStatus.PUBLIC) {
                     LOGGER.warn("Cannot undo a public vertex");
@@ -165,7 +165,7 @@ public class WorkspaceUndoHelper {
                     graph.flush();
                     webQueueRepository.broadcastUndoEdgeDelete(edge);
                     webQueueRepository.broadcastPropertyChange(edge, null, null, null);
-                    workQueueRepository.pushGraphPropertyQueue(edge, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.UNHIDDEN, null);
+                    workQueueRepository.pushOnDwQueue(edge, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.UNHIDDEN, null);
 
                 } else if (SandboxStatusUtil.getSandboxStatus(edge, workspaceId) == SandboxStatus.PUBLIC) {
                     LOGGER.warn("Cannot undo a public edge");
@@ -249,7 +249,7 @@ public class WorkspaceUndoHelper {
                     if(webQueueRepository.shouldBroadcastGraphPropertyChange(propertyName, Priority.HIGH)) {
                         webQueueRepository.broadcastPropertyChange(element, propertyKey, propertyName, null);
                     }
-                    workQueueRepository.pushGraphPropertyQueue(
+                    workQueueRepository.pushOnDwQueue(
                             element,
                             propertyKey,
                             propertyName,
@@ -273,7 +273,7 @@ public class WorkspaceUndoHelper {
                     if(webQueueRepository.shouldBroadcastGraphPropertyChange(propertyName, Priority.HIGH)) {
                         webQueueRepository.broadcastPropertyChange(element, propertyKey, propertyName, null);
                     }
-                    workQueueRepository.pushGraphPropertyQueue(element, propertyKey, propertyName, null, null, Priority.HIGH, ElementOrPropertyStatus.UNHIDDEN, null);
+                    workQueueRepository.pushOnDwQueue(element, propertyKey, propertyName, null, null, Priority.HIGH, ElementOrPropertyStatus.UNHIDDEN, null);
 
                 } else {
                     graph.flush();
@@ -282,7 +282,7 @@ public class WorkspaceUndoHelper {
                     if(webQueueRepository.shouldBroadcastGraphPropertyChange(propertyName, Priority.HIGH)) {
                         webQueueRepository.broadcastPropertyChange(element, propertyKey, propertyName, null);
                     }
-                    workQueueRepository.pushGraphPropertyQueue(element, propertyKey, propertyName, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
+                    workQueueRepository.pushOnDwQueue(element, propertyKey, propertyName, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
                 }
             } else {
                 workspaceHelper.deleteProperty(element, property, false, workspaceId, Priority.HIGH, authorizations);

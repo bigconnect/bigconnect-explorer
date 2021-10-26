@@ -131,7 +131,7 @@ public class EditTextEntity implements ParameterizedHandler {
         auditService.auditGenericEvent(user, workspaceId, AuditEventType.SET_PROPERTY, BcSchema.TEXT.getPropertyName(), "");
 
         webQueueRepository.pushTextUpdated(graphVertexId, Priority.HIGH);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 vertex,
                 propertyKey,
                 propertyName,

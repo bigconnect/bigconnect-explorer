@@ -325,7 +325,7 @@ public class FileImport {
                             webQueueRepository.broadcastPropertyChange(vertex, MULTI_VALUE_KEY, BcSchema.RAW.getPropertyName(), workspace.getWorkspaceId());
                         }
 
-                        workQueueRepository.pushGraphPropertyQueue(
+                        workQueueRepository.pushOnDwQueue(
                                 vertex,
                                 MULTI_VALUE_KEY,
                                 BcSchema.RAW.getPropertyName(),
@@ -340,7 +340,7 @@ public class FileImport {
                             webQueueRepository.broadcastPropertyChange(vertex, MULTI_VALUE_KEY, BcSchema.RAW.getPropertyName(), null);
                         }
 
-                        workQueueRepository.pushGraphPropertyQueue(
+                        workQueueRepository.pushOnDwQueue(
                                 vertex,
                                 MULTI_VALUE_KEY,
                                 BcSchema.RAW.getPropertyName(),
@@ -463,7 +463,7 @@ public class FileImport {
 
             this.webQueueRepository.broadcastPropertyChange(vertex, null, null, workspaceId);
             this.webQueueRepository.broadcastPropertiesChange(vertex, changedProperties, workspace == null ? null : workspace.getWorkspaceId(), priority);
-            this.workQueueRepository.pushGraphPropertyQueue(
+            this.workQueueRepository.pushOnDwQueue(
                     vertex,
                     changedProperties,
                     workspace == null ? null : workspace.getWorkspaceId(),

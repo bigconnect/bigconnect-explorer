@@ -209,7 +209,7 @@ public class VertexSetProperty extends SetPropertyBase implements ParameterizedH
             if (webQueueRepository.shouldBroadcastGraphPropertyChange(savePropertyResult.getPropertyName(), Priority.HIGH)) {
                 webQueueRepository.broadcastPropertyChange(vertex, savePropertyResult.getPropertyKey(), savePropertyResult.getPropertyName(), workspaceId);
             }
-            workQueueRepository.pushGraphPropertyQueue(
+            workQueueRepository.pushOnDwQueue(
                     vertex,
                     savePropertyResult.getPropertyKey(),
                     savePropertyResult.getPropertyName(),

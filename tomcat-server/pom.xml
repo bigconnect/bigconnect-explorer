@@ -189,6 +189,11 @@
             <artifactId>cache2k-core</artifactId>
             <version>${cache2k.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-graphite</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

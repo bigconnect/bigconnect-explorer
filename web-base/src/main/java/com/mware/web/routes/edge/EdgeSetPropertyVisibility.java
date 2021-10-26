@@ -124,7 +124,7 @@ public class EdgeSetPropertyVisibility implements ParameterizedHandler {
         this.graph.flush();
 
         webQueueRepository.broadcastPropertyChange(edge, property.getKey(), property.getName(), workspaceId);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 edge,
                 property.getKey(),
                 property.getName(),

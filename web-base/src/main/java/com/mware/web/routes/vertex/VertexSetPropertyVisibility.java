@@ -128,7 +128,7 @@ public class VertexSetPropertyVisibility implements ParameterizedHandler {
         if (webQueueRepository.shouldBroadcastGraphPropertyChange(property.getName(), Priority.HIGH)) {
             webQueueRepository.broadcastPropertyChange(vertex, property.getKey(), property.getName(), workspaceId);
         }
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 vertex,
                 property.getKey(),
                 property.getName(),

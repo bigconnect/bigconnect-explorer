@@ -137,7 +137,7 @@ public class VertexSetVisibility implements ParameterizedHandler {
         this.graph.flush();
 
         webQueueRepository.broadcastPropertyChange(graphVertex, null, BcSchema.VISIBILITY_JSON.getPropertyName(), workspaceId);
-        workQueueRepository.pushGraphPropertyQueue(
+        workQueueRepository.pushOnDwQueue(
                 graphVertex,
                 null,
                 BcSchema.VISIBILITY_JSON.getPropertyName(),

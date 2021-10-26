@@ -201,7 +201,7 @@ public class DataSourceImportJob {
     }
 
     private void flushData(List<ElementMutation<? extends Element>> batchElementBuilders) {
-        workQueueRepository.pushMultipleGraphPropertyQueue(
+        workQueueRepository.pushMultipleElementOnDwQueue(
                 graph.saveElementMutations(batchElementBuilders, authorizations),
                 null,
                 null,

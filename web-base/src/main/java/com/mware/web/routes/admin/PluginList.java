@@ -45,7 +45,6 @@ import com.mware.core.ingest.dataworker.TermMentionFilter;
 import com.mware.core.model.Description;
 import com.mware.core.model.Name;
 import com.mware.core.model.user.UserListener;
-import com.mware.core.status.StatusServer;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
 import com.mware.core.util.ServiceLoaderUtil;
@@ -94,7 +93,7 @@ public class PluginList implements ParameterizedHandler {
 
     private JSONObject getUserListenerJson(Class<? extends UserListener> userListenerClass) {
         JSONObject json = new JSONObject();
-        StatusServer.getGeneralInfo(json, userListenerClass);
+        getGeneralInfo(json, userListenerClass);
         return json;
     }
 
@@ -108,7 +107,7 @@ public class PluginList implements ParameterizedHandler {
 
     private JSONObject getDataWorkerJson(Class<? extends DataWorker> dataWorkerClass) {
         JSONObject json = new JSONObject();
-        StatusServer.getGeneralInfo(json, dataWorkerClass);
+        getGeneralInfo(json, dataWorkerClass);
         return json;
     }
 
@@ -122,7 +121,7 @@ public class PluginList implements ParameterizedHandler {
 
     private JSONObject getPostMimeTypeWorkerJson(Class<? extends PostMimeTypeWorker> postMimeTypeWorkerClass) {
         JSONObject json = new JSONObject();
-        StatusServer.getGeneralInfo(json, postMimeTypeWorkerClass);
+        getGeneralInfo(json, postMimeTypeWorkerClass);
         return json;
     }
 
@@ -142,7 +141,7 @@ public class PluginList implements ParameterizedHandler {
 
     private JSONObject getFileImportSupportingFileHandlerJson(Class<? extends FileImportSupportingFileHandler> fileImportSupportingFileHandlerClass) {
         JSONObject json = new JSONObject();
-        StatusServer.getGeneralInfo(json, fileImportSupportingFileHandlerClass);
+        getGeneralInfo(json, fileImportSupportingFileHandlerClass);
         return json;
     }
 
@@ -156,7 +155,7 @@ public class PluginList implements ParameterizedHandler {
 
     private JSONObject getTermMentionFilterJson(Class<? extends TermMentionFilter> termMentionFilterClass) {
         JSONObject json = new JSONObject();
-        StatusServer.getGeneralInfo(json, termMentionFilterClass);
+        getGeneralInfo(json, termMentionFilterClass);
         return json;
     }
 
@@ -170,7 +169,7 @@ public class PluginList implements ParameterizedHandler {
 
     private JSONObject getWebAppPluginJson(Class<? extends WebAppPlugin> webAppPluginClass) {
         JSONObject json = new JSONObject();
-        StatusServer.getGeneralInfo(json, webAppPluginClass);
+        getGeneralInfo(json, webAppPluginClass);
         return json;
     }
 
