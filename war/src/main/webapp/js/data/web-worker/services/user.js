@@ -49,6 +49,8 @@ define(['../util/ajax', '../store', '../store/user/actions-impl'], function(ajax
      */
     var api = {
 
+        cachedNames: {},
+
         /**
          * Get the current user
          */
@@ -118,34 +120,31 @@ define(['../util/ajax', '../store', '../store/user/actions-impl'], function(ajax
          * @function
          * @param {Array.<string>} userIds
          */
-        getUserNames: (function() {
-            var cachedNames = {};
-            return function getUserNames(userIds) {
-                var notCached = _.reject(userIds, function(userId) {
-                    return userId in cachedNames || (
-                        publicData.currentUser.id === userId
-                    );
-                });
+        getUserNames: function(userIds) {
+            var notCached = _.reject(userIds, function(userId) {
+                return userId in api.cachedNames || (
+                    publicData.currentUser.id === userId
+                );
+            });
 
-                if (notCached.length) {
-                    return api.search({ userIds: notCached })
-                        .then(function(users) {
-                            var usersById = _.indexBy(users, 'id');
-                            return userIds.map(function(userId) {
-                                return cachedNames[userId] || (
-                                    cachedNames[userId] = (usersById[userId] || publicData.currentUser).displayName
-                                );
-                            });
+            if (notCached.length) {
+                return api.search({ userIds: notCached })
+                    .then(function(users) {
+                        var usersById = _.indexBy(users, 'id');
+                        return userIds.map(function(userId) {
+                            return api.cachedNames[userId] || (
+                                api.cachedNames[userId] = (usersById[userId] || publicData.currentUser).displayName
+                            );
                         });
-                } else {
-                    return Promise.resolve(
-                        userIds.map(function(userId) {
-                            return cachedNames[userId] || publicData.currentUser.displayName;
-                        })
-                    );
-                }
-            };
-        })(),
+                    });
+            } else {
+                return Promise.resolve(
+                    userIds.map(function(userId) {
+                        return api.cachedNames[userId] || publicData.currentUser.displayName;
+                    })
+                );
+            }
+        },
 
         table: function(options) {
             return ajax(
