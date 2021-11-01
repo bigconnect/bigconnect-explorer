@@ -73,7 +73,7 @@ define([
 {
     'use strict';
 
-    var NO_DATA_RESPONSE_TIMEOUT_SECONDS = 4,
+    var NO_DATA_RESPONSE_TIMEOUT_SECONDS = 10,
         currentDataRequestId = 0,
         requests = {};
 

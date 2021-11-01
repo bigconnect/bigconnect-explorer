@@ -857,7 +857,7 @@ public class WebWorkspaceRepository {
         if (kind == null) {
             throw new BcException("Work product kind must not be null");
         }
-        if (workProductServices == null) {
+        if (workProductServices == null || workProductServices.isEmpty()) {
             if (configuration == null) {
                 throw new BcException("Configuration not injected");
             } else {
