@@ -547,8 +547,8 @@ public class WorkspaceHelper {
             Priority priority,
             Authorizations authorizations
     ) {
-        for (ArtifactDetectedObject artifactDetectedObject : RawObjectSchema.DETECTED_OBJECT.getPropertyValues(
-                outVertex)) {
+        for (Property prop : RawObjectSchema.DETECTED_OBJECT.getProperties(outVertex)) {
+            ArtifactDetectedObject artifactDetectedObject = RawObjectSchema.DETECTED_OBJECT_METADATA.getMetadataValue(prop);
             if (edge.getId().equals(artifactDetectedObject.getEdgeId())) {
                 unresolveDetectedObject(
                         artifactDetectedObject,

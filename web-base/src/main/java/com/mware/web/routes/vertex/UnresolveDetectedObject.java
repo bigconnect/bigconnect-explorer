@@ -47,10 +47,7 @@ import com.mware.core.model.workQueue.WorkQueueRepository;
 import com.mware.core.user.User;
 import com.mware.core.util.ClientApiConverter;
 import com.mware.core.util.SandboxStatusUtil;
-import com.mware.ge.Authorizations;
-import com.mware.ge.Edge;
-import com.mware.ge.Graph;
-import com.mware.ge.Vertex;
+import com.mware.ge.*;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
@@ -83,7 +80,8 @@ public class UnresolveDetectedObject implements ParameterizedHandler {
             Authorizations authorizations
     ) throws Exception {
         Vertex artifactVertex = graph.getVertex(vertexId, authorizations);
-        ArtifactDetectedObject artifactDetectedObject = RawObjectSchema.DETECTED_OBJECT.getPropertyValue(artifactVertex, multiValueKey);
+        Property prop = RawObjectSchema.DETECTED_OBJECT.getProperty(artifactVertex, multiValueKey);
+        ArtifactDetectedObject artifactDetectedObject = RawObjectSchema.DETECTED_OBJECT_METADATA.getMetadataValue(prop);
         Edge edge = graph.getEdge(artifactDetectedObject.getEdgeId(), authorizations);
         Vertex resolvedVertex = edge.getOtherVertex(artifactVertex.getId(), authorizations);
 

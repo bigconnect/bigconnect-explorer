@@ -161,6 +161,7 @@ public class ResolveDetectedObject implements ParameterizedHandler {
                     y1,
                     x2,
                     y2,
+                    1f,
                     concept.getName(),
                     "user",
                     edge.getId(),
@@ -184,7 +185,18 @@ public class ResolveDetectedObject implements ParameterizedHandler {
                 termMentionRepository.addJustification(resolvedVertex, justificationText, sourceInfo, bcVisibility, authorizations);
                 workspaceRepository.updateEntityOnWorkspace(workspace, resolvedVertex.getId(), user);
             }
-            RawObjectSchema.DETECTED_OBJECT.addPropertyValue(artifactVertex, propertyKey, artifactDetectedObject, bcVisibility.getVisibility(), authorizations);
+
+
+            Metadata metadata = Metadata.create();
+            RawObjectSchema.DETECTED_OBJECT_METADATA.setMetadata(metadata, artifactDetectedObject, Visibility.EMPTY);
+            RawObjectSchema.DETECTED_OBJECT.addPropertyValue(
+                    artifactVertex,
+                    propertyKey,
+                    artifactDetectedObject.getConcept(),
+                    metadata,
+                    bcVisibility.getVisibility(),
+                    authorizations
+            );
         }
 
         webQueueRepository.broadcastPropertyChange(edge, null, null, workspaceId);

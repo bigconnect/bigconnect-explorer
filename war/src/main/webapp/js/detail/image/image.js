@@ -86,13 +86,11 @@ define([
         });
 
         this.onCoordsChanged = function(event, data) {
-            var self = this,
-                vertex = this.attr.model,
+            var vertex = this.attr.model,
                 width = parseFloat(data.x2) - parseFloat(data.x1),
                 height = parseFloat(data.y2) - parseFloat(data.y1),
                 artifactImage = this.$node.find('.image-preview'),
-                isLargeEnough = (artifactImage.width() * width) > 5 &&
-                    (artifactImage.height() * height) > 5,
+                isLargeEnough = (artifactImage.width() * width) > 5 && (artifactImage.height() * height) > 5,
                 detectedObject;
 
             if (data.id && data.id !== 'NEW') {

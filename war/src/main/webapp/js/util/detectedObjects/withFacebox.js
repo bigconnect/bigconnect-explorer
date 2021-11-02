@@ -189,7 +189,7 @@ define(['./withFaceboxTpl.hbs'], function(tpl) {
         this.showFacebox = function(property, opts) {
             var self = this,
                 options = $.extend({ editing: false, viewing: false }, opts || {}),
-                value = property.value,
+                value = property.metadata ? property.metadata[ONTOLOGY_CONSTANTS.PROP_DETECTED_OBJECT_META] : property.value,
                 box = (options.editing || options.viewing) ?
                     self.select('boxEditingSelector') :
                     self.select('boxSelector').not('.editing'),
@@ -248,12 +248,14 @@ define(['./withFaceboxTpl.hbs'], function(tpl) {
 
             this.select('boxSelector').show();
 
-            if (data.property && data.property.resolvedVertexId) {
-                this.currentlyEditing = data.property.resolvedVertexId;
+            const metadata = (data.property && data.property.metadata[ONTOLOGY_CONSTANTS.PROP_DETECTED_OBJECT_META]) || {};
+
+            if (metadata['resolvedVertexId']) {
+                this.currentlyEditing = metadata['resolvedVertexId'];
                 this.showFaceboxForView(data);
             } else if (data.property) {
                 this.currentlyEditing = data.property.key;
-                this.showFaceboxForEdit(data);
+                this.showFaceboxForEdit(data.property);
             } else {
                 this.currentlyEditing = 'NEW';
                 this.showFaceboxForEdit(data);

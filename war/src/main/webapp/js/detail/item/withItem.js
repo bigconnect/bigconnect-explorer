@@ -71,8 +71,6 @@ define([
         });
 
         this.after('initialize', function () {
-            var self = this;
-
             this.on('openFullscreen', this.onOpenFullscreen);
             this.on('deleteMultipleItems', this.deleteMultipleItems);
 

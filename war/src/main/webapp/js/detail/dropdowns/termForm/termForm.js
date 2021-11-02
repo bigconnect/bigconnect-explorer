@@ -112,8 +112,7 @@ define([
         };
 
         this.graphVertexChanged = function(newGraphVertexId, item, initial) {
-            var self = this,
-                relationshipSelect = this.select('relationshipsSelector').find('select');
+            var self = this;
 
             this.currentGraphVertexId = newGraphVertexId;
             if (!initial || newGraphVertexId) {
@@ -391,7 +390,6 @@ define([
         };
 
         this.setupContent = function() {
-
             var self = this,
                 vertex = this.$node,
                 existingEntity,
@@ -416,7 +414,8 @@ define([
                 if (existingEntity && mentionVertex.hasClass('resolved')) {
                     objectSign = title;
                     this.unresolve = this.attr.unresolve;
-                    graphVertexId = this.unresolve && data && (data.resolvedToVertexId || data.resolvedVertexId);
+                    graphVertexId = this.unresolve && data && data.metadata[ONTOLOGY_CONSTANTS.PROP_DETECTED_OBJECT_META] &&
+                        (data.metadata[ONTOLOGY_CONSTANTS.PROP_DETECTED_OBJECT_META].resolvedToVertexId || data.metadata[ONTOLOGY_CONSTANTS.PROP_DETECTED_OBJECT_META].resolvedVertexId);
                     this.termMentionId = data && data.id;
                 } else {
                     objectSign = this.attr.sign || mentionVertex.text();
@@ -426,7 +425,8 @@ define([
                 objectSign = data && data.title;
                 existingEntity = this.attr.existing;
                 this.unresolve = this.attr.unresolve;
-                graphVertexId = this.unresolve && data && (data.resolvedToVertexId || data.resolvedVertexId);
+                graphVertexId = this.unresolve && data && data.metadata[ONTOLOGY_CONSTANTS.PROP_DETECTED_OBJECT_META] &&
+                    (data.metadata[ONTOLOGY_CONSTANTS.PROP_DETECTED_OBJECT_META].resolvedToVertexId || data.metadata[ONTOLOGY_CONSTANTS.PROP_DETECTED_OBJECT_META].resolvedVertexId);
             }
 
             vertex.html(dropdownTemplate({
@@ -448,7 +448,7 @@ define([
                 value: objectSign || '',
                 filterResultsToTitleField: true,
                 defaultText: i18n('detail.resolve.form.entity_search.placeholder'),
-                allowNew: true
+                allowNew: false
             });
 
             this.graphVertexChanged(graphVertexId, data, true);

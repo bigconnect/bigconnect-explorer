@@ -75,12 +75,6 @@ define(['util/withFormFieldErrors'], function(withFormFieldErrors) {
                     self.trigger('opened');
                 }
             });
-            var form = node.find('.form'),
-                outerHeight = form.outerHeight(true);
-
-            // Add placeholder node that doesn't animate height which
-            // could confuse the browsers scrollTo logic
-            node.css({ height: outerHeight + 'px' });
         };
 
         this.after('teardown', function() {
