@@ -79,7 +79,8 @@ define([
             nameInputSelector: '.form input.name',
             globalSearchSelector: '.form .global-search',
             globalInputSelector: '.form .global-search input',
-            deleteSelector: 'ul .btn-danger'
+            deleteSelector: 'ul .btn-del',
+            deleteConfirmSelector: 'ul .btn-del-confirm'
         });
 
         this.before('initialize', function(node, config) {
@@ -108,7 +109,8 @@ define([
                 this.on(this.popover, 'click', {
                     listSelector: this.onClick,
                     saveSelector: this.onSave,
-                    deleteSelector: this.onDelete
+                    deleteSelector: this.onDeleteConfirm,
+                    deleteConfirmSelector: this.onDelete,
                 });
 
                 this.on(this.popover, 'keyup change', {
@@ -205,6 +207,26 @@ define([
                 .finally(function() {
                     $button.removeClass('loading');
                 })
+        };
+
+        this.onDeleteConfirm = function(event) {
+            const $btn = $(event.target),
+                $btnConfirm = $btn.siblings('.btn-del-confirm'),
+                hasBtnCancel = $btn.siblings('btn-cancel').length > 0,
+                $btnCancel = $('<button class="btn btn-xs btn-raised btn-cancel">No</button>');
+
+            if (!hasBtnCancel) {
+                $btnCancel.on('click', () => {
+                    $btn.show();
+                    $btnConfirm.hide();
+                    $btnCancel.remove();
+                });
+                $btn.parent().append($btnCancel);
+            }
+
+            $btn.hide();
+            $btnConfirm.css('right', '5em');
+            $btnConfirm.show();
         };
 
         this.onDelete = function(event) {
