@@ -368,16 +368,20 @@ define([
                     .data(commentsTree);
 
             this.renderCommentLevel(commentsTreeResponse.maxDepth, 0, selection);
-            this.dataRequest('user', 'getUserNames', commentsTreeResponse.userIds)
-                .then((users) => {
-                    var usersById = _.object(commentsTreeResponse.userIds, users);
-                    this.$node.find('.user').each(function() {
-                        $(this).text(usersById[$(this).data('userId')]);
-                    })
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+
+            // this triggers in a non-deterministic way the following problem:
+            // Error: No data request handler responded for user->getUserNames
+            // disabling it for now...
+            // this.dataRequest('user', 'getUserNames', commentsTreeResponse.userIds)
+            //     .then((users) => {
+            //         var usersById = _.object(commentsTreeResponse.userIds, users);
+            //         this.$node.find('.user').each(function() {
+            //             $(this).text(usersById[$(this).data('userId')]);
+            //         })
+            //     })
+            //     .catch((error) => {
+            //         console.log(error);
+            //     });
 
             this.$node.find('.results').text(
                 F.number.pretty(commentsTreeResponse.total)
