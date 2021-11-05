@@ -142,17 +142,19 @@ define([
             this.constraints = this.attr.constraints;
             this.context = this.attr.context;
 
-            this.renderRoot()
-                .catch(function(error) {
-                    self.trigger('errorLoadingTypeContent');
-                    console.error(error);
-                })
-                .then(function() {
-                    self.trigger('finishedLoadingTypeContent');
-                    if (!_.isEmpty(self.attr.focus)) {
-                        self.$node.find('.org-bigconnect-texts').trigger('focusOnSnippet', self.attr.focus);
-                    }
-                })
+            if (this.model && this.model.length > 0) {
+                this.renderRoot()
+                    .catch(function (error) {
+                        self.trigger('errorLoadingTypeContent');
+                        console.error(error);
+                    })
+                    .then(function () {
+                        self.trigger('finishedLoadingTypeContent');
+                        if (!_.isEmpty(self.attr.focus)) {
+                            self.$node.find('.org-bigconnect-texts').trigger('focusOnSnippet', self.attr.focus);
+                        }
+                    });
+            }
         });
 
         this.renderRoot = function() {

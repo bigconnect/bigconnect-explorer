@@ -41,22 +41,19 @@
  * @module services/user
  * @see module:dataRequest
  */
-define(['../util/ajax', '../store', '../store/user/actions-impl'], function(ajax, store, userActions) {
+define(['../util/ajax', '../store', '../store/user/actions-impl'], function (ajax, store, userActions) {
     'use strict';
 
     /**
      * @alias module:services/user
      */
     var api = {
-
-        cachedNames: {},
-
         /**
          * Get the current user
          */
-        me: function(options) {
+        me: function (options) {
             return ajax('GET', '/user/me')
-                .then(function(user) {
+                .then(function (user) {
                     return _.extend(user, {
                         privilegesHelper: _.indexBy(user.privileges || [])
                     });
@@ -67,7 +64,7 @@ define(['../util/ajax', '../store', '../store/user/actions-impl'], function(ajax
          * Get user info
          * @param {string} userName
          */
-        get: function(userName) {
+        get: function (userName) {
             return ajax('GET', '/user', {
                 'user-name': userName
             });
@@ -77,13 +74,13 @@ define(['../util/ajax', '../store', '../store/user/actions-impl'], function(ajax
          * Get user info by id
          * @param {string} userId
          */
-        getById: function(userId) {
+        getById: function (userId) {
             return ajax('GET', '/user/id', {
                 'user-id': userId
             });
         },
 
-        addOrEdit: function(user, mode) {
+        addOrEdit: function (user, mode) {
             return ajax('POST', '/user/addOrEdit', {
                 id: user.id,
                 userName: user.userName,
@@ -101,56 +98,53 @@ define(['../util/ajax', '../store', '../store/user/actions-impl'], function(ajax
          * @param {string} name
          * @param {object} value
          */
-        preference: function(name, value) {
-            store.getStore().dispatch(userActions.putUserPreference({ name, value }));
+        preference: function (name, value) {
+            store.getStore().dispatch(userActions.putUserPreference({name, value}));
             return ajax('POST', '/user/ui-preferences', {
                 name: name,
                 value: value
             });
         },
 
-        delete: function(userId) {
+        delete: function (userId) {
             return ajax('POST', '/user/delete1', {
                 id: userId
             });
         },
+
+        cachedNames: {},
 
         /**
          * Get user names for ids
          * @function
          * @param {Array.<string>} userIds
          */
-        getUserNames: function(userIds) {
-            var notCached = _.reject(userIds, function(userId) {
-                return userId in api.cachedNames || (
-                    publicData.currentUser.id === userId
-                );
-            });
+        getUserNames: function (userIds) {
+            const notCached = _.reject(userIds, userId =>
+                (userId in api.cachedNames) || (publicData.currentUser.id === userId)
+            );
 
-            if (notCached.length) {
-                return api.search({ userIds: notCached })
-                    .then(function(users) {
-                        var usersById = _.indexBy(users, 'id');
-                        return userIds.map(function(userId) {
-                            return api.cachedNames[userId] || (
-                                api.cachedNames[userId] = (usersById[userId] || publicData.currentUser).displayName
-                            );
-                        });
+            if (notCached.length > 0) {
+                return api.search({ userIds: notCached }).then(users => {
+                    return userIds.map(function (userId) {
+                        if (!api.cachedNames[userId]) {
+                            const usersById = _.indexBy(users, 'id');
+                            api.cachedNames[userId] = (usersById[userId] || publicData.currentUser).displayName;
+                        }
+                        return api.cachedNames[userId];
                     });
+                });
             } else {
-                return Promise.resolve(
-                    userIds.map(function(userId) {
-                        return api.cachedNames[userId] || publicData.currentUser.displayName;
-                    })
-                );
+                const fromCache = userIds.map(userId => api.cachedNames[userId] || publicData.currentUser.displayName);
+                return Promise.resolve(fromCache);
             }
         },
 
-        table: function(options) {
+        table: function (options) {
             return ajax(
                 'GET',
                 '/user/table', options)
-                .then(function(response) {
+                .then(function (response) {
                     return response.users;
                 })
         },
@@ -161,7 +155,7 @@ define(['../util/ajax', '../store', '../store/user/actions-impl'], function(ajax
          * @param {object} [options.query]
          * @param {Array.<string>} [options.userIds]
          */
-        search: function(options) {
+        search: function (options) {
             var data = {},
                 returnSingular = false;
 
@@ -182,7 +176,7 @@ define(['../util/ajax', '../store', '../store/user/actions-impl'], function(ajax
             return ajax(
                 (data.userIds && data.userIds.length > 2) ? 'POST' : 'GET',
                 '/user/all', data)
-                .then(function(response) {
+                .then(function (response) {
                     var users = response.users;
                     return returnSingular ? users[0] : users;
                 })
@@ -191,7 +185,7 @@ define(['../util/ajax', '../store', '../store/user/actions-impl'], function(ajax
         /**
          * Logout
          */
-        logout: function(options) {
+        logout: function (options) {
             return ajax('POST', '/logout');
         }
 

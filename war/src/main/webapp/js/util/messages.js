@@ -111,7 +111,7 @@ define([
         if (ignoreWarning) {
             return;
         } else {
-            console.error('No message for key', key);
+            console.debug('No message for key', key);
         }
         return key;
     };

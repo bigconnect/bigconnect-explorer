@@ -38,21 +38,26 @@ define([], function() {
     'use strict';
 
     return function(message) {
-        require(['data/web-worker/services/' + message.data.service],
-            function(Service) {
-                if (!(message.data.method in Service)) {
+        // 1. we load the service api file
+        require(['data/web-worker/services/' + message.data.service], function(serviceApi) {
+                if (!(message.data.method in serviceApi)) {
                     throw new Error('Service: ' + message.data.service + ' is missing method: ' + message.data.method);
                 }
 
-                Service[message.data.method].apply(undefined, message.data.parameters || [])
-                    .progress(function(p) {
+                // 2. we invoke the requested method
+                const service = serviceApi[message.data.method];
+                const params = message.data.parameters || [];
+                const promise = service.apply(null, params);
+
+                promise
+                    .progress(p => {
                         dispatchMain('dataRequestProgress', {
                             progress: p,
                             requestId: message.data.requestId,
                             originalRequest: _.pick(message.data, 'service', 'method', 'parameters')
                         });
                     })
-                    .then(function(result) {
+                    .then(result => {
                         dispatchMain('dataRequestCompleted', {
                             success: true,
                             result: result,
@@ -60,7 +65,7 @@ define([], function() {
                             originalRequest: _.pick(message.data, 'service', 'method', 'parameters')
                         });
                     })
-                    .catch(function(error) {
+                    .catch(error => {
                         if (error && error instanceof Error) {
                             if (!error.json) {
                                 error = error.message;

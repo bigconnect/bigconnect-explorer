@@ -325,7 +325,7 @@ define([
                 .text(function(p) {
                     return F.string.plural(p[1].length, 'reply', 'replies');
                 })
-                .on('click', function(property) {
+                .on('click', function() {
                     $(this).toggleClass('open')
                         .closest('li').children('ul').toggleClass('collapsed')
                 });
@@ -369,11 +369,14 @@ define([
 
             this.renderCommentLevel(commentsTreeResponse.maxDepth, 0, selection);
             this.dataRequest('user', 'getUserNames', commentsTreeResponse.userIds)
-                .done((users) => {
+                .then((users) => {
                     var usersById = _.object(commentsTreeResponse.userIds, users);
                     this.$node.find('.user').each(function() {
                         $(this).text(usersById[$(this).data('userId')]);
                     })
+                })
+                .catch((error) => {
+                    console.log(error);
                 });
 
             this.$node.find('.results').text(
