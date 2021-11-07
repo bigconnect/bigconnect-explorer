@@ -54,10 +54,7 @@ import com.mware.web.framework.handlers.StaticResourceHandler;
 import com.mware.web.privilegeFilters.*;
 import com.mware.web.routes.Download;
 import com.mware.web.routes.Index;
-import com.mware.web.routes.admin.AdminList;
-import com.mware.web.routes.admin.DeleteElements;
-import com.mware.web.routes.admin.PluginList;
-import com.mware.web.routes.admin.RestoreElements;
+import com.mware.web.routes.admin.*;
 import com.mware.web.routes.behaviour.*;
 import com.mware.web.routes.dashboard.*;
 import com.mware.web.routes.dataload.*;
@@ -315,6 +312,7 @@ public class Router extends HttpServlet {
             app.delete("/long-running-process", authenticator, csrfProtector, LongRunningProcessDelete.class);
             app.post("/long-running-process/cancel", authenticator, csrfProtector, LongRunningProcessCancel.class);
 
+            app.get("/admin/etrace", authenticator, csrfProtector, AdminPrivilegeFilter.class, GetElementTrace.class);
             app.get("/admin/all", authenticator, csrfProtector, AdminPrivilegeFilter.class, AdminList.class);
             app.get("/admin/plugins", authenticator, csrfProtector, AdminPrivilegeFilter.class, PluginList.class);
             app.post("/admin/ontologyPropertySave", authenticator, csrfProtector, AdminPrivilegeFilter.class, OntologyManagerPropertySave.class);
