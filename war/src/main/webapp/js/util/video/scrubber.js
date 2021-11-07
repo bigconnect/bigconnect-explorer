@@ -43,7 +43,7 @@ define([
 ], function(defineComponent, template, videoTemplate, withDataRequest, uuid) {
     'use strict';
 
-    var NUMBER_FRAMES = 0, // Populated by config
+    var NUMBER_FRAMES = 0,
         POSTER = 1,
         FRAMES = 2,
         MAX_DIMENSIONS = [450, 300],
@@ -77,14 +77,14 @@ define([
             this.setVideoPreviewBackgroundImage = _.once(this.setVideoPreviewBackgroundImage.bind(this));
 
             Promise.all([
-                this.dataRequest('config', 'properties'),
+                this.dataRequest('vertex', 'videoPreviewFrameCount', { graphVertexId: this.attr.vertexId }),
                 this.loadPosterFrame()
             ])
                 .then(function(results) {
-                    var properties = results.shift(),
+                    var frameCount = results.shift(),
                         posterDimensions = results.shift();
 
-                    NUMBER_FRAMES = parseInt(properties['video.preview.frames.count'], 10);
+                    NUMBER_FRAMES = parseInt(frameCount);
                     return posterDimensions;
                 })
                 .then(this.setupVideo.bind(this))

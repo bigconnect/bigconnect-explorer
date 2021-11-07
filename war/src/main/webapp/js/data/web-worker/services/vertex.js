@@ -164,6 +164,10 @@ define([
             return ajax('GET', '/vertex/find-path', options);
         },
 
+        videoPreviewFrameCount: function (options) {
+            return ajax('GET', '/vertex/video-preview-count', options);
+        },
+
         /**
          * Get history of vertex (property changes, etc)
          *

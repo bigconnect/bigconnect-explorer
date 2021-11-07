@@ -106,7 +106,8 @@ define([
                     videoPreviewImageUrl,
                     duration: this.duration,
                     allowPlayback: true,
-                    formatsReady
+                    formatsReady,
+                    vertexId: this.model.id
                 });
                 this.videoRendered = true;
             }

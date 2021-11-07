@@ -38,22 +38,16 @@ package com.mware.web.routes.vertex;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.mware.artifactThumbnails.ArtifactThumbnailRepository;
-import com.mware.bigconnect.ffmpeg.ArtifactThumbnailRepositoryProps;
-import com.mware.core.exception.BcResourceNotFoundException;
 import com.mware.core.model.properties.MediaBcSchema;
-import com.mware.core.user.User;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
 import com.mware.ge.Authorizations;
 import com.mware.ge.Graph;
-import com.mware.ge.Property;
 import com.mware.ge.Vertex;
 import com.mware.ge.values.storable.StreamingPropertyValue;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
-import com.mware.web.framework.annotations.Optional;
 import com.mware.web.framework.annotations.Required;
 import org.apache.commons.io.IOUtils;
 
@@ -64,75 +58,38 @@ import java.io.OutputStream;
 public class VertexVideoPreviewImage implements ParameterizedHandler {
     private static final BcLogger LOGGER = BcLoggerFactory.getLogger(VertexVideoPreviewImage.class);
     private final Graph graph;
-    private final ArtifactThumbnailRepository artifactThumbnailRepository;
 
     @Inject
-    public VertexVideoPreviewImage(
-            final Graph graph,
-            final ArtifactThumbnailRepository artifactThumbnailRepository
-    ) {
+    public VertexVideoPreviewImage(final Graph graph) {
         this.graph = graph;
-        this.artifactThumbnailRepository = artifactThumbnailRepository;
     }
 
     @Handle
     public void handle(
             @Required(name = "graphVertexId") String graphVertexId,
-            @Optional(name = "width") Integer width,
-            User user,
             Authorizations authorizations,
             BcResponse response
     ) throws Exception {
         Vertex artifactVertex = graph.getVertex(graphVertexId, authorizations);
         if (artifactVertex == null) {
-            throw new BcResourceNotFoundException("Could not find vertex with id: " + graphVertexId);
+            LOGGER.warn("Could not find vertex with id: " + graphVertexId);
+            response.respondWithNotFound();
+            return;
         }
 
-        int[] boundaryDims = new int[]{200 * ArtifactThumbnailRepositoryProps.FRAMES_PER_PREVIEW, 200};
-
-        if (width != null) {
-            boundaryDims[0] = width * ArtifactThumbnailRepositoryProps.FRAMES_PER_PREVIEW;
-            boundaryDims[1] = width;
-
-            response.setContentType("image/jpeg");
-            response.addHeader("Content-Disposition", "inline; filename=videoPreview" + boundaryDims[0] + ".jpg");
-            response.setMaxAge(BcResponse.EXPIRES_1_HOUR);
-
-            byte[] thumbnailData = artifactThumbnailRepository.getThumbnailData(artifactVertex.getId(), "video-preview", boundaryDims[0], boundaryDims[1], user);
-            if (thumbnailData != null) {
-                LOGGER.debug("Cache hit for: %s (video-preview) %d x %d", artifactVertex.getId(), boundaryDims[0], boundaryDims[1]);
-                try (OutputStream out = response.getOutputStream()) {
-                    out.write(thumbnailData);
-                }
-                return;
-            }
-        }
-
-        Property videoPreviewImage = MediaBcSchema.VIDEO_PREVIEW_IMAGE.getProperty(artifactVertex);
         StreamingPropertyValue videoPreviewImageValue = MediaBcSchema.VIDEO_PREVIEW_IMAGE.getPropertyValue(artifactVertex);
         if (videoPreviewImageValue == null) {
             LOGGER.warn("Could not find video preview image for artifact: %s", artifactVertex.getId());
             response.respondWithNotFound();
             return;
         }
+
         try (InputStream in = videoPreviewImageValue.getInputStream()) {
-            if (width != null) {
-                LOGGER.info("Cache miss for: %s (video-preview) %d x %d", artifactVertex.getId(), boundaryDims[0], boundaryDims[1]);
-
-                response.setContentType("image/jpeg");
-                response.addHeader("Content-Disposition", "inline; filename=videoPreview" + boundaryDims[0] + ".jpg");
-                response.setMaxAge(BcResponse.EXPIRES_1_HOUR);
-
-                byte[] thumbnailData = artifactThumbnailRepository
-                        .createThumbnail(artifactVertex, videoPreviewImage.getKey(), "video-preview", in, boundaryDims, user, null).getData();
-                try (OutputStream out = response.getOutputStream()) {
-                    out.write(thumbnailData);
-                }
-            } else {
-                response.setContentType("image/png");
-                try (OutputStream out = response.getOutputStream()) {
-                    IOUtils.copy(in, out);
-                }
+            response.setContentType("image/png");
+            response.setMaxAge(BcResponse.EXPIRES_1_HOUR);
+            response.addHeader("Content-Disposition", "inline; filename=videoPreview.png");
+            try (OutputStream out = response.getOutputStream()) {
+                IOUtils.copy(in, out);
             }
         }
     }

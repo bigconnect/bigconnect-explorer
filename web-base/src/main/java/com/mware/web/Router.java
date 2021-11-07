@@ -189,6 +189,7 @@ public class Router extends HttpServlet {
             app.get("/vertex/thumbnail-public", VertexThumbnailPublic.class);
             app.get("/vertex/poster-frame", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexPosterFrame.class);
             app.get("/vertex/video-preview", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexVideoPreviewImage.class);
+            app.get("/vertex/video-preview-count", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexVideoPreviewFrameCount.class);
             app.get("/vertex/details", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexDetails.class);
             app.get("/vertex/history", authenticator, csrfProtector, HistoryReadPrivilegeFilter.class, VertexGetHistory.class);
             app.get("/vertex/property/details", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexPropertyDetails.class);
