@@ -280,6 +280,8 @@
     left: 0;
     right: 0;
     padding: 15px;
+    overflow: auto;
+
     &.flush-content {
       overflow: hidden;
       padding: 5px;
@@ -294,6 +296,7 @@
     border: 1px solid #eee;
     background-color: white;
     border-radius: 4px;
+    overflow: hidden;
   }
   &.editing .grid-stack .grid-stack-item .grid-stack-item-content {
     overflow: visible;
@@ -301,11 +304,13 @@
     border-radius: 3px;
     cursor: move;
     .item-content {
+      display: flex;
       pointer-events: none;
       opacity: 0.3;
       &.list {
         overflow-y: scroll;
         overflow-x: auto;
+        flex-direction: column;
       }
     }
     & > h1 {
