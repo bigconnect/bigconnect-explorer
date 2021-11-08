@@ -144,20 +144,27 @@ define([
                     vertexId: data.id
                 })));
 
-                bcData.storePromise.then((store) => store.observe(elementSelectors.getElements, (elements) => {
-                    bcData.storePromise.then(store => {
-                        const selectedIds = store.getState().selection.idsByType;
-                        const vertices = _.filter(elements.vertices, v => v && _.contains(selectedIds.vertices, v.id));
-                        const edges = _.filter(elements.edges, e => e && _.contains(selectedIds.edges, e.id));
+                bcData.storePromise.then((store) => {
+                    var unsub = store.observe(elementSelectors.getElements, (elements) => {
+                        bcData.storePromise.then(store => {
+                            const selectedIds = store.getState().selection.idsByType;
+                            const vertices = _.filter(elements.vertices, v => v && _.contains(selectedIds.vertices, v.id));
+                            const edges = _.filter(elements.edges, e => e && _.contains(selectedIds.edges, e.id));
 
-                        require(['detail/item/item'], (Module) => {
-                            Module.attachTo(self.select('detailTypeContentSelector').teardownAllComponents(), {
-                                model: vertices.concat(edges),
-                                constraints: ['width']
+                            self.cancelTransitionTeardown = true;
+                            self.teardownComponents();
+                            self.$node.addClass('loading');
+                            unsub();
+
+                            require(['detail/item/item'], (Module) => {
+                                Module.attachTo(self.select('detailTypeContentSelector').teardownAllComponents(), {
+                                    model: vertices.concat(edges),
+                                    constraints: ['width']
+                                });
                             });
-                        });
-                    })
-                }))
+                        })
+                    });
+                });
             });
         };
 
