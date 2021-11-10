@@ -66,7 +66,9 @@ define([], function() {
                         });
                     })
                     .catch(error => {
-                        if (error && error instanceof Error) {
+                        if (error && error.status === 403) {
+                            error = "access.denied";
+                        } else if (error && error instanceof Error) {
                             if (!error.json) {
                                 error = error.message;
                             }

@@ -63,13 +63,12 @@ public class SearchSave implements ParameterizedHandler {
             @Required(name = "url") String url,
             @Required(name = "parameters") JSONObject searchParameters,
             @Optional(name = "global", defaultValue = "false") boolean global,
-            @Optional(name = "update", defaultValue = "false") boolean update,
             User user
     ) throws Exception {
         if (global) {
-            id = this.searchRepository.saveGlobalSearch(id, name, url, searchParameters, user, update);
+            id = this.searchRepository.saveGlobalSearch(id, name, url, searchParameters, user);
         } else {
-            id = this.searchRepository.saveSearch(id, name, url, searchParameters, user, update);
+            id = this.searchRepository.saveSearch(id, name, url, searchParameters, user);
         }
         ClientApiSaveSearchResponse saveSearchResponse = new ClientApiSaveSearchResponse();
         saveSearchResponse.id = id;

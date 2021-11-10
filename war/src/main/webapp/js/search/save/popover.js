@@ -255,6 +255,11 @@ define([
                         self.validate();
                     }
                 })
+                .catch((e) => {
+                  if (e && e.message === 'access.denied') {
+                      $.growl.error({ message: 'Access denied' });
+                  }
+                })
                 .finally(function() {
                     $button.removeClass('loading');
                     $li.removeClass('loading');
