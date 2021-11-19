@@ -167,7 +167,7 @@ define([
         this.after('initialize', function() {
             this.on('updateModel', this.onUpdateModel)
 
-            const enableWatcher = config['watcher.enabled'] || "true";
+            const enableWatcher = config['watcher.enabled'] || "false";
             if (enableWatcher === 'true') {
                 ToolbarComponent.ITEMS['ADD_WATCH'] = {
                     title: i18n('detail.toolbar.add.watch'),
@@ -300,7 +300,7 @@ define([
                             ToolbarComponent.ITEMS.UNRESOLVE_MENTIONS,
                         ];
 
-                        const enableWatcher = config['watcher.enabled'] || "true";
+                        const enableWatcher = config['watcher.enabled'] || "false";
                         if (enableWatcher === 'true') {
                             actions.push(ToolbarComponent.ITEMS.ADD_WATCH);
                         }
