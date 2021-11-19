@@ -40,14 +40,16 @@ define([
     'configuration/plugins/registry',
     'util/vertex/formatters',
     'util/withDataRequest',
-    'util/acl'
+    'util/acl',
+    'util/requirejs/promise!util/service/propertiesPromise'
 ], function(
     defineComponent,
     template,
     registry,
     F,
     withDataRequest,
-    acl) {
+    acl,
+    config) {
     'use strict';
 
     /**
@@ -141,12 +143,6 @@ define([
             cls: 'requires-EDIT',
             event: 'requeue'
         },
-        ADD_WATCH: {
-            title: i18n('detail.toolbar.add.watch'),
-            subtitle: i18n('detail.toolbar.add.watch.subtitle'),
-            cls: 'requires-READ',
-            event: 'createWatch'
-        },
         UNRESOLVE_MENTIONS: {
             title: i18n('detail.toolbar.unresolveMentions'),
             subtitle: i18n('detail.toolbar.unresolveMentions.subtitle'),
@@ -170,6 +166,16 @@ define([
 
         this.after('initialize', function() {
             this.on('updateModel', this.onUpdateModel)
+
+            const enableWatcher = config['watcher.enabled'] || "true";
+            if (enableWatcher === 'true') {
+                ToolbarComponent.ITEMS['ADD_WATCH'] = {
+                    title: i18n('detail.toolbar.add.watch'),
+                    subtitle: i18n('detail.toolbar.add.watch.subtitle'),
+                    cls: 'requires-READ',
+                    event: 'createWatch'
+                };
+            }
 
             this.render();
         });
@@ -287,6 +293,26 @@ define([
                 }
             } else {
                 return acl.getPropertyAcls(model).then(propertyAcls => {
+                    const getToolbarActions = () => {
+                        const actions = [
+                            ToolbarComponent.ITEMS.REFRESH,
+                            ToolbarComponent.ITEMS.REQUEUE_ITEM,
+                            ToolbarComponent.ITEMS.UNRESOLVE_MENTIONS,
+                        ];
+
+                        const enableWatcher = config['watcher.enabled'] || "true";
+                        if (enableWatcher === 'true') {
+                            actions.push(ToolbarComponent.ITEMS.ADD_WATCH);
+                        }
+
+                        actions.push([
+                            ToolbarComponent.ITEMS.DIVIDER,
+                            this.deleteToolbarItem(model)
+                        ]);
+
+                        return actions;
+                    };
+
                     return {
                         items: [
                             {
@@ -307,15 +333,7 @@ define([
                             },
                             {
                                 title: i18n('detail.toolbar.actions'),
-                                submenu: _.compact([
-                                    ToolbarComponent.ITEMS.REFRESH,
-                                    ToolbarComponent.ITEMS.ADD_WATCH,
-                                    ToolbarComponent.ITEMS.REQUEUE_ITEM,
-                                    ToolbarComponent.ITEMS.UNRESOLVE_MENTIONS,
-                                    ToolbarComponent.ITEMS.DIVIDER,
-                                    this.deleteToolbarItem(model)
-
-                                ])
+                                submenu: _.compact(getToolbarActions())
                             },
                         ],
                         objects: { vertices: vertices, edges: edges }
