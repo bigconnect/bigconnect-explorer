@@ -305,10 +305,10 @@ define([
                             actions.push(ToolbarComponent.ITEMS.ADD_WATCH);
                         }
 
-                        actions.push([
+                        actions.push(
                             ToolbarComponent.ITEMS.DIVIDER,
                             this.deleteToolbarItem(model)
-                        ]);
+                        );
 
                         return actions;
                     };

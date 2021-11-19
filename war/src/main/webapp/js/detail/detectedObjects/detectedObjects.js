@@ -208,7 +208,8 @@ define([
                         restrictConcept: data.value.concept,
                         existing: Boolean(data.property && data.property.resolvedVertexId),
                         detectedObject: true,
-                        unresolve: data.unresolve || false
+                        unresolve: data.unresolve || false,
+                        conceptType: F.vertex.concept(self.model).id
                     });
                 }
             })
