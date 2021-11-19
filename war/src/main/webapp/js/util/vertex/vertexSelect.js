@@ -70,7 +70,8 @@ define([
                     defaultText,
                     filterResultsToTitleField,
                     placeholder,
-                    value
+                    value,
+                    matchType: 'vertex'
                 })
                 .behavior({
                     onCreateNewElement: (attacher, sign) => {

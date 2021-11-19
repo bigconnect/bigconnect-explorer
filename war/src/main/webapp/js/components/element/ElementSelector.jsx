@@ -55,7 +55,8 @@ define([
         propTypes: {
             onElementSelected: PropTypes.func,
             onCreateNewElement: PropTypes.func,
-            searchOptions: PropTypes.object
+            searchOptions: PropTypes.object,
+            matchType: PropTypes.string
         },
         getDefaultProps() {
             return { searchOptions: {} };
@@ -109,7 +110,7 @@ define([
             return Promise.require('util/withDataRequest')
                 .then(({ dataRequest }) => {
                     this.request = dataRequest('vertex', 'search', {
-                        matchType: 'element',
+                        matchType: this.props.matchType || 'element',
                         paging: {
                             offset: 0,
                             size: 25
