@@ -63,10 +63,7 @@ import com.mware.core.util.ClientApiConverter;
 import com.mware.core.util.RowKeyHelper;
 import com.mware.ge.*;
 import com.mware.ge.mutation.ElementMutation;
-import com.mware.ge.values.storable.ByteArray;
-import com.mware.ge.values.storable.DefaultStreamingPropertyValue;
-import com.mware.ge.values.storable.StreamingPropertyValue;
-import com.mware.ge.values.storable.Values;
+import com.mware.ge.values.storable.*;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
@@ -223,7 +220,7 @@ public class VertexUploadImage implements ParameterizedHandler {
             Concept concept = schemaRepository.getConceptByName(vertexConceptType, workspaceId);
             title = concept.getDisplayName();
         } else {
-            title = titleProperty.getValue();
+            title = ((TextValue) titleProperty.getValue()).stringValue();
         }
         return String.format("Image of %s", title.toString());
     }
