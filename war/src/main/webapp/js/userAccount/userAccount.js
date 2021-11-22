@@ -37,11 +37,13 @@
 define([
     'flight/lib/component',
     './pageList.hbs',
-    'util/component/attacher'
+    'util/component/attacher',
+    'util/requirejs/promise!util/service/propertiesPromise'
 ], function(
     defineComponent,
     listTemplate,
-    Attacher) {
+    Attacher,
+    config) {
     'use strict';
 
     const PROFILE_EXTENSION_PAGE = {
@@ -112,9 +114,12 @@ define([
                     pages.push(PROFILE_EXTENSION_PAGE);
                 }
 
-                if (!_.findWhere(pages, { identifier: WATCHES_EXTENSION_PAGE.identifier })) {
-                    registry.registerExtension('org.bigconnect.user.account.page', WATCHES_EXTENSION_PAGE);
-                    pages.push(WATCHES_EXTENSION_PAGE);
+                const enableWatcher = config['watcher.enabled'] || "false";
+                if (enableWatcher === 'true') {
+                    if (!_.findWhere(pages, {identifier: WATCHES_EXTENSION_PAGE.identifier})) {
+                        registry.registerExtension('org.bigconnect.user.account.page', WATCHES_EXTENSION_PAGE);
+                        pages.push(WATCHES_EXTENSION_PAGE);
+                    }
                 }
 
                 self.select('listSelector').html(
