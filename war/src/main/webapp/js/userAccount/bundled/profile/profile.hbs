@@ -16,19 +16,29 @@
     </div>
 
     <div class="form-group">
-        <label class="control-label" for="currPasswordInput">{{ i18n 'useraccount.page.profile.current.password.label' }}</label>
-        <input id="currPasswordInput" type="password" class="current form-control">
+        <label class="control-label" for="displayNameInput">{{ i18n 'useraccount.page.profile.displayName.label' }}</label>
+        <input type="text"
+               class="form-control"
+               id="displayNameInput"
+               value="{{ displayName }}">
     </div>
 
-    <div class="form-group">
-        <label class="control-label" for="newPassInput">{{ i18n 'useraccount.page.profile.new.password.label' }}</label>
-        <input id="newPassInput" type="password" class="new form-control">
-    </div>
+    {{#if ldap}}
+        <div class="form-group">
+            <label class="control-label" for="currPasswordInput">{{ i18n 'useraccount.page.profile.current.password.label' }}</label>
+            <input id="currPasswordInput" type="password" class="current form-control">
+        </div>
 
-    <div class="form-group">
-        <label class="control-label" for="newPassConfirmInput">{{ i18n 'useraccount.page.profile.new.password.confirmation.label' }}</label>
-        <input id="newPassConfirmInput" type="password" class="confirm form-control">
-    </div>
+        <div class="form-group">
+            <label class="control-label" for="newPassInput">{{ i18n 'useraccount.page.profile.new.password.label' }}</label>
+            <input id="newPassInput" type="password" class="new form-control">
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="newPassConfirmInput">{{ i18n 'useraccount.page.profile.new.password.confirmation.label' }}</label>
+            <input id="newPassConfirmInput" type="password" class="confirm form-control">
+        </div>
+    {{/if~}}
 
     <button style="margin: 1em 0;width: 100%;" class="btn btn-primary">{{ i18n 'useraccount.page.profile.button' }}</button>
 </div>

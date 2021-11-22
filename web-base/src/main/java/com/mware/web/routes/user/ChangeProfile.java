@@ -46,7 +46,9 @@ import com.mware.web.BadRequestException;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
+import com.mware.web.framework.annotations.Optional;
 import com.mware.web.framework.annotations.Required;
+import com.mware.web.framework.utils.StringUtils;
 import com.mware.web.model.ClientApiSuccess;
 
 @Singleton
@@ -63,28 +65,33 @@ public class ChangeProfile implements ParameterizedHandler {
     public ClientApiSuccess handle(
             User user,
             @Required(name = "email") String email,
-            @Required(name = "currentPassword") String currentPassword,
-            @Required(name = "newPassword") String newPassword,
-            @Required(name = "newPasswordConfirmation") String newPasswordConfirmation
+            @Optional(name = "displayName") String displayName,
+            @Optional(name = "currentPassword") String currentPassword,
+            @Optional(name = "newPassword") String newPassword,
+            @Optional(name = "newPasswordConfirmation") String newPasswordConfirmation
     ) throws Exception {
         userRepository.setEmailAddress(user, email);
+        userRepository.setDisplayName(user, displayName == null ? "" : displayName);
 
-        if (userRepository.isPasswordValid(user, currentPassword)) {
-            if (newPassword.length() > 0) {
-                if (newPassword.equals(newPasswordConfirmation)) {
-                    userRepository.setPassword(user, newPassword);
-                    LOGGER.info("changed password for user: %s", user.getUsername());
-                    return BcResponse.SUCCESS;
+        if (!StringUtils.isEmpty(currentPassword) && !StringUtils.isEmpty(newPassword) && !StringUtils.isEmpty(newPasswordConfirmation)) {
+            if (userRepository.isPasswordValid(user, currentPassword)) {
+                if (newPassword.length() > 0) {
+                    if (newPassword.equals(newPasswordConfirmation)) {
+                        userRepository.setPassword(user, newPassword);
+                        LOGGER.info("changed password for user: %s", user.getUsername());
+                    } else {
+                        throw new BadRequestException("newPasswordConfirmation", "new password and new password confirmation do not match");
+                    }
                 } else {
-                    throw new BadRequestException("newPasswordConfirmation", "new password and new password confirmation do not match");
+                    throw new BadRequestException("newPassword", "new password may not be blank");
                 }
             } else {
-                throw new BadRequestException("newPassword", "new password may not be blank");
+                LOGGER.warn("failed to change password for user: %s due to incorrect current password", user.getUsername());
+                throw new BadRequestException("currentPassword", "incorrect current password");
             }
-        } else {
-            LOGGER.warn("failed to change password for user: %s due to incorrect current password", user.getUsername());
-            throw new BadRequestException("currentPassword", "incorrect current password");
         }
+
+        return BcResponse.SUCCESS;
     }
 }
 

@@ -38,12 +38,14 @@ define([
     'flight/lib/component',
     'util/withFormFieldErrors',
     './profile.hbs',
-    'tpl!util/alert'
+    'tpl!util/alert',
+    'util/requirejs/promise!util/service/propertiesPromise'
 ], function(
     defineComponent,
     withFormFieldErrors,
     template,
-    alertTemplate) {
+    alertTemplate,
+    config) {
     'use strict';
 
     return defineComponent(Profile, withFormFieldErrors);
@@ -62,8 +64,11 @@ define([
                 inputSelector: this.validateEmail
             });
 
+            const enableLdap = config['ldap.enabled'] || "false";
             this.$node.html(template({
-                email: bcData.currentUser.email
+                email: bcData.currentUser.email,
+                displayName: bcData.currentUser.displayName,
+                ldap: enableLdap === 'true'
             }));
             this.validateEmail();
         });
@@ -84,13 +89,15 @@ define([
         this.onChange = function(event) {
             var self = this,
                 btn = $(event.target).addClass('loading').attr('disabled', true),
-                newEmail = this.$node.find('#emailInput').val();
+                newEmail = this.$node.find('#emailInput').val(),
+                newDisplayName = this.$node.find('#displayNameInput').val();
 
             this.clearFieldErrors(this.$node);
             this.$node.find('.alert-info').remove();
 
             $.post('/user/changeProfile', {
                 email: newEmail,
+                displayName: newDisplayName,
                 currentPassword: this.$node.find('#currPasswordInput').val(),
                 newPassword: this.$node.find('#newPassInput').val(),
                 newPasswordConfirmation: this.$node.find('#newPassConfirmInput').val(),
@@ -104,6 +111,7 @@ define([
                 })
                 .done(function() {
                     bcData.currentUser.email = newEmail;
+                    bcData.currentUser.displayName = newDisplayName;
                     self.$node.prepend(alertTemplate({
                         message: i18n('useraccount.page.profile.success')
                     }));
