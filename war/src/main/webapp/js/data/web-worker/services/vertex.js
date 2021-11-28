@@ -165,7 +165,10 @@ define([
         },
 
         videoPreviewFrameCount: function (options) {
-            return ajax('GET', '/vertex/video-preview-count', options);
+            if (options && options.graphVertexId)
+                return ajax('GET', '/vertex/video-preview-count', options);
+            else
+                return new Promise((resolve) => resolve(0));
         },
 
         /**
