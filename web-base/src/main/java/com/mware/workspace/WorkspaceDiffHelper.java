@@ -61,7 +61,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mware.ge.util.IterableUtils.toList;
-import static com.mware.workspace.WorkspaceHelper.WORKSPACE_AUTO_PUBLISH_KEY;
 
 @Singleton
 public class WorkspaceDiffHelper {
@@ -71,7 +70,6 @@ public class WorkspaceDiffHelper {
     private final WebWorkspaceRepository webWorkspaceRepository;
     private final WorkspaceRepository workspaceRepository;
     private final LockRepository lockRepository;
-    private final Boolean autoPublish;
 
     @Inject
     public WorkspaceDiffHelper(
@@ -89,7 +87,6 @@ public class WorkspaceDiffHelper {
         this.webWorkspaceRepository = webWorkspaceRepository;
         this.workspaceRepository = workspaceRepository;
         this.lockRepository = lockRepository;
-        this.autoPublish = configuration.getBoolean(WORKSPACE_AUTO_PUBLISH_KEY, false);
     }
 
     @Traced
@@ -106,7 +103,7 @@ public class WorkspaceDiffHelper {
             );
         }
 
-        if (autoPublish) {
+        if (!workspaceRepository.isStagingEnabled(workspace)) {
             return new ClientApiWorkspaceDiff();
         }
 

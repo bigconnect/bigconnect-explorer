@@ -304,7 +304,7 @@ define([
                     })
         },
 
-        save: queue(function(workspaceId, changes) {
+        save: function(workspaceId, changes) {
             if (arguments.length === 1) {
                 changes = workspaceId;
                 workspaceId = publicData.currentWorkspaceId;
@@ -322,7 +322,7 @@ define([
                 getStore().dispatch(workspaceActions.update({ workspace }))
                 return { saved: true, workspace };
             });
-        }),
+        },
 
         publish: function(changes) {
             return ajax('POST', '/workspace/publish', {

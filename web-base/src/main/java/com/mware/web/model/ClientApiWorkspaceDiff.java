@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientApiWorkspaceDiff implements ClientApiObject {
-    private List<Item> diffs = new ArrayList<Item>();
+    private List<Item> diffs = new ArrayList<>();
 
     public void addAll(List<Item> diffs) {
         this.diffs.addAll(diffs);
@@ -159,8 +159,17 @@ public class ClientApiWorkspaceDiff implements ClientApiObject {
         }
 
         public PropertyItem(
-                String elementType, String elementId, String elementConcept, String name, String key, JsonNode oldData,
-                JsonNode newData, SandboxStatus sandboxStatus, boolean deleted, String visibilityString) {
+                String elementType,
+                String elementId,
+                String elementConcept,
+                String name,
+                String key,
+                JsonNode oldData,
+                JsonNode newData,
+                SandboxStatus sandboxStatus,
+                boolean deleted,
+                String visibilityString
+        ) {
             super("PropertyDiffItem", sandboxStatus, deleted);
             this.elementType = elementType;
             this.elementId = elementId;
@@ -173,8 +182,19 @@ public class ClientApiWorkspaceDiff implements ClientApiObject {
         }
 
         public PropertyItem(
-                String elementType, String elementId, String label, String outVertexId, String inVertexId, String name, String key, JsonNode oldData,
-                JsonNode newData, SandboxStatus sandboxStatus, boolean deleted, String visibilityString) {
+                String elementType,
+                String elementId,
+                String label,
+                String outVertexId,
+                String inVertexId,
+                String name,
+                String key,
+                JsonNode oldData,
+                JsonNode newData,
+                SandboxStatus sandboxStatus,
+                boolean deleted,
+                String visibilityString
+        ) {
             super("PropertyDiffItem", sandboxStatus, deleted);
             this.elementType = elementType;
             this.elementId = elementId;

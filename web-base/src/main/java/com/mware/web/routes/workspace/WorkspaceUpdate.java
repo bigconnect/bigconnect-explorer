@@ -38,6 +38,7 @@ package com.mware.web.routes.workspace;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.exception.BcException;
 import com.mware.core.exception.BcResourceNotFoundException;
 import com.mware.core.model.clientapi.dto.ClientApiWorkspace;
 import com.mware.core.model.clientapi.dto.WorkspaceAccess;
@@ -50,13 +51,16 @@ import com.mware.core.model.workspace.WorkspaceRepository;
 import com.mware.core.user.User;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
+import com.mware.formula.FormulaEvaluator;
 import com.mware.ge.Authorizations;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
+import com.mware.web.model.ClientApiWorkspaceDiff;
 import com.mware.web.model.ClientApiWorkspaceUpdateData;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import com.mware.web.parameterProviders.SourceGuid;
+import com.mware.workspace.WorkspaceDiffHelper;
 import org.json.JSONObject;
 
 import java.text.MessageFormat;
@@ -69,16 +73,19 @@ public class WorkspaceUpdate implements ParameterizedHandler {
     private final WorkspaceRepository workspaceRepository;
     private final WebQueueRepository webQueueRepository;
     private final UserNotificationRepository userNotificationRepository;
+    private final WorkspaceDiffHelper workspaceDiffHelper;
 
     @Inject
     public WorkspaceUpdate(
             final WorkspaceRepository workspaceRepository,
             final WebQueueRepository webQueueRepository,
-            final UserNotificationRepository userNotificationRepository
+            final UserNotificationRepository userNotificationRepository,
+            WorkspaceDiffHelper workspaceDiffHelper
     ) {
         this.workspaceRepository = workspaceRepository;
         this.webQueueRepository = webQueueRepository;
         this.userNotificationRepository = userNotificationRepository;
+        this.workspaceDiffHelper = workspaceDiffHelper;
     }
 
     @Handle
@@ -88,7 +95,8 @@ public class WorkspaceUpdate implements ParameterizedHandler {
             @SourceGuid String sourceGuid,
             ResourceBundle resourceBundle,
             User user,
-            Authorizations authorizations
+            Authorizations authorizations,
+            FormulaEvaluator.UserContext userContext
     ) throws Exception {
         Workspace workspace = workspaceRepository.findById(workspaceId, user);
         if (workspace == null) {
@@ -97,6 +105,10 @@ public class WorkspaceUpdate implements ParameterizedHandler {
 
         if (updateData.getTitle() != null) {
             setTitle(workspace, updateData.getTitle(), user);
+        }
+
+        if (updateData.getStaging() != null) {
+            setStaging(workspace, updateData.getStaging(), user, userContext);
         }
 
         updateUsers(workspace, updateData.getUserUpdates(), resourceBundle, user);
@@ -120,6 +132,19 @@ public class WorkspaceUpdate implements ParameterizedHandler {
     private void setTitle(Workspace workspace, String title, User authUser) {
         LOGGER.debug("setting title (%s): %s", workspace.getWorkspaceId(), title);
         workspaceRepository.setTitle(workspace, title, authUser);
+    }
+
+    private void setStaging(Workspace workspace, Boolean staging, User authUser, FormulaEvaluator.UserContext userContext) {
+        LOGGER.debug("setting stating (%s): %s", workspace.getWorkspaceId(), staging);
+
+        if (!staging && workspaceRepository.isStagingEnabled(workspace)) {
+            // if staging is being disabled, check any outstanding diffs
+            ClientApiWorkspaceDiff diff = workspaceDiffHelper.getDiff(workspace, authUser, userContext);
+            if (diff.getDiffs().size() > 0) {
+                throw new BcException("Publish your changes to disable staging.");
+            }
+        }
+        workspaceRepository.setStaging(workspace, staging, authUser);
     }
 
     private void deleteUsers(Workspace workspace, List<String> userDeletes, User authUser) {

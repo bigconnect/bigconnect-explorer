@@ -97,8 +97,6 @@ public class VertexImport implements ParameterizedHandler {
     private final WorkspaceHelper workspaceHelper;
     private Path uploadTempDir;
     private Authorizations authorizations;
-    private final boolean autoPublish;
-    public static final String WORKSPACE_AUTO_PUBLISH_KEY = "workspace.autopublish";
 
     @Inject
     public VertexImport(
@@ -114,7 +112,6 @@ public class VertexImport implements ParameterizedHandler {
         this.workspaceRepository = workspaceRepository;
         this.visibilityTranslator = visibilityTranslator;
         this.workspaceHelper = workspaceHelper;
-        this.autoPublish = configuration.getBoolean(WORKSPACE_AUTO_PUBLISH_KEY, false);
 
         try {
             String configuredTempDir = configuration.get(TEMP_DIR_CONFIG, null);
@@ -175,8 +172,8 @@ public class VertexImport implements ParameterizedHandler {
             }
 
             Workspace workspace = null;
-
-            if (!autoPublish) {
+            boolean workspaceStaging = workspaceRepository.isStagingEnabled(workspaceId, user);
+            if (workspaceStaging) {
                 workspace = workspaceRepository.findById(workspaceId, user);
             }
             List<Vertex> vertices = fileImport.importVertices(

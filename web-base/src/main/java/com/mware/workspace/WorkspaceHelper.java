@@ -90,8 +90,6 @@ public class WorkspaceHelper {
     private String entityHasImageIri;
     private final AuthorizationRepository authorizationRepository;
     private String artifactContainsImageOfEntityIri;
-    private final Boolean autoPublish;
-    public static final String WORKSPACE_AUTO_PUBLISH_KEY = "workspace.autopublish";
 
     @Inject
     public WorkspaceHelper(
@@ -114,7 +112,6 @@ public class WorkspaceHelper {
         this.privilegeRepository = privilegeRepository;
         this.authorizationRepository = authorizationRepository;
         this.entityHasImageIri = schemaRepository.getRelationshipNameByIntent("entityHasImage", SchemaRepository.PUBLIC);
-        this.autoPublish = configuration.getBoolean(WORKSPACE_AUTO_PUBLISH_KEY, false);
 
         if (this.entityHasImageIri == null) {
             LOGGER.warn("'entityHasImage' intent has not been defined. Please update your ontology.");
@@ -191,11 +188,14 @@ public class WorkspaceHelper {
             boolean propertyIsPublic,
             String workspaceId,
             Priority priority,
-            Authorizations authorizations
+            Authorizations authorizations,
+            User user
     ) {
-        if (autoPublish) {
+        boolean workspaceStaging = workspaceRepository.isStagingEnabled(workspaceId, user);
+        if (!workspaceStaging) {
             workspaceId = null;
         }
+
         if (propertyIsPublic && workspaceId != null) {
             e.markPropertyHidden(property, new Visibility(workspaceId), authorizations);
         } else {
@@ -226,10 +226,11 @@ public class WorkspaceHelper {
         ensureOntologyIrisInitialized();
         long beforeActionTimestamp = System.currentTimeMillis() - 1;
 
-        deleteProperties(edge, workspaceId, priority, authorizations);
+        deleteProperties(edge, workspaceId, priority, authorizations, user);
         unresolveDetectedObjects(workspaceId, edge, outVertex, inVertex, priority, authorizations);
 
-        if (!autoPublish) {
+        boolean workspaceStaging = workspaceRepository.isStagingEnabled(workspaceId, user);
+        if (!workspaceStaging) {
             // add the vertex to the workspace so that the changes show up in the diff panel
             workspaceRepository.updateEntityOnWorkspace(workspaceId, edge.getVertexId(Direction.IN), user);
             workspaceRepository.updateEntityOnWorkspace(workspaceId, edge.getVertexId(Direction.OUT), user);
@@ -258,7 +259,7 @@ public class WorkspaceHelper {
                 webQueueRepository.pushTextUpdated(outVertex.getId());
             }
 
-            if (autoPublish) {
+            if (!workspaceStaging) {
                 long beforeDeletionTimestamp = System.currentTimeMillis() - 1;
                 graph.deleteEdge(edge, authorizations);
                 graph.flush();
@@ -294,7 +295,7 @@ public class WorkspaceHelper {
                 webQueueRepository.pushTextUpdated(outVertex.getId());
             }
 
-            if (autoPublish) {
+            if (!workspaceStaging) {
                 long beforeDeletionTimestamp = System.currentTimeMillis() - 1;
                 graph.softDeleteEdge(edge, authorizations);
                 graph.flush();
@@ -381,18 +382,18 @@ public class WorkspaceHelper {
         for (int i = 0; i < sandboxStatuses.length; i++) {
             boolean propertyIsPublic = (sandboxStatuses[i] == SandboxStatus.PUBLIC);
             Property property = properties.get(i);
-            deleteProperty(e, property, propertyIsPublic, workspaceId, Priority.HIGH, authorizations);
+            deleteProperty(e, property, propertyIsPublic, workspaceId, Priority.HIGH, authorizations, user);
         }
     }
 
-    private void deleteProperties(Element e, String workspaceId, Priority priority, Authorizations authorizations) {
+    private void deleteProperties(Element e, String workspaceId, Priority priority, Authorizations authorizations, User user) {
         List<Property> properties = IterableUtils.toList(e.getProperties());
         SandboxStatus[] sandboxStatuses = SandboxStatusUtil.getPropertySandboxStatuses(properties, workspaceId);
 
         for (int i = 0; i < sandboxStatuses.length; i++) {
             boolean propertyIsPublic = (sandboxStatuses[i] == SandboxStatus.PUBLIC);
             Property property = properties.get(i);
-            deleteProperty(e, property, propertyIsPublic, workspaceId, priority, authorizations);
+            deleteProperty(e, property, propertyIsPublic, workspaceId, priority, authorizations, user);
         }
     }
 
@@ -414,10 +415,11 @@ public class WorkspaceHelper {
         ensureOntologyIrisInitialized();
         long beforeActionTimestamp = System.currentTimeMillis() - 1;
 
-        deleteProperties(vertex, workspaceId, priority, authorizations);
+        deleteProperties(vertex, workspaceId, priority, authorizations, user);
 
         // make sure the entity is on the workspace so that it shows up in the diff panel
-        if (!autoPublish) {
+        boolean workspaceStaging = workspaceRepository.isStagingEnabled(workspaceId, user);
+        if (!workspaceStaging) {
             workspaceRepository.updateEntityOnWorkspace(workspaceId, vertex.getId(), user);
         }
         VisibilityJson visibilityJson = BcSchema.VISIBILITY_JSON.getPropertyValue(vertex);
@@ -485,7 +487,8 @@ public class WorkspaceHelper {
             Visibility workspaceVisibility = new Visibility(workspaceId);
             graph.markVertexHidden(vertex, workspaceVisibility, systemAuthorization);
             graph.flush();
-            if (autoPublish) {
+
+            if (!workspaceStaging) {
                 long beforeDeletionTimestamp = System.currentTimeMillis() - 1;
                 graph.deleteVertex(vertex, authorizations);
                 graph.flush();
@@ -512,7 +515,8 @@ public class WorkspaceHelper {
             LOGGER.debug("soft delete vertex");
             graph.softDeleteVertex(vertex, authorizations);
             graph.flush();
-            if (autoPublish) {
+
+            if (!workspaceStaging) {
                 long beforeDeletionTimestamp = System.currentTimeMillis() - 1;
                 webQueueRepository.broadcastPropertyChange(vertex, null, null, null);
                 workQueueRepository.pushOnDwQueue(vertex, null, null, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeDeletionTimestamp);

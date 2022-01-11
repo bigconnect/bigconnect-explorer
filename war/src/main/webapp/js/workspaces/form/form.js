@@ -41,7 +41,8 @@ define([
     './shareRow.hbs',
     './permissions.hbs',
     'util/users/userSelect',
-    'util/withDataRequest'
+    'util/withDataRequest',
+    'px/extensions/growl'
 ], function(
     defineComponent,
     template,
@@ -64,6 +65,7 @@ define([
         this.defaultAttrs({
             titleSelector: '.workspace-title',
             titleErrorSelector: '.form-title-error',
+            stagingSelector: '.workspace-staging',
             shareListSelector: '.share-list',
             shareHeader: '.share-header',
             shareFormSelector: '.share-form',
@@ -127,6 +129,7 @@ define([
                     permissionsRadioSelector: this.onPermissionsChange
                 });
                 this.select('titleSelector').on('change keyup paste', this.onChangeTitle.bind(this));
+                this.select('stagingSelector').on('change', this.onChangeStaging.bind(this));
             }
         });
 
@@ -155,10 +158,10 @@ define([
                             self.trigger(document, 'workspaceSaved', self.attr.data);
                             d.resolve({ workspace: self.attr.data });
                         })
-                        .catch(function() {
+                        .catch(function(err) {
                             self.attr.data = revert;
                             self.trigger(document, 'workspaceSaved', revert);
-                            d.reject();
+                            d.reject(err);
                         })
                 }
 
@@ -253,6 +256,28 @@ define([
                         }))
                     })).data('userRow', row);
                 }
+            });
+        };
+
+        this.onChangeStaging = function(event) {
+            var self = this,
+                $target = $(event.target),
+                val = $target.is(':checked');
+
+            if (!this.stagingRevert) {
+                this.stagingRevert = $.extend(true, {}, this.attr.data);
+            }
+
+            this.saveWorkspace(true, {
+                changes: {
+                    staging: val,
+                },
+                revert: this.stagingRevert
+            }).fail(function(e) {
+                $target.prop('checked', self.stagingRevert.staging);
+                $.growl.error({
+                    message: (e.json && e.json.error) || 'Something went wrong with your request.',
+                })
             });
         };
 

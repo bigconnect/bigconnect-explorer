@@ -82,7 +82,7 @@ public class WorkspaceUndoHelper {
                      String workspaceId, User user, Authorizations authorizations) {
         undoVertices(undoItems, workspaceUndoResponse, workspaceId, user, authorizations);
         undoEdges(undoItems, workspaceUndoResponse, workspaceId, user, authorizations);
-        undoProperties(undoItems, workspaceUndoResponse, workspaceId, authorizations);
+        undoProperties(undoItems, workspaceUndoResponse, workspaceId, authorizations, user);
     }
 
     private void undoVertices(Iterable<ClientApiUndoItem> undoItems, ClientApiWorkspaceUndoResponse workspaceUndoResponse,
@@ -107,7 +107,7 @@ public class WorkspaceUndoHelper {
                     for (Property property : vertex.getProperties()) {
                         undoProperties(
                                 property.getKey(), property.getName(), property.getVisibility().getVisibilityString(),
-                                vertex, workspaceId, authorizations);
+                                vertex, workspaceId, authorizations, user);
                     }
 
                     graph.flush();
@@ -186,7 +186,7 @@ public class WorkspaceUndoHelper {
 
     private void undoProperties(
             Iterable<ClientApiUndoItem> undoItems, ClientApiWorkspaceUndoResponse workspaceUndoResponse,
-            String workspaceId, Authorizations authorizations) {
+            String workspaceId, Authorizations authorizations, User user) {
         LOGGER.debug("BEGIN undoProperties");
         for (ClientApiUndoItem undoItem : undoItems) {
             try {
@@ -205,7 +205,7 @@ public class WorkspaceUndoHelper {
                 }
                 undoProperties(
                         propertyUndoItem.getKey(), propertyUndoItem.getName(), propertyUndoItem.getVisibilityString(),
-                        element, workspaceId, authorizations);
+                        element, workspaceId, authorizations, user);
             } catch (Exception ex) {
                 LOGGER.error("Error publishing %s", undoItem.toString(), ex);
                 undoItem.setErrorMessage(ex.getMessage());
@@ -217,8 +217,14 @@ public class WorkspaceUndoHelper {
     }
 
     private void undoProperties(
-            String propertyKey, String propertyName, String propertyVisibilityString, Element element,
-            String workspaceId, Authorizations authorizations) {
+            String propertyKey,
+            String propertyName,
+            String propertyVisibilityString,
+            Element element,
+            String workspaceId,
+            Authorizations authorizations,
+            User user
+    ) {
         List<Property> properties = IterableUtils.toList(element.getProperties(propertyKey, propertyName));
         SandboxStatus[] sandboxStatuses = SandboxStatusUtil.getPropertySandboxStatuses(properties, workspaceId);
         Property publicProperty = null;
@@ -285,7 +291,7 @@ public class WorkspaceUndoHelper {
                     workQueueRepository.pushOnDwQueue(element, propertyKey, propertyName, null, null, Priority.HIGH, ElementOrPropertyStatus.DELETION, beforeActionTimestamp);
                 }
             } else {
-                workspaceHelper.deleteProperty(element, property, false, workspaceId, Priority.HIGH, authorizations);
+                workspaceHelper.deleteProperty(element, property, false, workspaceId, Priority.HIGH, authorizations, user);
                 graph.flush();
                 webQueueRepository.broadcastUndoProperty(element, propertyKey, propertyName);
             }

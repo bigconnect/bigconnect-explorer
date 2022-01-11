@@ -47,6 +47,7 @@ import java.util.List;
 
 @Getter
 public class ClientApiWorkspaceUpdateData implements ClientApiObject {
+    private Boolean staging;
     private String title;
     private List<EntityUpdate> entityUpdates = new ArrayList<EntityUpdate>();
     private List<String> entityDeletes = new ArrayList<String>();
@@ -55,6 +56,10 @@ public class ClientApiWorkspaceUpdateData implements ClientApiObject {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void setStaging(Boolean staging) {
+        this.staging = staging;
     }
 
     public static class EntityUpdate {

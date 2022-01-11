@@ -7,6 +7,13 @@
                 <input class="workspace-title form-control" type="text" value="{{ workspace.title }}" required>
                 <span class="form-title-error">{{ i18n 'workspaces.form.title.unique.error' }}</span>
             </li>
+
+            <li>
+                <label>
+                    <input type="checkbox" class="workspace-staging" style="width: 2em" {{#if workspace.staging}}checked{{/if}} required>
+                    <span>Enable staging</span>
+                </label>
+            </li>
         {{/if}}
 
         <li class="nav-header share-header">{{ i18n 'workspaces.form.sharing' }}<span class="badge loading"/></li>

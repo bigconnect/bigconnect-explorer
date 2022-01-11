@@ -348,7 +348,8 @@ public class VertexSetProperty extends SetPropertyBase implements ParameterizedH
                             isPropertyPublic,
                             workspaceId,
                             Priority.HIGH,
-                            authorizations
+                            authorizations,
+                            user
                     );
                 }
             } else {
