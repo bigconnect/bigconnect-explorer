@@ -66,8 +66,11 @@ define([
             var self = this;
 
             this.updateDiffBadge = _.throttle(this.updateDiffBadge.bind(this), UPDATE_WORKSPACE_DIFF_SECONDS * 1000)
+            const publishPrivilege = bcData.currentUser.privileges.includes('PUBLISH');
 
-            this.$node.hide().html(template({}));
+            this.$node.hide().html(template({
+                publishPrivilege
+            }));
 
             requestAnimationFrame(function() {
                 self.$node.addClass('visible');
@@ -191,6 +194,9 @@ define([
             var self = this,
                 node = this.select('nameSelector'),
                 badge = this.$node.find('.badge');
+
+            if (!bcData.currentUser.privileges.includes('PUBLISH'))
+                return;
 
             if (!badge.length) {
                 badge = $('<span class="badge"></span>')

@@ -7,15 +7,24 @@
         <div class="navbar-collapse collapse menu-top">
             <ul class="nav navbar-nav">
                 <li class="dashboard"><a>{{ i18n 'menubar.icons.dashboard' }}</a></li>
+{{#if showIngest }}
                 <li class="ingest"><a>{{ i18n 'menubar.icons.ingest' }}</a></li>
+{{/if}}
+{{#if showDiscover }}
                 <li class="search"><a>{{ i18n 'menubar.icons.search' }}</a></li>
+{{/if}}
+{{#if showAnalyze }}
                 <li class="products"><a>{{ i18n 'menubar.icons.products' }}</a></li>
-                {{#if enableCypherLabLink}}
+{{/if}}
+{{#if enableCypherLabLink}}
                     <li class="lab"><a href="/cypherlab/index.html?connectURL={{connectURL}}&token={{jwtToken}}" target="_blank">{{ i18n 'search.advanced.lab' }}</a></li>
-                {{/if}}
+{{/if}}
+{{#if showAddItems }}
                 <li class="add-items"><a>Add items...</a></li>
+{{/if}}
             </ul>
 
+{{#if showDiscover }}
             <div class="navbar-form navbar-left">
                 <div class="form-group qs-form">
                     <div class="input-group">
@@ -24,13 +33,16 @@
                     </div>
                 </div>
             </div>
+{{/if}}
 
             <ul class="nav navbar-nav navbar-right">
+{{#if showSpaces }}
                 <li class="workspaces"><a><i class="material-icons">dashboard</i></a></li>
+{{/if}}
                 <li class="activity"><a><i class="material-icons">group_work</i></a></li>
-                {{#if isAdmin }}
+{{#if isAdmin }}
                     <li class="admin"><a><i class="material-icons">settings</i></a></li>
-                {{/if}}
+{{/if}}
 
                 <li class="dropdown user">
                     <a class="dropdown-toggle" data-toggle="dropdown">{{ currentUser.displayName }}</a>

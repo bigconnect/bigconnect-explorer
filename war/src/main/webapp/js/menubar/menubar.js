@@ -232,8 +232,21 @@ define([
                 boltURL = 'bolt://'+bcData.currentUser.userName+'@'+config['bolt.server'],
                 jwt = (bcData.currentUser.properties && bcData.currentUser.properties.jwt) || '';
 
+            const userPrivileges = bcData.currentUser.privileges,
+                editPrivilege = userPrivileges.includes('EDIT') || userPrivileges.includes('ADMIN'),
+                showIngest = editPrivilege || userPrivileges.includes('INGEST'),
+                showDiscover = editPrivilege || userPrivileges.includes('DISCOVER'),
+                showAnalyze = editPrivilege || userPrivileges.includes('ANALYZE'),
+                showAddItems = editPrivilege || userPrivileges.includes('ADMIN'),
+                showSpaces = editPrivilege || userPrivileges.includes('SPACES');
+
             this.$node.html(template({
                 isAdmin: AdminList.getExtensions().length > 0,
+                showIngest,
+                showDiscover,
+                showAnalyze,
+                showAddItems,
+                showSpaces,
                 enableCypherLabLink: (enableCypherLabLink === "true"),
                 currentUser: bcData.currentUser,
                 jwtToken: jwt,
