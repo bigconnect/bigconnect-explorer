@@ -142,7 +142,18 @@ public class OntologyManagerPropertySave implements ParameterizedHandler {
             prop.setProperty(SchemaProperties.USER_VISIBLE.getPropertyName(), booleanValue(property.getUserVisible()), user, authorizations);
             prop.setProperty(SchemaProperties.SEARCHABLE.getPropertyName(), booleanValue(property.getSearchable()), user, authorizations);
             prop.setProperty(SchemaProperties.SEARCH_FACET.getPropertyName(), booleanValue(property.getSearchFacet()), user, authorizations);
-            prop.setProperty(SchemaProperties.TEXT_INDEX_HINTS.getPropertyName(), stringValue(property.getTextIndexHints().toString()), user, authorizations);
+
+            prop.removeTextIndexHint(TextIndexHint.FULL_TEXT, authorizations);
+            prop.removeTextIndexHint(TextIndexHint.EXACT_MATCH, authorizations);
+            if (property.getTextIndexHints().contains("ALL")) {
+                prop.addTextIndexHint(TextIndexHint.FULL_TEXT, authorizations);
+                prop.addTextIndexHint(TextIndexHint.EXACT_MATCH, authorizations);
+            } else if (property.getTextIndexHints().contains("FULL_TEXT")) {
+                prop.addTextIndexHint(TextIndexHint.FULL_TEXT, authorizations);
+            } else if (property.getTextIndexHints().contains("EXACT_MATCH")) {
+                prop.addTextIndexHint(TextIndexHint.EXACT_MATCH, authorizations);
+            }
+
             prop.setProperty(SchemaProperties.DELETEABLE.getPropertyName(), booleanValue(property.getDeleteable()), user, authorizations);
             prop.setProperty(SchemaProperties.ADDABLE.getPropertyName(), booleanValue(property.getAddable()), user, authorizations);
             prop.setProperty(SchemaProperties.UPDATEABLE.getPropertyName(), booleanValue(property.getUpdateable()), user, authorizations);
