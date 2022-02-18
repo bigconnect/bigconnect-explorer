@@ -1,6 +1,7 @@
 package com.mware.web.routes.element;
 
 import com.mware.core.model.clientapi.dto.ClientApiObject;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.security.AuditService;
 import com.mware.core.user.User;
 import com.mware.ge.Authorizations;
@@ -14,7 +15,6 @@ import com.mware.web.model.ClientApiSuccess;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import com.mware.web.routes.edge.EdgeDelete;
 import com.mware.web.routes.vertex.VertexRemove;
-import com.mware.workspace.WorkspaceHelper;
 import lombok.Data;
 
 import javax.inject.Inject;

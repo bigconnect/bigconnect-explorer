@@ -39,6 +39,7 @@ package com.mware.web.routes.product;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.model.clientapi.dto.ClientApiProduct;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.user.User;
 import com.mware.product.Product;
 import com.mware.web.framework.ParameterizedHandler;
@@ -47,7 +48,6 @@ import com.mware.web.framework.annotations.Optional;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import com.mware.web.parameterProviders.SourceGuid;
 import com.mware.workspace.WebWorkspaceRepository;
-import com.mware.workspace.WorkspaceHelper;
 import org.json.JSONObject;
 
 @Singleton

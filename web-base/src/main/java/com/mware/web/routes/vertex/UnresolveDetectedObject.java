@@ -44,6 +44,7 @@ import com.mware.core.model.properties.ArtifactDetectedObject;
 import com.mware.core.model.properties.RawObjectSchema;
 import com.mware.core.model.workQueue.Priority;
 import com.mware.core.model.workQueue.WorkQueueRepository;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.user.User;
 import com.mware.core.util.ClientApiConverter;
 import com.mware.core.util.SandboxStatusUtil;
@@ -55,7 +56,6 @@ import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
-import com.mware.workspace.WorkspaceHelper;
 
 @Singleton
 public class UnresolveDetectedObject implements ParameterizedHandler {

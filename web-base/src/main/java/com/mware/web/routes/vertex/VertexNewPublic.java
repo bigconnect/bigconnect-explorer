@@ -48,6 +48,7 @@ import com.mware.core.model.user.UserNameAuthorizationContext;
 import com.mware.core.model.user.UserRepository;
 import com.mware.core.model.workQueue.WebQueueRepository;
 import com.mware.core.model.workQueue.WorkQueueRepository;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.security.AuditService;
 import com.mware.core.security.VisibilityTranslator;
 import com.mware.core.user.User;
@@ -61,7 +62,6 @@ import com.mware.web.framework.annotations.Required;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import com.mware.web.parameterProviders.JustificationText;
 import com.mware.web.util.RemoteAddressUtil;
-import com.mware.workspace.WorkspaceHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ResourceBundle;

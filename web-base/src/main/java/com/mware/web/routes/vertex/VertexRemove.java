@@ -42,6 +42,7 @@ import com.mware.core.exception.BcAccessDeniedException;
 import com.mware.core.exception.BcResourceNotFoundException;
 import com.mware.core.model.clientapi.dto.SandboxStatus;
 import com.mware.core.model.workQueue.Priority;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.security.AuditEventType;
 import com.mware.core.security.AuditService;
 import com.mware.core.user.User;
@@ -56,7 +57,6 @@ import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
 import com.mware.web.model.ClientApiSuccess;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
-import com.mware.workspace.WorkspaceHelper;
 
 @Singleton
 public class VertexRemove implements ParameterizedHandler {

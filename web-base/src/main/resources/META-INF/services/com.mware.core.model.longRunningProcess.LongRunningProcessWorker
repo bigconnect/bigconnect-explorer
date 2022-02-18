@@ -1,2 +1,0 @@
-com.mware.ingest.structured.worker.StructuredIngestProcessWorker
-com.mware.ingest.database.DataSourceImportLongRunningProcess

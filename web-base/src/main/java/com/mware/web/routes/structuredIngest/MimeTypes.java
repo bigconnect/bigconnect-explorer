@@ -37,9 +37,9 @@
 package com.mware.web.routes.structuredIngest;
 
 import com.google.inject.Inject;
-import com.mware.ingest.structured.model.ClientApiMimeTypes;
-import com.mware.ingest.structured.model.StructuredIngestParser;
-import com.mware.ingest.structured.model.StructuredIngestParserFactory;
+import com.mware.core.ingest.structured.model.ClientApiMimeTypes;
+import com.mware.core.ingest.structured.model.StructuredIngestParser;
+import com.mware.core.ingest.structured.model.StructuredIngestParserFactory;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 

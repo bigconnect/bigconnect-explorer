@@ -43,6 +43,7 @@ import com.mware.core.exception.BcException;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.schema.SchemaProperty;
 import com.mware.core.model.schema.SchemaRepository;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.user.User;
 import com.mware.ge.Authorizations;
 import com.mware.ge.Graph;
@@ -54,7 +55,6 @@ import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
 import com.mware.web.model.ClientApiSuccess;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
-import com.mware.workspace.WorkspaceHelper;
 
 import javax.servlet.http.HttpServletRequest;
 

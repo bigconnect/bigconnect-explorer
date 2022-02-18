@@ -38,8 +38,8 @@ package com.mware.web.routes.dataload;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.ingest.database.DataConnectionRepository;
 import com.mware.core.user.User;
-import com.mware.ingest.database.DataConnectionRepository;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;

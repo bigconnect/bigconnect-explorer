@@ -40,14 +40,10 @@ import com.google.inject.Inject;
 import com.mware.core.model.lock.LockRepository;
 import com.mware.core.model.role.AuthorizationRepository;
 import com.mware.core.model.user.UserRepository;
-import com.mware.core.model.workspace.DefaultWorkspaceListener;
-import com.mware.core.model.workspace.GeWorkspace;
-import com.mware.core.model.workspace.Workspace;
-import com.mware.core.model.workspace.WorkspaceRepository;
+import com.mware.core.model.workspace.*;
 import com.mware.core.security.BcVisibility;
 import com.mware.core.user.User;
 import com.mware.ge.*;
-import com.mware.ontology.WebWorkspaceSchema;
 
 public class DeleteProductWorkspaceListener extends DefaultWorkspaceListener {
     private final WorkspaceRepository workspaceRepository;

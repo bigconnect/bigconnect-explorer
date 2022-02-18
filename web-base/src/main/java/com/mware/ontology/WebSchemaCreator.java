@@ -39,13 +39,15 @@ package com.mware.ontology;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.ingest.database.DataConnectionSchema;
+import com.mware.core.ingest.structured.StructuredIngestSchema;
 import com.mware.core.model.clientapi.dto.PropertyType;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.properties.SchemaProperties;
 import com.mware.core.model.properties.WorkspaceSchema;
 import com.mware.core.model.schema.*;
+import com.mware.core.model.workspace.WebWorkspaceSchema;
 import com.mware.ge.TextIndexHint;
-import com.mware.ge.values.storable.BooleanValue;
 
 import java.text.MessageFormat;
 import java.util.EnumSet;

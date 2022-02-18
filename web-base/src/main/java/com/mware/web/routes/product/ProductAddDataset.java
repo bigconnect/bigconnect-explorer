@@ -48,6 +48,7 @@ import com.mware.core.model.graph.GraphUpdateContext;
 import com.mware.core.model.role.AuthorizationRepository;
 import com.mware.core.model.search.*;
 import com.mware.core.model.workQueue.Priority;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.security.VisibilityTranslator;
 import com.mware.core.user.User;
 import com.mware.ge.Authorizations;
@@ -63,7 +64,6 @@ import com.mware.web.framework.annotations.Required;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import com.mware.web.parameterProviders.SourceGuid;
 import com.mware.workspace.WebWorkspaceRepository;
-import com.mware.workspace.WorkspaceHelper;
 
 import java.util.HashSet;
 import java.util.Set;

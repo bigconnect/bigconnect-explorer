@@ -39,13 +39,13 @@ package com.mware.web.routes.dataload;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.exception.BcResourceNotFoundException;
+import com.mware.core.ingest.database.DataConnection;
+import com.mware.core.ingest.database.DataConnectionRepository;
+import com.mware.core.ingest.database.model.ClientApiDataConnection;
 import com.mware.core.user.User;
-import com.mware.ingest.database.DataConnection;
-import com.mware.ingest.database.DataConnectionRepository;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
-import com.mware.web.model.ClientApiDataConnection;
 
 @Singleton
 public class DataConnectionGetById implements ParameterizedHandler {

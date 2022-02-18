@@ -38,8 +38,6 @@ package com.mware.workspace;
 
 import com.mware.core.config.Configuration;
 import com.mware.core.model.clientapi.dto.VisibilityJson;
-import com.mware.core.model.schema.SchemaConstants;
-import com.mware.core.model.schema.SchemaRepository;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.role.AuthorizationRepository;
 import com.mware.core.model.schema.SchemaRepository;
@@ -51,6 +49,7 @@ import com.mware.core.model.user.UserRepository;
 import com.mware.core.model.workQueue.Priority;
 import com.mware.core.model.workQueue.WebQueueRepository;
 import com.mware.core.model.workQueue.WorkQueueRepository;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.model.workspace.WorkspaceRepository;
 import com.mware.core.security.DirectVisibilityTranslator;
 import com.mware.core.security.VisibilityTranslator;

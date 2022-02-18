@@ -57,6 +57,7 @@ import com.mware.core.model.schema.SchemaRepository;
 import com.mware.core.model.workQueue.Priority;
 import com.mware.core.model.workQueue.WebQueueRepository;
 import com.mware.core.model.workQueue.WorkQueueRepository;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.model.workspace.WorkspaceRepository;
 import com.mware.core.security.AuditEventType;
 import com.mware.core.security.AuditService;
@@ -78,7 +79,6 @@ import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import com.mware.web.parameterProviders.JustificationText;
 import com.mware.web.routes.SetPropertyBase;
 import com.mware.web.util.VisibilityValidator;
-import com.mware.workspace.WorkspaceHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;

@@ -40,11 +40,11 @@ import com.google.common.collect.Lists;
 import com.mware.core.model.graph.ElementUpdateContext;
 import com.mware.core.model.graph.GraphUpdateContext;
 import com.mware.core.model.role.AuthorizationRepository;
+import com.mware.core.model.workspace.WebWorkspaceSchema;
 import com.mware.core.security.BcVisibility;
 import com.mware.core.user.User;
 import com.mware.core.util.StreamUtil;
 import com.mware.ge.*;
-import com.mware.ontology.WebWorkspaceSchema;
 
 import java.util.HashMap;
 import java.util.List;

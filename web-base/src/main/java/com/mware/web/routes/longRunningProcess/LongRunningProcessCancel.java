@@ -39,12 +39,12 @@ package com.mware.web.routes.longRunningProcess;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.exception.BcResourceNotFoundException;
+import com.mware.core.ingest.database.DataConnectionRepository;
+import com.mware.core.ingest.database.DataSourceImportLongRunningProcess;
 import com.mware.core.model.longRunningProcess.LongRunningProcessRepository;
 import com.mware.core.user.User;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
-import com.mware.ingest.database.DataConnectionRepository;
-import com.mware.ingest.database.DataSourceImportLongRunningProcess;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
@@ -54,7 +54,6 @@ import com.mware.web.model.ClientApiSuccess;
 import org.json.JSONObject;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 @Singleton
 public class LongRunningProcessCancel implements ParameterizedHandler {

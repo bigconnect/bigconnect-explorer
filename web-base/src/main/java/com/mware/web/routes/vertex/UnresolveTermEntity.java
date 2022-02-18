@@ -37,12 +37,12 @@
 package com.mware.web.routes.vertex;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.mware.core.exception.BcResourceNotFoundException;
 import com.mware.core.model.clientapi.dto.SandboxStatus;
 import com.mware.core.model.clientapi.dto.VisibilityJson;
 import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.termMention.TermMentionRepository;
+import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
 import com.mware.core.util.SandboxStatusUtil;
@@ -53,7 +53,6 @@ import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
 import com.mware.web.model.ClientApiSuccess;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
-import com.mware.workspace.WorkspaceHelper;
 
 import static com.mware.ge.util.IterableUtils.singleOrDefault;
 

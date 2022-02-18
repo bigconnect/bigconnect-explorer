@@ -38,15 +38,15 @@ package com.mware.web.routes.dataload;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.ingest.database.DataConnectionRepository;
+import com.mware.core.ingest.database.model.ClientApiDataSource;
 import com.mware.core.model.longRunningProcess.LongRunningProcessRepository;
 import com.mware.core.user.User;
 import com.mware.ge.Authorizations;
-import com.mware.ingest.database.DataConnectionRepository;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
-import com.mware.web.model.ClientApiDataSource;
 import com.mware.web.model.ClientApiSuccess;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 
