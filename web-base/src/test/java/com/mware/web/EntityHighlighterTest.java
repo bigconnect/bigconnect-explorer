@@ -155,7 +155,7 @@ public class EntityHighlighterTest {
                 if (!doneWithExpected) {
                     expected.append("<span class=\"resolvable res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" " +
                             "title=\"joe ferner\" " +
-                            "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:" + start + ",&quot;end&quot;:" + end + ",&quot;id&quot;:&quot;TM_" + start + "-" + end + "-5e180bf84df5539ac1e6762812dcd29e2b5b4374&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                            "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:" + start + ",&quot;end&quot;:" + end + ",&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                             "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\">" +
                             "joe ferner" +
                             "</span>" +
@@ -178,9 +178,9 @@ public class EntityHighlighterTest {
         terms.add(createTermMention(outVertex, "jeff kunkle", PERSON_IRI, 33, 44, "uniq1"));
         List<OffsetItem> termAndTermMetadata = new EntityHighlighter().convertTermMentionsToOffsetItems(terms, "", authorizations);
         String highlightedText = EntityHighlighter.getHighlightedText("Test highlight of Joe Ferner and Jeff Kunkle.", termAndTermMetadata);
-        String joeDataInfo = "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;end&quot;:28,&quot;id&quot;:&quot;TM_18-28-5e180bf84df5539ac1e6762812dcd29e2b5b4374&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+        String joeDataInfo = "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;end&quot;:28,&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                 "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\"";
-        String jeffDataInfo = "data-info=\"{&quot;process&quot;:&quot;uniq1&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:33,&quot;end&quot;:44,&quot;id&quot;:&quot;TM_33-44-ed6f44225a01778932642e3c8a1bc65ef5967432&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;jeff kunkle&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+        String jeffDataInfo = "data-info=\"{&quot;process&quot;:&quot;uniq1&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:33,&quot;end&quot;:44,&quot;id&quot;:&quot;"+termAndTermMetadata.get(1).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;jeff kunkle&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                 "data-ref-id=\"" + termAndTermMetadata.get(1).getClassIdentifier() + "\"";
         String expectedText = "Test highlight of " +
                 "<span class=\"resolvable res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" title=\"joe ferner\" " + joeDataInfo + ">Joe Ferner</span>" +
@@ -203,9 +203,10 @@ public class EntityHighlighterTest {
             and Jeff Kunkle.
          */
         String highlightedText = EntityHighlighter.getHighlightedText("Test highlight of: Joe\nFerner\n\tand Jeff Kunkle.", termAndTermMetadata);
+
         String joe = "<span class=\"resolvable res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" " +
                         "title=\"joe\" " +
-                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:23,&quot;end&quot;:29,&quot;id&quot;:&quot;TM_23-29-f804acaaa829703b2de338ef485d68577e2bade6&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;joe&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:23,&quot;end&quot;:29,&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;joe&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                         "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\">";
 
         String expectedText = "Test highlight of: Joe\n<br>" +
@@ -227,7 +228,7 @@ public class EntityHighlighterTest {
                 "Test highlight of: " +
                     "<span class=\"resolvable res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" " +
                         "title=\"joe\" " +
-                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:19,&quot;end&quot;:30,&quot;id&quot;:&quot;TM_19-30-f804acaaa829703b2de338ef485d68577e2bade6&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;joe&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:19,&quot;end&quot;:30,&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;joe&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                         "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\">" +
                             "first\n<br>\n<br>last" +
                     "</span>";
@@ -248,12 +249,12 @@ public class EntityHighlighterTest {
         String expectedText =
                 "<span class=\"resolvable res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" " +
                     "title=\"first\" " +
-                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;end&quot;:5,&quot;id&quot;:&quot;TM_0-5-e2cf06e792f9edf5f29a3737044ce1934bf0c08e&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;first&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;end&quot;:5,&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;first&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                     "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\">" +
                     "firs" +
                     "<span class=\"resolvable res " + termAndTermMetadata.get(1).getClassIdentifier() + "\" " +
                         "title=\"t se\" " +
-                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:4,&quot;end&quot;:8,&quot;id&quot;:&quot;TM_4-8-61ade973cf8381c3e77b307be4c7314703a03b27&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;t se&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:4,&quot;end&quot;:8,&quot;id&quot;:&quot;"+termAndTermMetadata.get(1).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;t se&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                         "data-ref-id=\"" + termAndTermMetadata.get(1).getClassIdentifier() + "\">" +
                         "t" +
                     "</span>" +
@@ -266,7 +267,7 @@ public class EntityHighlighterTest {
                 "cond " +
                 "<span class=\"resolvable res " + termAndTermMetadata.get(2).getClassIdentifier() + "\" " +
                     "title=\"third\" " +
-                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:13,&quot;end&quot;:18,&quot;id&quot;:&quot;TM_13-18-864b9b57177a5dd86de4dc29e8925cf0836c03c7&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;third&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:13,&quot;end&quot;:18,&quot;id&quot;:&quot;"+termAndTermMetadata.get(2).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;third&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                     "data-ref-id=\"" + termAndTermMetadata.get(2).getClassIdentifier() + "\">" +
                         "third" +
                 "</span>";
@@ -290,25 +291,25 @@ public class EntityHighlighterTest {
         String expectedText =
                 "<span class=\"resolvable res " + termAndTermMetadata.get(6).getClassIdentifier() + "\" " +
                     "title=\"first second third\" " +
-                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;end&quot;:18,&quot;id&quot;:&quot;TM_0-18-797c665056c681010dad6fb6a7f09f49a71605b2&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;first second third&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;end&quot;:18,&quot;id&quot;:&quot;"+termAndTermMetadata.get(6).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;first second third&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                     "data-ref-id=\"" + termAndTermMetadata.get(6).getClassIdentifier() + "\">" +
                     "<span class=\"resolvable res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" " +
                         "title=\"first\" " +
-                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;end&quot;:5,&quot;id&quot;:&quot;TM_0-5-e2cf06e792f9edf5f29a3737044ce1934bf0c08e&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;first&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;end&quot;:5,&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;first&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                         "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\">" +
                         "<span class=\"resolvable res " + termAndTermMetadata.get(1).getClassIdentifier() + "\" " +
                             "title=\"firs\" " +
-                            "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;end&quot;:4,&quot;id&quot;:&quot;TM_0-4-c4781cfb3f0ea21db9d28c44486e65439eedeb07&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;firs&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                            "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;end&quot;:4,&quot;id&quot;:&quot;"+termAndTermMetadata.get(1).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;firs&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                             "data-ref-id=\"" + termAndTermMetadata.get(1).getClassIdentifier() + "\">" +
                             "f" +
                             "<span class=\"resolvable res " + termAndTermMetadata.get(4).getClassIdentifier() + "\" " +
                                 "title=\"irst sec\" " +
-                                "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:1,&quot;end&quot;:9,&quot;id&quot;:&quot;TM_1-9-e9c080fef2bcd729b0634c9d9e5bd562b3b1c1a4&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;irst sec&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                                "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:1,&quot;end&quot;:9,&quot;id&quot;:&quot;"+termAndTermMetadata.get(4).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;irst sec&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                                 "data-ref-id=\"" + termAndTermMetadata.get(4).getClassIdentifier() + "\">" +
                                 "irs" +
                                 "<span class=\"resolvable res " + termAndTermMetadata.get(3).getClassIdentifier() + "\" " +
                                     "title=\"t se\" " +
-                                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:4,&quot;end&quot;:8,&quot;id&quot;:&quot;TM_4-8-61ade973cf8381c3e77b307be4c7314703a03b27&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;t se&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:4,&quot;end&quot;:8,&quot;id&quot;:&quot;"+termAndTermMetadata.get(3).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;t se&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                                     "data-ref-id=\"" + termAndTermMetadata.get(3).getClassIdentifier() + "\">" +
                                 "</span>" +
                             "</span>" +
@@ -332,11 +333,11 @@ public class EntityHighlighterTest {
                         "o" +
                         "<span class=\"resolvable res " + termAndTermMetadata.get(2).getClassIdentifier() + "\" " +
                             "title=\"nd third\" " +
-                            "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:10,&quot;end&quot;:18,&quot;id&quot;:&quot;TM_10-18-24f7791aa39784662e0f22bd5b99c96aacba08bc&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;nd third&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                            "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:10,&quot;end&quot;:18,&quot;id&quot;:&quot;"+termAndTermMetadata.get(2).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;nd third&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                             "data-ref-id=\"" + termAndTermMetadata.get(2).getClassIdentifier() + "\">" +
                         "<span class=\"resolvable res " + termAndTermMetadata.get(5).getClassIdentifier() + "\" " +
                             "title=\"nd \" " +
-                            "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:10,&quot;end&quot;:13,&quot;id&quot;:&quot;TM_10-13-7e00646a2ce55eec5a5c69725980b4cdf8678558&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;nd &quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                            "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:10,&quot;end&quot;:13,&quot;id&quot;:&quot;"+termAndTermMetadata.get(5).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;nd &quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                             "data-ref-id=\"" + termAndTermMetadata.get(5).getClassIdentifier() + "\">" +
                             "nd " +
                         "</span>" +
@@ -396,7 +397,6 @@ public class EntityHighlighterTest {
                 .conceptName(conceptIri)
                 .start(start)
                 .end(end)
-                .type("ent")
                 .title(sign)
                 .visibilityJson("")
                 .process(getClass().getSimpleName());
@@ -406,13 +406,36 @@ public class EntityHighlighterTest {
         return tmb.save(graph, visibilityTranslator, user, authorizations);
     }
 
+    private Vertex createTermMentionWithSentiment(Vertex outVertex, String sign, String conceptIri, int start, int end, int sentiment, double sentimentScore, String process) {
+        TermMentionBuilder tmb = new TermMentionBuilder()
+                .outVertex(outVertex)
+                .propertyKey(PROPERTY_KEY)
+                .propertyName(BcSchema.TEXT.getPropertyName())
+                .start(start)
+                .end(end)
+                .title(sign)
+                .conceptName(conceptIri)
+                .visibilityJson("")
+                .process(process)
+                .score(sentimentScore);
+
+        if (sentiment == -1) {
+            tmb.style(String.format("color: rgb(255, 0, 0);"));
+        } else if (sentiment == 1) {
+            tmb.style(String.format("color: rgb(0, 255, 0);"));
+        } else {
+            tmb.style(String.format("color: rgb(0, 0, 0);"));
+        }
+
+        return tmb.save(graph, visibilityTranslator, user, authorizations);
+    }
+
     private Vertex createTermMention(Vertex outVertex, String sign, String conceptIri, int start, int end, String process) {
         return new TermMentionBuilder()
                 .outVertex(outVertex)
                 .propertyKey(PROPERTY_KEY)
                 .propertyName(BcSchema.TEXT.getPropertyName())
                 .conceptName(conceptIri)
-                .type("ent")
                 .start(start)
                 .end(end)
                 .title(sign)
@@ -434,11 +457,11 @@ public class EntityHighlighterTest {
             "Test highlight of " +
                 "<span class=\"resolvable res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" " +
                     "title=\"joe ferner\" " +
-                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;end&quot;:28,&quot;id&quot;:&quot;TM_18-28-5e180bf84df5539ac1e6762812dcd29e2b5b4374&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;end&quot;:28,&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                     "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\">" +
                     "<span class=\"resolvable res " + termAndTermMetadata.get(1).getClassIdentifier() + "\" " +
                         "title=\"jeff kunkle\" " +
-                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;end&quot;:21,&quot;id&quot;:&quot;TM_18-21-573648828a7888c138cbc1d580be8d09a1f2e782&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;jeff kunkle&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;end&quot;:21,&quot;id&quot;:&quot;"+termAndTermMetadata.get(1).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;jeff kunkle&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                         "data-ref-id=\"" + termAndTermMetadata.get(1).getClassIdentifier() + "\">" +
                         "Joe" +
                     "</span> " +
@@ -468,7 +491,7 @@ public class EntityHighlighterTest {
         String expectedText =
                 "Test highlight of <span class=\"resolved res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" " +
                         "title=\"joe ferner\" " +
-                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;resolvedToVertexId&quot;:&quot;jf&quot;,&quot;resolvedToEdgeId&quot;:&quot;e1&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;termMentionFor&quot;:&quot;VERTEX&quot;,&quot;termMentionForElementId&quot;:&quot;jf&quot;,&quot;end&quot;:28,&quot;id&quot;:&quot;TM_18-28-47b5d3c6dc289fae21f303034649da038a7db76d&quot;,&quot;outVertexId&quot;:&quot;v1&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;resolvedToEdgeId&quot;:&quot;e1&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;,&quot;resolvedToVertexId&quot;:&quot;jf&quot;,&quot;termMentionFor&quot;:&quot;VERTEX&quot;,&quot;termMentionForElementId&quot;:&quot;jf&quot;,&quot;end&quot;:28,&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;v1&quot;}\" " +
                         "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\">" +
                         "Joe Ferner</span>.";
         assertMatchStyleAndMeta(expectedText, highlightedText, 1);
@@ -479,7 +502,7 @@ public class EntityHighlighterTest {
         expectedText =
                 "Test highlight of <span class=\"resolved res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" " +
                         "title=\"joe ferner\" " +
-                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;resolvedToVertexId&quot;:&quot;jf&quot;,&quot;resolvedToEdgeId&quot;:&quot;e2&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;termMentionFor&quot;:&quot;VERTEX&quot;,&quot;termMentionForElementId&quot;:&quot;jf&quot;,&quot;end&quot;:28,&quot;id&quot;:&quot;TM_18-28-eb6560a01113a23abf584241655b8a4c5af1bce0&quot;,&quot;outVertexId&quot;:&quot;v2&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;resolvedToEdgeId&quot;:&quot;e2&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:18,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;joe ferner&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;,&quot;resolvedToVertexId&quot;:&quot;jf&quot;,&quot;termMentionFor&quot;:&quot;VERTEX&quot;,&quot;termMentionForElementId&quot;:&quot;jf&quot;,&quot;end&quot;:28,&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;v2&quot;}\" " +
                         "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\">" +
                         "Joe Ferner</span>.";
         assertMatchStyleAndMeta(expectedText, highlightedText, 1);
@@ -510,7 +533,7 @@ public class EntityHighlighterTest {
                 "<span " +
                     "class=\"resolved res " + termAndTermMetadata.get(1).getClassIdentifier() + "\" " +
                     "title=\"This\" " +
-                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;resolvedToEdgeId&quot;:&quot;e1&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;title&quot;:&quot;This&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;,&quot;resolvedToVertexId&quot;:&quot;v1&quot;,&quot;termMentionFor&quot;:&quot;VERTEX&quot;,&quot;termMentionForElementId&quot;:&quot;v1&quot;,&quot;end&quot;:4,&quot;id&quot;:&quot;TM_0-4-cc377e2478ec54c8e486a1a814b45e80b2d5db42&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;resolvedFromTermMentionId&quot;:&quot;TM_0-4-6e1990686375878517ed309bdc271b758164f939&quot;}\" " +
+                    "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;resolvedToEdgeId&quot;:&quot;e1&quot;,&quot;conceptType&quot;:&quot;test/person&quot;,&quot;start&quot;:0,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;This&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;,&quot;resolvedToVertexId&quot;:&quot;v1&quot;,&quot;termMentionFor&quot;:&quot;VERTEX&quot;,&quot;termMentionForElementId&quot;:&quot;v1&quot;,&quot;end&quot;:4,&quot;id&quot;:&quot;"+resolved.getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;resolvedFromTermMentionId&quot;:&quot;"+resolvable.getId()+"&quot;}\" " +
                     "data-ref-id=\"" + termAndTermMetadata.get(1).getClassIdentifier() + "\"" +
                 ">This</span> is a test sentence";
 
@@ -576,13 +599,13 @@ public class EntityHighlighterTest {
 
         String highlightedText = EntityHighlighter.getHighlightedText(text, offsetItems);
         String expectedText =
-                "<span class=\"This is\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">" +
-                    "<span class=\"This\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">This</span> " +
-                    "<span class=\"is a\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\" data-ref-id=\"id\">is</span>" +
+                "<span class=\"This is\" data-score=\"0.0\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">" +
+                    "<span class=\"This\" data-score=\"0.0\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">This</span> " +
+                    "<span class=\"is a\" data-score=\"0.0\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\" data-ref-id=\"id\">is</span>" +
                 "</span>" +
-                "<span class=\"is a\" data-ref=\"id\"> a</span>" +
+                "<span class=\"is a\" data-score=\"0.0\" data-ref=\"id\"> a</span>" +
                 " test " +
-                "<span class=\"sentence\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">sentence</span>";
+                "<span class=\"sentence\" data-score=\"0.0\" data-info=\"{&quot;data&quot;:&quot;attribute&quot;}\">sentence</span>";
 
         assertMatchStyleAndMeta(expectedText, highlightedText, 2);
     }
@@ -600,7 +623,7 @@ public class EntityHighlighterTest {
                 "Ejército de Liberación Nacional® partnered with " +
                     "<span class=\"resolvable res " + termAndTermMetadata.get(0).getClassIdentifier() + "\" " +
                         "title=\"US\" " +
-                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/location&quot;,&quot;start&quot;:48,&quot;end&quot;:50,&quot;id&quot;:&quot;TM_48-50-3921918b09b047c621b891f4f6ed60abb5d7f9e4&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;title&quot;:&quot;US&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
+                        "data-info=\"{&quot;process&quot;:&quot;EntityHighlighterTest&quot;,&quot;conceptType&quot;:&quot;test/location&quot;,&quot;start&quot;:48,&quot;end&quot;:50,&quot;id&quot;:&quot;"+termAndTermMetadata.get(0).getId()+"&quot;,&quot;outVertexId&quot;:&quot;1&quot;,&quot;type&quot;:&quot;&quot;,&quot;title&quot;:&quot;US&quot;,&quot;sandboxStatus&quot;:&quot;PRIVATE&quot;}\" " +
                         "data-ref-id=\"" + termAndTermMetadata.get(0).getClassIdentifier() + "\">" +
                         "US" +
                     "</span> on peace treaty";
@@ -614,10 +637,9 @@ public class EntityHighlighterTest {
     }
 
     @Test
-    public void testSentiment() throws Exception {
+    public void testSentiment() {
         Vertex outVertex = graph.addVertex("1", visibility, authorizations, CONCEPT_TYPE_THING);
         ArrayList<Vertex> terms = new ArrayList<>();
-
 
         terms.add(createSentimentSection(outVertex, "positive", 0.4, 0, 281));
         terms.add(createSentimentSection(outVertex, "negative", 0.6, 282, 614));
@@ -634,6 +656,27 @@ public class EntityHighlighterTest {
         text += "Flavia Teodosiu, avocata lui Liviu Dragnea, a declarat pentru HotNews.ro că instanța nu a stabilit interdicții suplimentare pentru fostul lider al PSD și că vor fi în vigoare doar cele stabilite de Înalta Curte de Casație și Justiție.\n";
         text += "Liviu Dragnea se află în penitenciar din 27 mai 2019, când a fost condamnat definitiv de instanţa supremă la 3 ani şi 6 luni de închisoare.\n";
 
+        String highlightedText = EntityHighlighter.getHighlightedText(text, termAndTermMetadata);
+        System.out.println(highlightedText);
+    }
+
+    @Test
+    public void testEntityWithSentiment() {
+        Vertex outVertex = graph.addVertex("1", visibility, authorizations, CONCEPT_TYPE_THING);
+
+        String text = "Candidatul independent la Primăria Capitalei susţinut de USR, Nicuşor Dan, afirmă că " +
+                "bugetul Primăriei Municipiului Bucureşti pe 2020 'nu are nicio legătură cu realitatea', " +
+                "în condiţiile în care veniturile estimate – 7,2 miliarde de lei – sunt, ca şi în anii precedenţi, " +
+                "supraevaluate cu aproximativ 75%, transmite Agerpres.";
+
+        ArrayList<Vertex> terms = new ArrayList<>();
+        terms.add(createTermMentionWithSentiment(outVertex, "Primăriei Municipiului Bucureşti", "organization", 93, 125, -1, 0.7, "p1"));
+        terms.add(createTermMentionWithSentiment(outVertex, "USR", "organization", 57, 60, -1, 0.7, "p1"));
+        terms.add(createTermMentionWithSentiment(outVertex, "Nicuşor Dan", "person", 62, 73, -1, 0.486173, "p1"));
+        terms.add(createTermMentionWithSentiment(outVertex, "Primăria Capitalei", "organization", 26, 44, -1, 0.7, "p1"));
+        terms.add(createTermMentionWithSentiment(outVertex, "Agerpres", "organization", 315, 323, 1, 0.7, "p1"));
+
+        List<OffsetItem> termAndTermMetadata = new EntityHighlighter().convertTermMentionsToOffsetItems(terms, "", authorizations);
         String highlightedText = EntityHighlighter.getHighlightedText(text, termAndTermMetadata);
         System.out.println(highlightedText);
     }
