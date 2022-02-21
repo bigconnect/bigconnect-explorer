@@ -41,8 +41,6 @@ import com.google.inject.Scopes;
 import com.mware.core.bootstrap.BcBootstrap;
 import com.mware.core.bootstrap.BootstrapBindingProvider;
 import com.mware.core.config.Configuration;
-import com.mware.core.ingest.database.DataConnectionRepository;
-import com.mware.core.ingest.database.GeDataConnectionRepository;
 import com.mware.core.util.BcLogger;
 import com.mware.core.util.BcLoggerFactory;
 import com.mware.ge.cypher.connection.DefaultNetworkConnectionTracker;
@@ -63,9 +61,6 @@ public class ApplicationBindingProvider implements BootstrapBindingProvider {
     public void addBindings(Binder binder, Configuration configuration) {
         LOGGER.info("Create Web bindings");
 
-        binder.bind(DataConnectionRepository.class)
-                .toProvider(BcBootstrap.getConfigurableProvider(configuration, null, GeDataConnectionRepository.class))
-                .in(Scopes.SINGLETON);
         binder.bind(ACLProvider.class)
                 .toProvider(BcBootstrap.getConfigurableProvider(configuration, Configuration.ACL_PROVIDER_REPOSITORY, AllowAllAclProvider.class))
                 .in(Scopes.SINGLETON);
