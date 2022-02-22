@@ -423,7 +423,7 @@ public class FileImport {
                     defaultVisibility
             );
             if (!StringUtils.isEmpty(title)) {
-                LOGGER.info("#### Setting title "+title);
+                LOGGER.error("#### Setting title "+title);
                 BcSchema.TITLE.updateProperty(
                         changedProperties,
                         null,
@@ -446,7 +446,7 @@ public class FileImport {
             }
 
             vertex = vertexBuilder.save(authorizations);
-            LOGGER.info("#### Reading title after save: "+BcSchema.TITLE.getFirstPropertyValue(vertex));
+            LOGGER.error("#### Reading title after save: "+BcSchema.TITLE.getFirstPropertyValue(vertex));
             graph.flush();
 
             for (PostFileImportHandler postFileImportHandler : this.postFileImportHandlers) {
