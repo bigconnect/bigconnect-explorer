@@ -85,7 +85,10 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static com.mware.ge.util.IterableUtils.toList;
 
@@ -420,6 +423,7 @@ public class FileImport {
                     defaultVisibility
             );
             if (!StringUtils.isEmpty(title)) {
+                LOGGER.info("#### Setting title "+title);
                 BcSchema.TITLE.updateProperty(
                         changedProperties,
                         null,
@@ -442,6 +446,7 @@ public class FileImport {
             }
 
             vertex = vertexBuilder.save(authorizations);
+            LOGGER.info("#### Reading title after save: "+BcSchema.TITLE.getFirstPropertyValue(vertex));
             graph.flush();
 
             for (PostFileImportHandler postFileImportHandler : this.postFileImportHandlers) {
