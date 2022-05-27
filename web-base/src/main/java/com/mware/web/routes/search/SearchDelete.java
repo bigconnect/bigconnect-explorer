@@ -38,6 +38,7 @@ package com.mware.web.routes.search;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.cache.CacheService;
 import com.mware.core.exception.BcResourceNotFoundException;
 import com.mware.core.model.clientapi.dto.ClientApiSearch;
 import com.mware.core.model.search.SearchRepository;
@@ -49,10 +50,12 @@ import com.mware.web.framework.annotations.Required;
 @Singleton
 public class SearchDelete implements ParameterizedHandler {
     private final SearchRepository searchRepository;
+    private final CacheService cacheService;
 
     @Inject
-    public SearchDelete(SearchRepository searchRepository) {
+    public SearchDelete(SearchRepository searchRepository, CacheService cacheService) {
         this.searchRepository = searchRepository;
+        this.cacheService = cacheService;
     }
 
     @Handle
@@ -63,6 +66,12 @@ public class SearchDelete implements ParameterizedHandler {
         ClientApiSearch savedSearch = this.searchRepository.getSavedSearch(id, user);
         if (savedSearch == null) {
             throw new BcResourceNotFoundException("Could not find saved search with id " + id);
+        }
+
+        if (savedSearch.scope == ClientApiSearch.Scope.Global) {
+            cacheService.invalidate(SearchList.CACHE_KEY);
+        } else {
+            cacheService.invalidate(SearchList.CACHE_KEY, user.getUserId());
         }
 
         this.searchRepository.deleteSearch(id, user);

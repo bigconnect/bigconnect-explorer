@@ -38,6 +38,7 @@ package com.mware.web.routes.search;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.cache.CacheService;
 import com.mware.core.model.search.SearchRepository;
 import com.mware.core.user.User;
 import com.mware.web.framework.ParameterizedHandler;
@@ -50,10 +51,12 @@ import org.json.JSONObject;
 @Singleton
 public class SearchSave implements ParameterizedHandler {
     private final SearchRepository searchRepository;
+    private final CacheService cacheService;
 
     @Inject
-    public SearchSave(SearchRepository searchRepository) {
+    public SearchSave(SearchRepository searchRepository, CacheService cacheService) {
         this.searchRepository = searchRepository;
+        this.cacheService = cacheService;
     }
 
     @Handle
@@ -67,8 +70,10 @@ public class SearchSave implements ParameterizedHandler {
     ) throws Exception {
         if (global) {
             id = this.searchRepository.saveGlobalSearch(id, name, url, searchParameters, user);
+            cacheService.invalidate(SearchList.CACHE_KEY);
         } else {
             id = this.searchRepository.saveSearch(id, name, url, searchParameters, user);
+            cacheService.invalidate(SearchList.CACHE_KEY, user.getUserId());
         }
         ClientApiSaveSearchResponse saveSearchResponse = new ClientApiSaveSearchResponse();
         saveSearchResponse.id = id;

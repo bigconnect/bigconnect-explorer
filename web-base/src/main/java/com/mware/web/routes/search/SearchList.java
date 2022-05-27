@@ -38,6 +38,8 @@ package com.mware.web.routes.search;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.cache.CacheOptions;
+import com.mware.core.cache.CacheService;
 import com.mware.core.model.clientapi.dto.ClientApiSearchListResponse;
 import com.mware.core.model.search.SearchRepository;
 import com.mware.core.user.User;
@@ -46,15 +48,30 @@ import com.mware.web.framework.annotations.Handle;
 
 @Singleton
 public class SearchList implements ParameterizedHandler {
+    protected static final String CACHE_KEY = "searches";
     private final SearchRepository searchRepository;
+    private final CacheService cacheService;
 
     @Inject
-    public SearchList(SearchRepository searchRepository) {
+    public SearchList(SearchRepository searchRepository, CacheService cacheService) {
         this.searchRepository = searchRepository;
+        this.cacheService = cacheService;
     }
 
     @Handle
     public ClientApiSearchListResponse handle(User user) throws Exception {
-        return this.searchRepository.getSavedSearches(user);
+        ClientApiSearchListResponse response = cacheService.getIfPresent(CACHE_KEY, user.getUserId());
+        if (response == null) {
+            response = this.searchRepository.getSavedSearches(user);
+            cacheService.put(
+                    CACHE_KEY,
+                    user.getUserId(),
+                    response,
+                    new CacheOptions()
+                            .setMaximumSize(Long.MAX_VALUE)
+                            .setExpireAfterWrite(30L)
+            );
+        }
+        return response;
     }
 }

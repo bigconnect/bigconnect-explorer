@@ -38,6 +38,7 @@ package com.mware.web.routes.dataset;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.cache.CacheService;
 import com.mware.core.exception.BcException;
 import com.mware.core.model.clientapi.dto.*;
 import com.mware.core.model.properties.BcSchema;
@@ -74,18 +75,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Singleton
-public class ReadDataset implements ParameterizedHandler  {
+public class ReadDataset implements ParameterizedHandler {
     private static final BcLogger LOGGER = BcLoggerFactory.getLogger(ReadDataset.class);
     private final SearchRepository searchRepository;
     private final UserRepository userRepository;
     private final AuthorizationRepository authorizationRepository;
+    private final CacheService cacheService;
 
     @Inject
-    public ReadDataset(SearchRepository searchRepository,
-                       UserRepository userRepository, AuthorizationRepository authorizationRepository) {
+    public ReadDataset(
+            SearchRepository searchRepository,
+            UserRepository userRepository,
+            AuthorizationRepository authorizationRepository,
+            CacheService cacheService
+    ) {
         this.searchRepository = searchRepository;
         this.userRepository = userRepository;
         this.authorizationRepository = authorizationRepository;
+        this.cacheService = cacheService;
     }
 
     @Handle
@@ -97,12 +104,12 @@ public class ReadDataset implements ParameterizedHandler  {
             @Optional(name = "as") ResponseType responseType,
             User user
     ) throws Exception {
-        ClientApiSearchListResponse userSearches = new SearchList(searchRepository).handle(user);
+        ClientApiSearchListResponse userSearches = new SearchList(searchRepository, cacheService).handle(user);
         java.util.Optional<ClientApiSearch> search = userSearches.searches.stream()
                 .filter(s -> scope == null || s.scope.equals(scope))
                 .filter(s -> s.name.equals(datasetName)).findFirst();
 
-        if(!search.isPresent()) {
+        if (!search.isPresent()) {
             throw new BcException(String.format("Could not find a saved search with name: %s", datasetName));
         }
         ClientApiUser userMe = userRepository.toClientApiPrivate(user);
@@ -116,11 +123,11 @@ public class ReadDataset implements ParameterizedHandler  {
         );
 
         ClientApiReadDatasetResponse response;
-        if(results instanceof ClientApiElementSearchResponse) {
+        if (results instanceof ClientApiElementSearchResponse) {
             response = geObjectsToDataset((ClientApiElementSearchResponse) results);
-        } else if(results instanceof ClientApiTabularSearchResponse) {
+        } else if (results instanceof ClientApiTabularSearchResponse) {
             response = rowsToDataset((ClientApiTabularSearchResponse) results);
-        } else if(results instanceof QueryResultsIterableSearchResults) {
+        } else if (results instanceof QueryResultsIterableSearchResults) {
             QueryResultsIterableSearchResults searchResults = (QueryResultsIterableSearchResults) results;
             List<ClientApiGeObject> geObjects = GeObjectSearchBase.convertElementsToClientApi(
                     searchResults.getQueryResultsIterable(),
@@ -196,20 +203,20 @@ public class ReadDataset implements ParameterizedHandler  {
                     .collect(Collectors.groupingBy(ClientApiProperty::getName))
                     .keySet()
                     .forEach(propName -> {
-                        if(!skipColumn(propName)) {
-                            if(RawObjectSchema.GEOLOCATION_PROPERTY.getPropertyName().equals(propName)) {
-                                int c1Index = addColumnToList(columns, propName+"_lon");
-                                int c2Index = addColumnToList(columns, propName+"_lat");
+                        if (!skipColumn(propName)) {
+                            if (RawObjectSchema.GEOLOCATION_PROPERTY.getPropertyName().equals(propName)) {
+                                int c1Index = addColumnToList(columns, propName + "_lon");
+                                int c2Index = addColumnToList(columns, propName + "_lat");
 
                                 ClientApiProperty property = IterableUtils.anyOrDefault(element.getProperties(propName), null);
-                                if(property != null && property.getValue() != null && property.getValue() instanceof GeoPoint) {
+                                if (property != null && property.getValue() != null && property.getValue() instanceof GeoPoint) {
                                     GeoPoint value = (GeoPoint) property.getValue();
                                     row.set(c1Index, value.getLongitude());
                                     row.set(c2Index, value.getLatitude());
                                     addColumnType(columnTypes, c1Index, Double.class.getName());
                                     addColumnType(columnTypes, c2Index, Double.class.getName());
                                 } else {
-                                    if(property != null && property.getValue() != null && !(property.getValue() instanceof GeoPoint)) {
+                                    if (property != null && property.getValue() != null && !(property.getValue() instanceof GeoPoint)) {
                                         LOGGER.warn("Property %s of type GeoLocation has unknown value type: %s", propName, property.getValue().getClass().getName());
                                     }
                                     row.set(c1Index, null);
@@ -230,7 +237,7 @@ public class ReadDataset implements ParameterizedHandler  {
                                         Object converted = convertValue(property.getValue());
 
                                         if (row.size() > cIndex) {
-                                            if(row.get(cIndex) != null) {
+                                            if (row.get(cIndex) != null) {
                                                 final String existing = row.get(cIndex).toString();
                                                 row.set(cIndex, existing + ";" + converted.toString());
                                             } else
@@ -255,7 +262,7 @@ public class ReadDataset implements ParameterizedHandler  {
                         }
                     });
 
-            if(maxRowSize.get() < row.size())
+            if (maxRowSize.get() < row.size())
                 maxRowSize.set(row.size());
 
             response.rows.add(row);
@@ -269,29 +276,29 @@ public class ReadDataset implements ParameterizedHandler  {
     }
 
     private Object convertValue(Object value) {
-        if(value == null)
+        if (value == null)
             return null;
 
         // transform dates to epoch seconds
-        if(value instanceof java.util.Date) {
-            return ((java.util.Date)value).toInstant().getEpochSecond();
-        } else if(value instanceof ZonedDateTime) {
+        if (value instanceof java.util.Date) {
+            return ((java.util.Date) value).toInstant().getEpochSecond();
+        } else if (value instanceof ZonedDateTime) {
             return ((ZonedDateTime) value).toInstant().getEpochSecond();
         } else if (value instanceof DateTime) {
-            return ((DateTime)value).toDate().toInstant().getEpochSecond();
+            return ((DateTime) value).toDate().toInstant().getEpochSecond();
         }
 
         return value;
     }
 
     private boolean skipColumn(String name) {
-        if(BcSchema.VISIBILITY_JSON.getPropertyName().equals(name)
-            || BcSchema.MODIFIED_BY.getPropertyName().equals(name)
-            || BcSchema.MODIFIED_DATE.getPropertyName().equals(name)
-            || RawObjectSchema.CONTENT_HASH.getPropertyName().equals(name)
-            || BcSchema.MIME_TYPE.getPropertyName().equals(name)
-            || BcSchema.FILE_NAME.getPropertyName().equals(name)
-            || BcSchema.RAW.getPropertyName().equals(name)
+        if (BcSchema.VISIBILITY_JSON.getPropertyName().equals(name)
+                || BcSchema.MODIFIED_BY.getPropertyName().equals(name)
+                || BcSchema.MODIFIED_DATE.getPropertyName().equals(name)
+                || RawObjectSchema.CONTENT_HASH.getPropertyName().equals(name)
+                || BcSchema.MIME_TYPE.getPropertyName().equals(name)
+                || BcSchema.FILE_NAME.getPropertyName().equals(name)
+                || BcSchema.RAW.getPropertyName().equals(name)
         )
             return true;
 
@@ -299,16 +306,16 @@ public class ReadDataset implements ParameterizedHandler  {
     }
 
     private int addColumnToList(List<String> columns, String column) {
-        if(!columns.contains(column))
+        if (!columns.contains(column))
             columns.add(column);
 
         return columns.indexOf(column);
     }
 
     private void addColumnType(List<String> columnTypes, int index, String type) {
-        if(columnTypes.size() <= index) {
+        if (columnTypes.size() <= index) {
             columnTypes.add(index, type);
-        } else if(Object.class.getName().equals(columnTypes.get(index)) && !Object.class.getName().equals(type)) {
+        } else if (Object.class.getName().equals(columnTypes.get(index)) && !Object.class.getName().equals(type)) {
             columnTypes.set(index, type);
         }
     }
@@ -333,7 +340,7 @@ public class ReadDataset implements ParameterizedHandler  {
 
         @Override
         public Object set(int index, Object element) {
-            ensureCapacity(index+1);
+            ensureCapacity(index + 1);
             elementData[index] = element;
             return element;
         }
@@ -351,7 +358,7 @@ public class ReadDataset implements ParameterizedHandler  {
         public void ensureCapacity(int minCapacity) {
             int oldCapacity = elementData.length;
 
-            if(minCapacity - oldCapacity <= 0)
+            if (minCapacity - oldCapacity <= 0)
                 return;
 
             elementData = Arrays.copyOf(elementData, minCapacity);

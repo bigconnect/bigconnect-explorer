@@ -38,6 +38,7 @@ package com.mware.web.routes.dataset;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mware.core.cache.CacheService;
 import com.mware.core.model.clientapi.dto.ClientApiObject;
 import com.mware.core.model.clientapi.dto.ClientApiSearch;
 import com.mware.core.model.clientapi.dto.ClientApiSearchListResponse;
@@ -54,10 +55,12 @@ import java.util.stream.Collectors;
 @Singleton
 public class DatasetList implements ParameterizedHandler {
     private final SearchRepository searchRepository;
+    private final CacheService cacheService;
 
     @Inject
-    public DatasetList(SearchRepository searchRepository) {
+    public DatasetList(SearchRepository searchRepository, CacheService cacheService) {
         this.searchRepository = searchRepository;
+        this.cacheService = cacheService;
     }
 
     @Handle
@@ -66,7 +69,7 @@ public class DatasetList implements ParameterizedHandler {
             @Required(name = "scope") ClientApiSearch.Scope scope,
             User user
     ) throws Exception {
-        ClientApiSearchListResponse userSearches = new SearchList(searchRepository).handle(user);
+        ClientApiSearchListResponse userSearches = new SearchList(searchRepository, cacheService).handle(user);
         Set<String> savedSearches = userSearches.searches.stream()
                 .filter(s -> s.scope.equals(scope))
                 .filter(s -> s.name.startsWith(datasetPattern))
