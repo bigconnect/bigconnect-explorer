@@ -38,6 +38,7 @@ package com.mware.web.routes.ontology;
 
 import com.google.inject.Inject;
 import com.mware.core.model.clientapi.dto.ClientApiSchema;
+import com.mware.core.model.clientapi.dto.PropertyType;
 import com.mware.core.model.properties.SchemaProperties;
 import com.mware.core.model.role.AuthorizationRepository;
 import com.mware.core.model.schema.*;
@@ -45,6 +46,8 @@ import com.mware.core.model.workQueue.WebQueueRepository;
 import com.mware.core.user.User;
 import com.mware.core.util.JSONUtil;
 import com.mware.ge.Authorizations;
+import com.mware.ge.Graph;
+import com.mware.ge.PropertyDefinition;
 import com.mware.ge.TextIndexHint;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
@@ -55,6 +58,7 @@ import com.mware.web.model.ClientApiSuccess;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -65,16 +69,19 @@ public class OntologyManagerPropertySave implements ParameterizedHandler {
     private final SchemaRepository schemaRepository;
     private final AuthorizationRepository authorizationRepository;
     private final WebQueueRepository webQueueRepository;
+    private final Graph graph;
 
     @Inject
     public OntologyManagerPropertySave(
             SchemaRepository schemaRepository,
             AuthorizationRepository authorizationRepository,
-            WebQueueRepository webQueueRepository
+            WebQueueRepository webQueueRepository,
+            Graph graph
     ) {
         this.schemaRepository = schemaRepository;
         this.authorizationRepository = authorizationRepository;
         this.webQueueRepository = webQueueRepository;
+        this.graph = graph;
     }
 
     @Handle
@@ -170,6 +177,23 @@ public class OntologyManagerPropertySave implements ParameterizedHandler {
             prop.setProperty(SchemaProperties.DISPLAY_FORMULA.getPropertyName(), stringValue(property.getDisplayFormula()), user, authorizations);
             prop.setProperty(SchemaProperties.VALIDATION_FORMULA.getPropertyName(), stringValue(property.getValidationFormula()), user, authorizations);
             schemaRepository.clearCache();
+
+            PropertyDefinition propertyDefinition = graph.getPropertyDefinition(prop.getName());
+            if (propertyDefinition != null) {
+                graph.defineProperty(propertyDefinition.getPropertyName())
+                        .boost(propertyDefinition.getBoost() == null ? 0.0 : propertyDefinition.getBoost())
+                        .sortable(propertyDefinition.isSortable())
+                        .dataType(propertyDefinition.getDataType())
+                        .textIndexHint(Arrays.asList(prop.getTextIndexHints()))
+                        .define();
+            } else {
+                graph.defineProperty(prop.getName())
+                        .sortable(prop.getSortable())
+                        .dataType(PropertyType.getTypeClass(prop.getDataType()))
+                        .textIndexHint(Arrays.asList(prop.getTextIndexHints()))
+                        .define();
+            }
+
             webQueueRepository.pushOntologyPropertiesChange(workspaceId, prop.getId());
         }
 
