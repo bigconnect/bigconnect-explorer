@@ -162,7 +162,16 @@ public class ExportToXlsHelper {
     public <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         return map.entrySet()
                 .stream()
-                .sorted(Map.Entry.comparingByValue(/*Collections.reverseOrder()*/))
+                .sorted((o1, o2) -> {
+                    if (o1.getValue() != null && o2.getValue() != null)
+                        return o1.getValue().compareTo(o2.getValue());
+                    else if (o1.getValue() != null && o2.getValue() == null)
+                        return 1;
+                    else if (o1.getValue() == null && o2.getValue() != null)
+                        return -1;
+                    else
+                        return 0;
+                })
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
