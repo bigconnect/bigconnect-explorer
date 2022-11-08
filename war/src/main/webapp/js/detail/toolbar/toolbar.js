@@ -93,12 +93,6 @@ define([
         DIVIDER,
         BACK: { title: '◀' },
         FORWARD: { title: '▶' },
-        FULLSCREEN: {
-            title: i18n('detail.toolbar.open.fullscreen'),
-            cls: 'hide-in-fullscreen-details',
-            subtitle: i18n('detail.toolbar.open.fullscreen.subtitle'), //'Open in New Window / Tab',
-            event: 'openFullscreen'
-        },
         ADD_PROPERTY: {
             title: i18n('detail.toolbar.add.property'),
             subtitle: i18n('detail.toolbar.add.property.entity.subtitle'), // 'Add New Property to Entity',
@@ -270,12 +264,6 @@ define([
             if (isArray) {
                 return {
                     items: [
-                        {
-                            title: i18n('detail.toolbar.open'),
-                            submenu: [
-                                ToolbarComponent.ITEMS.FULLSCREEN,
-                            ].concat(this.selectionHistory())
-                        },
                         {
                             title: i18n('detail.toolbar.actions'),
                             submenu: _.compact([
