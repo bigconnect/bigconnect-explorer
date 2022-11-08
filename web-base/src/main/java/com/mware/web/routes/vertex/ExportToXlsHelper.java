@@ -67,11 +67,10 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class ExportToXlsHelper {
-    private static final BcLogger LOGGER = BcLoggerFactory.getLogger(ExportToXlsHelper.class);
     public static final String EXPORT_FILE_EXT = ".xlsx";
     public static final String EXPORT_MIME_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-    private Graph graph;
+    private final Graph graph;
     private final SchemaRepository ontologyRepository;
 
     @Inject
@@ -89,8 +88,10 @@ public class ExportToXlsHelper {
         Map<String, String> uniqueColumns = new HashMap<>();
         for (SchemaProperty prop : ontologyRepository.getProperties(SchemaRepository.PUBLIC)) {
             if (prop.getUserVisible()) {
-                if (!uniqueColumns.containsKey(prop.getName()))
-                    uniqueColumns.put(prop.getName(), prop.getDisplayName());
+                if (!uniqueColumns.containsKey(prop.getName())) {
+                    String displayName = prop.getDisplayName() == null ? "" : prop.getDisplayName();
+                    uniqueColumns.put(prop.getName(), displayName);
+                }
             }
         }
         uniqueColumns = sortByValue(uniqueColumns);
