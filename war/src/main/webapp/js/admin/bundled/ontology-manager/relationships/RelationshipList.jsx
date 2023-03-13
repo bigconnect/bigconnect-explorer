@@ -153,12 +153,16 @@ define([
                                     });
                                 });
                         } else if(operation === 'delete') {
-                            dataRequest('admin', 'ontologyRelDelete', this.state.selectedWorkspace, relationship)
+                            dataRequest('admin', 'ontologyRelDelete', this.state.selectedWorkspace, relationship.title)
                                 .then(() => this.loadData())
                                 .catch(e => {
+                                    let text = 'The relationship cannot be deleted';
+                                    if (e.json && e.json.error) {
+                                        text = e.json.error;
+                                    }
                                     swal({
                                         title: 'Error!',
-                                        text: 'The property could not be added',
+                                        text,
                                         type: 'error',
                                     });
                                 });
@@ -181,9 +185,13 @@ define([
                         dataRequest('admin', 'ontologyRelDelete', this.state.selectedWorkspace, relId)
                             .then(() => this.loadData())
                             .catch(e => {
+                                let text = 'The relationship cannot be deleted';
+                                if (e.json && e.json.error) {
+                                    text = e.json.error;
+                                }
                                 swal({
                                     title: 'Error!',
-                                    text: 'The property could not be added',
+                                    text,
                                     type: 'error',
                                 });
                             });

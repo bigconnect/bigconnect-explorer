@@ -92,9 +92,13 @@ define([
                         dataRequest('admin', 'ontologyConceptDelete', this.props.workspaceId, this.state.concept.id)
                             .then(() => this.props.saveHandler(this.state.concept))
                             .catch(e => {
+                                let text = 'The concept cannot be deleted';
+                                if (e.json && e.json.error) {
+                                    text = e.json.error;
+                                }
                                 swal({
                                     title: 'Error!',
-                                    text: 'The concept could not be deleted',
+                                    text,
                                     type: 'error',
                                 });
                             });
