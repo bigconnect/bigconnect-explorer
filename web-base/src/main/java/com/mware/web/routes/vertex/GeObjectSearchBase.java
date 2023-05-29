@@ -38,9 +38,13 @@ package com.mware.web.routes.vertex;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.mware.config.WebOptions;
 import com.mware.core.exception.BcException;
-import com.mware.core.model.clientapi.dto.*;
+import com.mware.core.model.clientapi.dto.ClientApiElementSearchResponse;
+import com.mware.core.model.clientapi.dto.ClientApiExtendedDataRow;
+import com.mware.core.model.clientapi.dto.ClientApiGeObject;
 import com.mware.core.model.clientapi.dto.ClientApiSearchResponse.*;
+import com.mware.core.model.clientapi.dto.PropertyType;
 import com.mware.core.model.clientapi.util.ObjectMapperFactory;
 import com.mware.core.model.schema.Concept;
 import com.mware.core.model.schema.SchemaProperty;
@@ -60,7 +64,6 @@ import com.mware.ge.query.Query;
 import com.mware.ge.query.QueryResultsIterable;
 import com.mware.ge.query.aggregations.*;
 import com.mware.ge.values.storable.DateTimeValue;
-import com.mware.web.WebConfiguration;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import com.mware.web.routes.search.WebSearchOptionsFactory;
@@ -109,10 +112,7 @@ public abstract class GeObjectSearchBase {
             Authorizations authorizations
     ) throws Exception {
         SearchOptions searchOptions = WebSearchOptionsFactory.create(request, workspaceId);
-        boolean disableWildcard = this.configuration.getBoolean(
-                WebConfiguration.SEARCH_DISABLE_WILDCARD_SEARCH,
-                Boolean.parseBoolean(WebConfiguration.DEFAULTS.get(WebConfiguration.SEARCH_DISABLE_WILDCARD_SEARCH))
-        );
+        boolean disableWildcard = this.configuration.get(WebOptions.SEARCH_DISABLE_WILDCARD_SEARCH);
 
         if (disableWildcard) {
             String queryString = searchOptions.getOptionalParameter("q", String.class);

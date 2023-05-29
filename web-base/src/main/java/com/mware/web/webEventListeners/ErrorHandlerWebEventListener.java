@@ -57,6 +57,9 @@ public class ErrorHandlerWebEventListener extends DefaultWebEventListener {
     private static final BcLogger LOGGER = BcLoggerFactory.getLogger(ErrorHandlerWebEventListener.class);
     public static final int PRIORITY = -1000;
 
+    public static final long DEFAULT_MULTIPART_MAX_FILE_SIZE = 1024 * 1024 * 512;
+    public static final long DEFAULT_MULTIPART_MAX_REQUEST_SIZE = 1024 * 1024 * 1024;
+
     @Override
     public void error(WebApp app, HttpServletRequest request, HttpServletResponse response, Throwable e) throws ServletException, IOException {
         if (e.getCause() instanceof BcResourceNotFoundException) {
@@ -112,8 +115,8 @@ public class ErrorHandlerWebEventListener extends DefaultWebEventListener {
                 String errorMessage = String.format(
                         "Uploaded file(s) are too large. " +
                                 "Limits are set to %dMB per file and %dMB total for all files",
-                        Configuration.DEFAULT_MULTIPART_MAX_FILE_SIZE / bytesToMB,
-                        Configuration.DEFAULT_MULTIPART_MAX_REQUEST_SIZE / bytesToMB
+                        DEFAULT_MULTIPART_MAX_FILE_SIZE / bytesToMB,
+                        DEFAULT_MULTIPART_MAX_REQUEST_SIZE / bytesToMB
                 );
                 LOGGER.error(message, cause);
                 handleBadRequest(response, new BadRequestException("files", errorMessage));
