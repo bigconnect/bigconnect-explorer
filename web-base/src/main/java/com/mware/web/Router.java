@@ -135,6 +135,7 @@ public class Router extends HttpServlet {
             app.get("/", UserAgentFilter.class, csrfProtector, Index.class);
             app.get("/configuration", csrfProtector, com.mware.web.routes.config.Configuration.class);
             app.post("/logout", csrfProtector, Logout.class);
+            app.get("/sso", csrfProtector, SSOHandler.class);
             app.post("/download", authenticator, csrfProtector, EditPrivilegeFilter.class, Download.class);
 
             app.get("/ontology", authenticator, csrfProtector, ReadPrivilegeFilter.class, Schema.class);
@@ -224,6 +225,7 @@ public class Router extends HttpServlet {
             app.post("/vertex/multiple", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexMultiple.class); // this is a post method to allow large data (ie data larger than would fit in the URL)
             app.post("/vertex/new", authenticator, csrfProtector, EditPrivilegeFilter.class, VertexNew.class);
             app.post("/vertex/new-public", VertexNewPublic.class);
+            app.post("/vertex/new-public-with-user", VertexNewPublicWithUser.class);
 
             app.get("/vertex/search", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexSearch.class);
             app.post("/vertex/search", authenticator, csrfProtector, ReadPrivilegeFilter.class, VertexSearch.class);
@@ -264,6 +266,7 @@ public class Router extends HttpServlet {
 
             app.get("/workspace/all", authenticator, csrfProtector, ReadPrivilegeFilter.class, WorkspaceList.class);
             app.post("/workspace/create", authenticator, csrfProtector, ReadPrivilegeFilter.class, WorkspaceCreate.class);
+            app.post("/workspace/create-public", WorkspaceCreatePublic.class);
             app.get("/workspace/diff", authenticator, csrfProtector, ReadPrivilegeFilter.class, WorkspaceDiff.class);
             app.post("/workspace/update", authenticator, csrfProtector, ReadPrivilegeFilter.class, WorkspaceUpdate.class);
             app.get("/workspace", authenticator, csrfProtector, ReadPrivilegeFilter.class, WorkspaceById.class);

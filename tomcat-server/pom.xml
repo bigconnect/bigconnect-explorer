@@ -100,6 +100,11 @@
         </dependency>
         <dependency>
             <groupId>io.bigconnect</groupId>
+            <artifactId>web-product-chart</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
             <artifactId>web-auth-username-password</artifactId>
             <version>${project.version}</version>
         </dependency>
