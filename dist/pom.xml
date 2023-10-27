@@ -28,11 +28,11 @@
         </dependency>
 
         <!-- Text -->
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-text-language-detector</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.bigconnect</groupId>-->
+<!--            <artifactId>dw-text-language-detector</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>io.bigconnect</groupId>
             <artifactId>dw-text-common</artifactId>
@@ -52,41 +52,41 @@
         </dependency>
 
         <!-- Video DWs -->
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-video-metadata-extractor</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-video-preview</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.bigconnect</groupId>-->
+<!--            <artifactId>dw-video-metadata-extractor</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.bigconnect</groupId>-->
+<!--            <artifactId>dw-video-preview</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
 
         <!-- Audio DWs -->
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-audio-metadata-extractor</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.bigconnect</groupId>-->
+<!--            <artifactId>dw-audio-metadata-extractor</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
 
         <!-- Google DWs -->
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-google-services-translate</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-google-services-s2t</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.grpc</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.bigconnect</groupId>-->
+<!--            <artifactId>dw-google-services-translate</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.bigconnect</groupId>-->
+<!--            <artifactId>dw-google-services-s2t</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>io.grpc</groupId>-->
+<!--                    <artifactId>*</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
 
         <!-- Web Plugins -->
         <dependency>
