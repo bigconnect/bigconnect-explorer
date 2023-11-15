@@ -20,6 +20,7 @@ COPY ./sbin /opt/bdl/sbin
 VOLUME /opt/bdl/data
 
 EXPOSE 8888
+EXPOSE 10247/tcp
 
 COPY docker/entrypoint.sh /opt/entrypoint.sh
 
