@@ -64,7 +64,7 @@ define([
                     <div className="file-ingest">
                         <div className="panel">
                             <div className="panel-heading">
-                                <span className="panel-heading-title">Choose a file to upload (CSV, XLSX)</span>
+                                <span className="panel-heading-title">Incarca fisierul in format CSV sau XLSX</span>
                             </div>
 
                             <div className="panel-body">

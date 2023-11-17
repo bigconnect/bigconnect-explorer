@@ -1,7 +1,7 @@
 <div class="panel panel-filters">
     <div class="panel-heading">
-        <div class="panel-heading-title">Filters</div>
-        <div class="panel-heading-subtitle">Refine your results using filters</div>
+        <div class="panel-heading-title">Filtre</div>
+        <div class="panel-heading-subtitle">Rafinati cautarea folosind filtre</div>
     </div>
 
     <div class="panel-body">
@@ -16,117 +16,103 @@
         <!-- Wrapper for slides -->
         <div class="carousel-inner">
             <div class="item active">
-                <h3 class="m-t-0">Querying data</h3>
+                <h3 class="m-t-0">Interogarea datelor</h3>
                 <p>
-                    The query string is parsed into a series of terms and operators. A term can be a single word — quick or brown — or a phrase,
-                    surrounded by double quotes — "quick brown" — which searches for all the words in the phrase, in the same order.
+                    Textul interogarii este analizat într-o serie de termeni si operatori. Un termen poate fi un singur cuvânt — quick sau brown — sau o frază,
+                    înconjurata de ghilimele duble — "quick brown" — care caută toate cuvintele din frază, în aceeași ordine.
                 </p>
                 <h4>Wildcards</h4>
                 <p>
-                    Wildcard searches can be run on individual terms, using ? to replace a single character, and * to replace zero or more characters:
+                    Cautarile de tip Wildcard pot fi rulate pe termeni individuali, folosind ? pentru a inlocui un singur caracter, si * pentru a inlocui zero sau mai multe caractere:
                 </p>
                 <pre class="literal">qu?ck bro*</pre>
                 <p>
-                    Be aware that wildcard queries can use an enormous amount of memory and
-                    perform very badly — just think how many terms need to be queried to
-                    match the query string
+                    Rețineți că interogările wildcard pot folosi o cantitate enormă de memorie și pot funcționa foarte lent.
                 </p>
                 <h4>Fuzziness</h4>
                 <p>
-                    We can search for terms that are similar to, but not exactly like our search terms, using the “fuzzy” operator:
+                    Putem căuta termeni care sunt similari, dar nu exact ca termenii noștri de căutare, folosind operatorul „fuzzy”:
                 </p>
                 <pre class="literal">quikc~ brwn~ foks~</pre>
                 <p>
-                    The default edit distance is 2, but an edit distance of 1 should be sufficient to catch 80% of all human misspellings. It can be specified as:
+                    Distanța de editare implicită este 2, dar o distanță de editare de 1 ar trebui să fie suficientă pentru a surprinde 80% din toate greșelile de ortografie umane. Poate fi specificat ca:
                 </p>
                 <pre class="literal">quikc~1</pre>
             </div>
 
             <div class="item">
-                <h4 class="m-t-0">Proximity searches</h4>
+                <h4 class="m-t-0">Proximitate</h4>
                 <p>
-                    While a phrase query (eg "john smith") expects all of the terms in exactly the same order,
-                    a proximity query allows the specified words to be further apart or in a different order.
-                    In the same way that fuzzy queries can specify a maximum edit distance for characters in a word,
-                    a proximity search allows us to specify a maximum edit distance of words in a phrase:
+                    În timp ce o interogare de expresie (de exemplu, „john smith”) așteaptă toți termenii în exact aceeași ordine, o interogare de proximitate permite cuvintelor specificate să fie mai departe sau într-o ordine diferită. În același mod în care interogările neclare pot specifica un maxim editați distanța pentru caracterele dintr-un cuvânt,
+                    o căutare de proximitate ne permite să specificăm o distanță maximă de editare a cuvintelor într-o frază:
                 </p>
                 <pre class="literal">"fox quick"~5</pre>
 
-                <h4>Boosting</h4>
+                <h4>Amplificare</h4>
                 <p>
-                    Use the <span class="emphasis"><em>boost</em></span> operator <code class="literal">^</code> to make one term more relevant than another.
-                    For instance, if we want to find all documents about foxes, but we are
-                    especially interested in quick foxes:
+                    Folositi operatorul <span class="emphasis"><em>boost</em></span> <code class="literal">^</code> pentru a face un termen mai relevant decât altul.
+                    De exemplu, dacă vrem să găsim toate documentele despre vulpi, dar ne interesează mai ales vulpile rapide:
                 </p>
                 <pre class="literal">quick^2 fox</pre>
                 <p>
-                    The default <code class="literal">boost</code> value is 1, but can be any positive floating point number.
-                    Boosts between 0 and 1 reduce relevance.
+                    Valoarea implicita <code class="literal">boost</code> este 1, dar poate fi orice număr pozitiv în virgulă mobilă.
+                    Amplificarile între 0 și 1 reduc relevanța.
                 </p>
-                <p>Boosts can also be applied to phrases or to groups:</p>
+                <p>Amplificarea poate fi aplicată și frazelor sau grupurilor:</p>
                 <pre class="literal">"john smith"^2   (foo bar)^4</pre>
             </div>
 
             <div class="item">
-                <h4 class="m-t-0">Boolean operators</h4>
-                <p>By default, all terms are optional, as long as one term matches.  A search
-                    for <code class="literal">foo bar baz</code> will find any document that contains one or more of
-                    <code class="literal">foo</code> or <code class="literal">bar</code> or <code class="literal">baz</code>.
-                    But there are also <span class="emphasis"><em>boolean operators</em></span> which can be used in the query string itself to provide more control.</p>
-                <p>The preferred operators are <code class="literal">+</code> (this term <span class="strong strong"><strong>must</strong></span> be present) and <code class="literal">-</code>
-                    (this term <span class="strong strong"><strong>must not</strong></span> be present). All other terms are optional.
-                    For example, this query:</p>
+                <h4 class="m-t-0">Operatori booleeni</h4>
+                <p>În mod implicit, toți termenii sunt opționali, atâta timp cât un termen se potrivește. O căutare după <code class="literal">foo bar baz</code> va găsi orice document care conține unul sau mai multe dintre <code class="literal">foo</code> sau <code class="literal"> bar</code> sau <code class="literal">baz</code>.
+                    Dar există și <span class="emphasis"><em>operatori booleen</em></span> care pot fi utilizați în șirul de interogare în sine pentru a oferi mai mult control.</p>
+                <p>Operatorii preferati sunt <code class="literal">+</code> (acest termen <span class="strong"><strong>trebuie</strong></span> sa fie prezent) si <code class="literal">-</code>
+                    (cest termen <span class="strong strong"><strong>nu trebuie</strong></span> sa fie prezent). Toți ceilalți termeni sunt opționali.
+                    De exemplu, această interogare:</p>
                 <pre class="literal">quick brown +fox -news</pre>
-                <p>states that:</p>
+                <p>afirmă că:</p>
                 <ul type="disc">
-                    <li><code class="literal">fox</code> must be present</li>
-                    <li><code class="literal">news</code> must not be present</li>
-                    <li><code class="literal">quick</code> and <code class="literal">brown</code> are optional — their presence increases the relevance</li>
+                    <li><code class="literal">fox</code> trebuie sa fie prezent</li>
+                    <li><code class="literal">news</code> nu trebuie sa fie prezent</li>
+                    <li><code class="literal">quick</code> si <code class="literal">brown</code> sunt optionali — prezenta lor creste relevanta rezultatelor</li>
                 </ul>
-                <p>The familiar operators <code class="literal">AND</code>, <code class="literal">OR</code> and <code class="literal">NOT</code> (also written <code class="literal">&amp;&amp;</code>, <code class="literal">||</code> and <code class="literal">!</code>)
-                    are also supported.  However, the effects of these operators can be more
-                    complicated than is obvious at first glance.  <code class="literal">NOT</code> takes precedence over
-                    <code class="literal">AND</code>, which takes precedence over <code class="literal">OR</code>.  While the <code class="literal">+</code> and <code class="literal">-</code> only affect
-                    the term to the right of the operator, <code class="literal">AND</code> and <code class="literal">OR</code> can affect the terms to
-                    the left and right.</p>
+                <p>Operatorii cunoscuti <code class="literal">AND</code>, <code class="literal">OR</code> si <code class="literal">NOT</code> (sau <code class="literal">&amp;&amp;</code>, <code class="literal">||</code> si <code class="literal">!</code>)
+                    sunt de asemenea suportati. Cu toate acestea, efectele acestor operatori pot fi mai complicate decât este evident la prima vedere.  <code class="literal">NOT</code> are prioritate asupra
+                    <code class="literal">AND</code>, care are prioritate asupra <code class="literal">OR</code>.  <code class="literal">+</code> si <code class="literal">-</code> afectează numai termenul din dreptul operatorului, in timp ce <code class="literal">AND</code> si <code class="literal">OR</code> pot afecta termenii din stânga și din dreapta.</p>
             </div>
 
             <div class="item">
-                <h4 class="m-t-0">Grouping</h4>
-                <p>Multiple terms or clauses can be grouped together with parentheses, to form sub-queries:</p>
+                <h4 class="m-t-0">Grupare</h4>
+                <p>Mai mulți termeni sau clauze pot fi grupați împreună cu paranteze, pentru a forma sub-interogări:</p>
                 <pre class="literal">(quick OR brown) AND fox</pre>
-                <p>Groups can be used to boost the result of a sub-query:</p>
+                <p>Grupurile pot fi folosite pentru a spori rezultatul unei sub-interogări:</p>
                 <pre class="literal">(active OR pending) AND (full text search)^2</pre>
 
-                <h4>Reserved characters</h4>
-                <p>If you need to use any of the characters which function as operators in your
-                    query itself (and not as operators), then you should escape them with
-                    a leading backslash. For instance, to search for <code class="literal">(1+1)=2</code>, you would
-                    need to write your query as <code class="literal">\(1\+1\)\=2</code>.</p>
-                <p>The reserved characters are:  <code class="literal">+ - = &amp;&amp; || &gt; &lt; ! ( ) { } [ ] ^ " ~ * ? : \ /</code></p>
-                <p>Failing to escape these special characters correctly could lead to a syntax error which prevents your query from running.</p>
-                <p><strong>Note:</strong><code class="literal">&lt;</code> and <code class="literal">&gt;</code> can’t be escaped at all. The only way to prevent them from
-                    attempting to create a range query is to remove them from the query string entirely.</p>
+                <h4>Caractere rezervate</h4>
+                <p>Dacă trebuie să utilizați oricare dintre caracterele care funcționează ca operatori în interogarea dvs. în sine (și nu ca operatori), atunci ar trebui să le prefixati cu o bară oblică inversă. De exemplu, pentru a căuta <code class="literal">(1+1)=2</code>, va trebui să scrieți interogarea ca <code class="literal">\(1\+1\) \=2</code>.</p>
+                <p>Personajele rezervate sunt:  <code class="literal">+ - = &amp;&amp; || &gt; &lt; ! ( ) { } [ ] ^ " ~ * ? : \ /</code></p>
+                <p>Nerespectarea corectă a acestor caractere speciale poate duce la o eroare de sintaxă care împiedică rularea interogării.</p>
+                <p><strong>Nota:</strong><code class="literal">&lt;</code> si <code class="literal">&gt;</code> nu poate fi utilizate deloc. Singura modalitate de a le împiedica să încerce să creeze o interogare de interval este să le eliminați complet din șirul de interogare.</p>
             </div>
 
             <div class="item">
-                <h4 class="m-t-0">Filters</h4>
-                <p>The Filters panel on the left side can be used to visually build advanced search scenarios based on a wide variety of predicates:</p>
+                <h4 class="m-t-0">Filtre</h4>
+                <p>Panoul Filtre din partea stângă poate fi folosit pentru a construi vizual scenarii de căutare avansată bazate pe o mare varietate de predicate:</p>
                 <ul>
-                    <li>You can filter by Concept Type or Relation Type by choosing one or more items from the dropdown list.</li>
-                    <li>You can filter by one or more properties from the data model by choosing a property and a search predicate.</li>
-                    <li>You can sort the search results using one or more properties.</li>
+                    <li>Puteți filtra după Tipul de concept sau Tipul de relație alegând unul sau mai multe elemente din lista verticală.</li>
+                    <li>Puteți filtra după una sau mai multe proprietăți din modelul de date alegând o proprietate și un predicat de căutare.</li>
+                    <li>Puteți sorta rezultatele căutării folosind una sau mai multe proprietăți.</li>
                 </ul>
 
-                <h4 class="m-t-2">Refinements</h4>
-                <p>Refinements are content-based filters which are made available once the search results are displayed.
-                You can use them to drill-down through search results to find out more detailed information about a particular topic.
-                Once you apply a refinement, it will be displayed above the search results and you can remove it anytime.</p>
-                <p>Each ontology property can act as a refinement, as long as it's configured to be indexed. Just enable "Searchable" and
-                    "Search Facet" for a property and it will be displayed in the refinements section.</p>
+                <h4 class="m-t-2">Rafinamente</h4>
+                <p>Rafinările sunt filtre bazate pe conținut care sunt disponibile odată ce rezultatele căutării sunt afișate.
+                    Le puteți folosi pentru a detalia rezultatele căutării pentru a afla informații mai detaliate despre un anumit subiect.
+                    Odată ce aplicați o rafinare, aceasta va fi afișată deasupra rezultatelor căutării și o puteți elimina oricând.</p>
+                <p>Orice proprietate modelului de date poate acționa ca o rafinare, atâta timp cât este configurată pentru a fi indexată. Este suficient activarea "Searchable" si
+                    "Search Facet" pentru o proprietate și va fi afișată în secțiunea de rafinare.</p>
 
-                <h4 class="m-t-2">Saving searches</h4>
-                <p>Queries can be saved for later use, but more important, they can be added to the dashboard to build various types of aggregations.</p>
+                <h4 class="m-t-2">Salvarea cautarilor</h4>
+                <p>Interogările pot fi salvate pentru utilizare ulterioară, dar, mai important, ele pot fi adăugate la tabloul de bord pentru a construi diferite tipuri de agregare.</p>
             </div>
         </div>
 

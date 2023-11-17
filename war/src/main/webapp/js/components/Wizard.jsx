@@ -371,7 +371,7 @@ define([
                                onClick={() => {this.previous()}}>&larr; {this.props.backButtonText}</a>
                         </li>
                         <li className="center">
-                            <button className="btn btn-danger" onClick={() => this.props.cancelWizard()}>Cancel</button>
+                            <button className="btn btn-danger" onClick={() => this.props.cancelWizard()}>Anuleaza</button>
                         </li>
                         <li className="next">
                             <a href="#"

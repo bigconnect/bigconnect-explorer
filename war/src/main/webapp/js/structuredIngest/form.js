@@ -103,7 +103,7 @@ define([
                 sheetIndex: 0
             }
             this.$modal = this.$node.html(template({
-                title: this.attr.vertex ? F.vertex.title(this.attr.vertex) : 'Map columns'
+                title: this.attr.vertex ? F.vertex.title(this.attr.vertex) : 'Mapare Coloane'
             }));
             var windowWidth = Math.round($(window).width() * 0.9);
             this.$modal.find('.modal-resizable').resizable({

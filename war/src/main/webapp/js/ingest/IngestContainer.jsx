@@ -66,15 +66,15 @@ define([
                         <div className="container-fluid">
                             <div className="row">
                                 <div className="ingest-title">
-                                    <h3>Load data</h3>
+                                    <h3>Incarca date</h3>
                                 </div>
                             </div>
 
                             <div className="cards">
                                 <div className="card">
-                                    <h3>Files</h3>
+                                    <h3>Fisiere</h3>
                                     <ul>
-                                        <li><a onClick={() => this.props.onSetLoadType('file')}>Upload your files</a></li>
+                                        <li><a onClick={() => this.props.onSetLoadType('file')}>Incarca fisier</a></li>
                                     </ul>
                                 </div>
 
@@ -93,25 +93,8 @@ define([
 
                                         <div className="pull-left" style={{width: '50%'}}>
                                             <ul>
-                                                <li><a onClick={() => this.props.onSetLoadType('db')}>Amazon Redshift</a></li>
                                                 <li><a onClick={() => this.props.onSetLoadType('db')}>Teradata</a></li>
-                                                <li><a onClick={() => this.props.onSetLoadType('db')}>Google BigQuery</a></li>
                                                 <li><a onClick={() => this.props.onSetLoadType('db')}>Other...</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="card">
-                                    <h3>Cloud Storage</h3>
-
-                                    <div style={{overflow: 'hidden'}}>
-                                        <div className="pull-left" style={{width: '50%'}}>
-                                            <ul>
-                                                <li><a className="disabled">BDL Object Storage</a></li>
-                                                <li><a className="disabled">Amazon S3</a></li>
-                                                <li><a className="disabled">Azure Blob Storage</a></li>
-                                                <li><a className="disabled">Google Cloud Storge</a></li>
                                             </ul>
                                         </div>
                                     </div>

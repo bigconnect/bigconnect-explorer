@@ -62,8 +62,8 @@ define([
 
         render() {
             const steps = [
-                {name: 'Choose file', component: <ChooseFile {...this.props} />},
-                {name: 'Preview', component: <FilePreview {...this.props} />}
+                {name: 'Alege un fisier', component: <ChooseFile {...this.props} />},
+                {name: 'Previzualizare', component: <FilePreview {...this.props} />}
             ]
 
             return (
@@ -74,8 +74,8 @@ define([
                             preventEnterSubmission={true}
                             nextTextOnFinalActionStep={"Import"}
                             prevBtnOnLastStep={false}
-                            nextButtonText={"Next"}
-                            backButtonText={"Back"}
+                            nextButtonText={"Urmator"}
+                            backButtonText={"Inapoi"}
                             cancelWizard={this.cancelWizard}
                         />
                     </div>

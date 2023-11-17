@@ -292,7 +292,7 @@ define([
                     <div className="panel-heading">
                         <div className="panel-heading-title">Data Ingestion</div>
                         <div className="panel-heading-subtitle text-muted">
-                            Load data from JDBC sources
+                            Incarca din surse JDBC
                         </div>
 
                         <div className="btn-group">
