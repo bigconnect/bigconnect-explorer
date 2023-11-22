@@ -115,6 +115,11 @@
             <artifactId>web-google-cloud-actions</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>web-video-actions</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Required DWs -->
         <dependency>
