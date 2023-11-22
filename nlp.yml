@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  ner-ron:
+    image: registry.escor.local/ner-ron:latest
+    ports:
+      - "8989:8989"
+    environment:
+      - CONCURRENCY_LEVEL=8
+
+  sentiment-ron:
+    image: registry.escor.local/sentiment-ron
+    ports:
+      - "8990:8989"
+
+  iptc-ron:
+    image: registry.escor.local/iptc-ron
+    ports:
+      - "8991:8989"
+
+  similarity-ron:
+    image: registry.escor.local/similarity-ron
+    ports:
+      - "8992:8989"
+
+  summarize-ron:
+    image: registry.escor.local/summarizer-ron
+    ports:
+      - "8993:8989"
