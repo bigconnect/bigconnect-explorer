@@ -4,6 +4,7 @@ RUN apt -qq update && \
 	apt -qq install -y \
 		dumb-init \
 		telnet \
+        ffmpeg \
 		iputils-ping \
 		openjdk-11-jdk-headless \
 		curl sudo net-tools \
