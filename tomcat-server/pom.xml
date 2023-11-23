@@ -123,6 +123,11 @@
             <artifactId>web-text-actions</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>web-image-actions</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Required DWs -->
         <dependency>
@@ -182,6 +187,11 @@
         <dependency>
             <groupId>io.bigconnect</groupId>
             <artifactId>dw-image-metadata-extractor</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-image-object-detector</artifactId>
             <version>${bigconnect.dw.version}</version>
         </dependency>
 
