@@ -65,7 +65,7 @@ define([
 
         this.renderPlugins = function() {
             var $node = this.$node.find('.admin-plugin-list'),
-                $list = $node.empty().text('Loading...');
+                $list = $node.empty().text('Se incarca...');
 
             Promise.all([
                 Promise.require('d3'),

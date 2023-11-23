@@ -15,137 +15,21 @@
     <name>BigConnect Explorer: Distribution Assembler</name>
 
     <dependencies>
-        <!-- Required DWs -->
         <dependency>
             <groupId>io.bigconnect</groupId>
-            <artifactId>dw-mime-type-detector</artifactId>
+            <artifactId>web-war</artifactId>
+            <type>war</type>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-mime-type-ontology-mapper</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-tomcat-adapter</artifactId>
+            <version>11.0.0</version>
         </dependency>
-
-        <!-- Text -->
-<!--        <dependency>-->
-<!--            <groupId>io.bigconnect</groupId>-->
-<!--            <artifactId>dw-text-language-detector</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-text-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-text-extractor</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- Image DWs -->
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>dw-image-metadata-extractor</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- Video DWs -->
-<!--        <dependency>-->
-<!--            <groupId>io.bigconnect</groupId>-->
-<!--            <artifactId>dw-video-metadata-extractor</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.bigconnect</groupId>-->
-<!--            <artifactId>dw-video-preview</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-
-        <!-- Audio DWs -->
-<!--        <dependency>-->
-<!--            <groupId>io.bigconnect</groupId>-->
-<!--            <artifactId>dw-audio-metadata-extractor</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-
-        <!-- Google DWs -->
-<!--        <dependency>-->
-<!--            <groupId>io.bigconnect</groupId>-->
-<!--            <artifactId>dw-google-services-translate</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.bigconnect</groupId>-->
-<!--            <artifactId>dw-google-services-s2t</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>io.grpc</groupId>-->
-<!--                    <artifactId>*</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
-        <!-- Web Plugins -->
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>web-product-graph</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>web-product-map</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>web-auth-username-password</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>rest-explorer</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-<!--        <dependency>-->
-<!--            <groupId>io.bigconnect</groupId>-->
-<!--            <artifactId>web-product-nvr</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>web-google-cloud-actions</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>cypher-lab</artifactId>
-            <version>4.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-graphite</artifactId>
-            <version>4.2.4</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.rabbitmq</groupId>
-                    <artifactId>amqp-client</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>av-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>io.bigconnect</groupId>
             <artifactId>web-base</artifactId>
-            <version>4.2.2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -155,24 +39,18 @@
         </dependency>
         <dependency>
             <groupId>io.bigconnect</groupId>
-            <artifactId>storage-accumulo</artifactId>
-            <version>4.2.2-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.squareup.okio</groupId>
-                    <artifactId>okio</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>storage-rocksdb</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.bigconnect</groupId>
-            <artifactId>storage-rocksdb</artifactId>
-            <version>4.2.2-SNAPSHOT</version>
+            <artifactId>storage-accumulo</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.bigconnect</groupId>
             <artifactId>cypher-runtime</artifactId>
-            <version>4.2.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
@@ -183,15 +61,8 @@
         <dependency>
             <groupId>io.bigconnect</groupId>
             <artifactId>search-index</artifactId>
-            <version>4.2.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
-            <artifactId>web-war</artifactId>
-            <type>war</type>
             <version>${project.version}</version>
         </dependency>
-
         <!-- Groovy is required when BC is configured to use in-process elasticsearch -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
@@ -208,42 +79,149 @@
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-guice</artifactId>
         </dependency>
-
-
         <dependency>
-            <groupId>org.cache2k</groupId>
-            <artifactId>cache2k-api</artifactId>
-            <version>${cache2k.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.cache2k</groupId>
-            <artifactId>cache2k-core</artifactId>
-            <version>${cache2k.version}</version>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
-        <!-- needed for Bolt server -->
+        <!-- Web Plugins -->
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.60</version>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>web-product-graph</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>web-product-map</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>web-product-chart</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>web-auth-username-password</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>rest-explorer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>web-video-actions</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>web-text-actions</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>web-image-actions</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
-        <!--Keycloak-->
+        <!-- Required DWs -->
         <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-core</artifactId>
-            <version>11.0.0-SNAPSHOT</version>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-mime-type-detector</artifactId>
+            <version>${bigconnect.dw.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-tomcat-adapter</artifactId>
-            <version>11.0.0-SNAPSHOT</version>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-mime-type-ontology-mapper</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>av-utils</artifactId>
+            <version>${bigconnect.dw.version}</version>
         </dependency>
 
+        <!-- Text DWs -->
         <dependency>
-            <groupId>com.github.pemistahl</groupId>
-            <artifactId>lingua</artifactId>
-            <version>1.1.0</version>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-text-common</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-text-language-detector</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-text-extractor</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-ner-intellidockers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-sentiment-intellidockers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-classification-intellidockers-iptc</artifactId>
+            <version>4.2.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-text-summary</artifactId>
+            <version>4.2.2-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Image DWs -->
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-image-metadata-extractor</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+
+        <!-- Video DWs -->
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-video-metadata-extractor</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-video-preview</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+
+        <!-- Audio DWs -->
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-audio-metadata-extractor</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+
+        <!-- Google -->
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-google-services-translate</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-google-services-s2t</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.grpc</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -262,31 +240,23 @@
             <version>1.34.1</version>
         </dependency>
         <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <version>4.12.0</version>
+            <groupId>org.cache2k</groupId>
+            <artifactId>cache2k-api</artifactId>
+            <version>${cache2k.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.cache2k</groupId>
+            <artifactId>cache2k-core</artifactId>
+            <version>${cache2k.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-graphite</artifactId>
+            <version>${metrics.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- only for development, remove in production -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <version>${rabbitmq.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
+                    <groupId>com.rabbitmq</groupId>
+                    <artifactId>amqp-client</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -80,7 +80,7 @@ define([
             return (
                 <div className='input-group'>
                     <select className="custom-select form-control" onChange={(e) => { this.setState({searchId : e.target.value}) }}>
-                        <option key={'none'} value={'none'}>Choose dataset...</option>
+                        <option key={'none'} value={'none'}>Incarca set de date...</option>
                         {this.state.searches.map(search => {
                             return (<option key={search.id} value={search.id}>{search.name}</option>)
                         })}

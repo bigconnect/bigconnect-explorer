@@ -3,13 +3,12 @@
   "description": "BigConnect Explorer",
   "author": "MWARE SOLUTIONS SRL",
   "license": "AGPL-3.0-only",
-
   "dependencies": {
+    "@ant-design/icons": "^4.3.0",
     "@babel/polyfill": "^7.0.0",
     "@mware/bootstrap": "3.3.8",
     "@mware/updeep": "^1.0.1",
     "antd": "^4.16.6",
-    "@ant-design/icons": "^4.3.0",
     "atmosphere.js": "3.0.0",
     "block-ui": "^2.70.1",
     "bluebird": "3.5.1",
@@ -116,7 +115,6 @@
     "react-hot-loader": "^4.13.0",
     "redux-devtools": "^3.4.1"
   },
-
   "scripts": {
     "postinstall": "grunt deps"
   }

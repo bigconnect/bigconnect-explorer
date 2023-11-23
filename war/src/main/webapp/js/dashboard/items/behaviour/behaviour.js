@@ -81,7 +81,7 @@ define([
                 config = this.attr.item.configuration,
                 limitResults = config.behaviourParameters && _.isNumber(config.behaviourParameters.size);
 
-            this.$node.text('Loading...');
+            this.$node.text('Se incarca...');
             this.dataRequest('behaviour', 'run', config.behaviourId, config.behaviourParameters)
                 .then(function(results) {
                     if (results.elements.length) {
