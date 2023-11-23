@@ -186,6 +186,16 @@
             <artifactId>dw-image-metadata-extractor</artifactId>
             <version>${bigconnect.dw.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-image-object-detector</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-image-ocr</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
 
         <!-- Video DWs -->
         <dependency>

@@ -10,3 +10,5 @@ libpeerconnection.log
 .idea/*
 *.iml
 yarn-error.log
+.yarnrc.yml
+.yarn
