@@ -254,7 +254,7 @@ define([
         getInitialState() {
             return {
                 items: [],
-                title: 'Loading...'
+                title: 'Se incarca...'
             };
         },
 

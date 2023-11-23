@@ -170,7 +170,7 @@ define([
                 let $loadingDiv = $(".cy-loading");
                 if(!$loadingDiv.length) {
                     const $content = $(this.resultsNode).find('.adv-content'),
-                        $loadingDiv = $("<div></div>").attr("class", "cy-loading").text("Loading...");
+                        $loadingDiv = $("<div></div>").attr("class", "cy-loading").text("Se incarca...");
 
                     $loadingDiv.appendTo($content);
                 }

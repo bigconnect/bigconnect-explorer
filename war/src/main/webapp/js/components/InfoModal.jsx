@@ -109,7 +109,7 @@ define([
                 return this.props.content
             } else {
                 if(this.state.loading) {
-                    return (<div>Loading...</div>);
+                    return (<div>Se incarca...</div>);
                 } else {
                     return this.state.asyncComponent
                 }

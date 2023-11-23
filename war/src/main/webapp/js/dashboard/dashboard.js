@@ -332,7 +332,7 @@ define([
             this.request = this.dataRequest.bind(this, 'dashboard');
 
             // TODO: make utility loading interface
-            this.$node.text('Loading...');
+            this.$node.text('Se incarca...');
 
             this.on('click', function(e) {
                 if ($(e.target).closest('.header, .grid-scroller, .grid-stack, .grid-stack-item, .item-content').length) {

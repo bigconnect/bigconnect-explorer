@@ -112,11 +112,6 @@
         </dependency>
         <dependency>
             <groupId>io.bigconnect</groupId>
-            <artifactId>web-google-cloud-actions</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
             <artifactId>web-video-actions</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -167,6 +162,11 @@
         <dependency>
             <groupId>io.bigconnect</groupId>
             <artifactId>dw-classification-intellidockers-iptc</artifactId>
+            <version>4.2.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-text-summary</artifactId>
             <version>4.2.2-SNAPSHOT</version>
         </dependency>
 

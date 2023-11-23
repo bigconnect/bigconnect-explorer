@@ -6,7 +6,7 @@ services:
     ports:
       - "8989:8989"
     environment:
-      - CONCURRENCY_LEVEL=8
+      - CONCURRENCY_LEVEL=4
 
   sentiment-ron:
     image: registry.escor.local/sentiment-ron
@@ -27,3 +27,8 @@ services:
     image: registry.escor.local/summarizer-ron
     ports:
       - "8993:8989"
+
+  object-detector:
+    image: registry.escor.local/object-detector
+    ports:
+      - "8994:8989"
