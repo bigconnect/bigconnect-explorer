@@ -204,6 +204,12 @@
             <artifactId>dw-image-captioning</artifactId>
             <version>${bigconnect.dw.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-image-face-detector</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+
 
         <!-- Video DWs -->
         <dependency>

@@ -325,7 +325,7 @@ define([
                                         return i18n('detail.detected_object.vertex_not_found');
                                     }
                                     return concepts.byId[detectedObject.value.concept] ?
-                                        concepts.byId[detectedObject.value.concept].displayName.displayName :
+                                        concepts.byId[detectedObject.value.concept].displayName :
                                         detectedObject.value.concept;
                                 })
                     })
