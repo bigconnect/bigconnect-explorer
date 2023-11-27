@@ -29,8 +29,8 @@
         <plugin.frontend>1.11.0</plugin.frontend>
         <enforcer.skip>true</enforcer.skip>
         <!-- Node Properties -->
-        <node.version>v10.16.0</node.version>
-        <yarnjs.version>v1.22.10</yarnjs.version>
+        <node.version>v16.15.1</node.version>
+        <yarnjs.version>v1.22.19</yarnjs.version>
         <frontend.installDirectory>${settings.localRepository}/node/${node.version}</frontend.installDirectory>
     </properties>
 
