@@ -43,36 +43,36 @@ define([
 
     registry.registerExtension(adminExtensionPoint, {
         componentPath: 'admin/bundled/users/UserManager',
-        section: 'Security',
-        name: 'Users',
-        subtitle: 'Manage Users'
+        section: 'Securitate',
+        name: 'Utilizatori',
+        subtitle: 'Gestiune utilizatori'
     });
 
     registry.registerExtension(adminExtensionPoint, {
         componentPath: 'admin/bundled/roles/RoleManager',
-        section: 'Security',
-        name: 'Roles',
-        subtitle: 'Manage Roles'
+        section: 'Securitate',
+        name: 'Roluri',
+        subtitle: 'Gestiune roluri'
     });
 
     registry.registerExtension(adminExtensionPoint, {
         componentPath: 'admin/bundled/ontology-manager/properties/PropertiesList',
-        section: 'Schema',
-        name: 'Properties',
-        subtitle: 'Manage Properties'
+        section: 'Schema date',
+        name: 'Proprietati',
+        subtitle: 'Gesitiune proprietati'
     });
 
     registry.registerExtension(adminExtensionPoint, {
         componentPath: 'admin/bundled/ontology-manager/concepts/ConceptList',
-        section: 'Schema',
-        name: 'Concepts',
-        subtitle: 'Manage Concepts'
+        section: 'Schema date',
+        name: 'Concepte',
+        subtitle: 'Gestiune concepte'
     });
 
     registry.registerExtension(adminExtensionPoint, {
         componentPath: 'admin/bundled/ontology-manager/relationships/RelationshipList',
-        section: 'Schema',
-        name: 'Relationships',
-        subtitle: 'Manage relationships'
+        section: 'Schema date',
+        name: 'Relatii',
+        subtitle: 'Gesitiune relatii'
     });
 })

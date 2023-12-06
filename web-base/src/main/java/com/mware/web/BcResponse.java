@@ -59,6 +59,7 @@ import java.util.List;
 
 public class BcResponse {
     public static final int EXPIRES_1_HOUR = 60 * 60;
+    public static final int EXPIRES_10_SECONDS = 10;
     public static final ClientApiSuccess SUCCESS = new ClientApiSuccess();
     private final HttpServletRequest request;
     private final HttpServletResponse response;

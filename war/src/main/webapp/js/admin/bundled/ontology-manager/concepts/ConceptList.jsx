@@ -158,8 +158,8 @@ define([
             this.setState({selectedConcept: null});
 
             swal({
-                title: 'Ontology updated',
-                text: 'Please relogin for changes to take effect',
+                title: 'Actualizare cu succes',
+                text: 'Va rugam sa va reconectati la sistem',
                 type: 'info',
             });
         },
@@ -178,12 +178,11 @@ define([
                     <div className="row">
                         <div className="col-md-3">
                             <div className="form-group">
-                                <label className="control-label" htmlFor="workspaceSelector">Workspace</label>
+                                <label className="control-label" htmlFor="workspaceSelector">Spatii de lucru</label>
                                 <select className="custom-select form-control" id="workspaceSelector"
                                         value={this.state.selectedWorkspace}
                                         onChange={(e) => { this.workspaceChanged(e.target.value) }}>
-                                    <option key={ONTOLOGY_CONSTANTS.PUBLIC_ONTOLOGY} value={ONTOLOGY_CONSTANTS.PUBLIC_ONTOLOGY}>PUBLIC</option>
-                                    {workspaceOptions}
+                                    <option key={ONTOLOGY_CONSTANTS.PUBLIC_ONTOLOGY} value={ONTOLOGY_CONSTANTS.PUBLIC_ONTOLOGY}>General</option>
                                 </select>
                             </div>
 

@@ -110,11 +110,12 @@ public class OntologyManagerConceptSave implements ParameterizedHandler {
             newConcept.setProperty(SchemaProperties.DISPLAY_TYPE.getPropertyName(), stringValue(concept.getDisplayType()), user, authorizations);
             newConcept.setProperty(SchemaProperties.COLOR.getPropertyName(), stringValue(concept.getColor()), user, authorizations);
 
-            if(!StringUtils.isEmpty(concept.getGlyphIconHref())) {
-                newConcept.setProperty(SchemaProperties.GLYPH_ICON_FILE_NAME.getPropertyName(), stringValue(concept.getGlyphIconHref()), user, authorizations);
+            if(!StringUtils.isEmpty(concept.getGlyphIconHref()) && !concept.getGlyphIconHref().startsWith("resource?")) {
+                String newIcon = concept.getGlyphIconHref();
+                newConcept.setProperty(SchemaProperties.GLYPH_ICON_FILE_NAME.getPropertyName(), stringValue(newIcon), user, authorizations);
 
                 try {
-                    InputStream is = request.getServletContext().getResourceAsStream(concept.getGlyphIconHref());
+                    InputStream is = request.getServletContext().getResourceAsStream(newIcon);
                     ByteArrayOutputStream imgOut = new ByteArrayOutputStream();
                     IOUtils.copy(is, imgOut);
                     byte[] rawImg = imgOut.toByteArray();

@@ -104,7 +104,7 @@ public class ResourceGet implements ParameterizedHandler {
         }
 
         response.setContentType("image/png");
-        response.setHeader("Cache-Control", "max-age=" + (5 * 60));
+        response.setMaxAge(BcResponse.EXPIRES_10_SECONDS);
         glyph.write(tint, request, response);
     }
 

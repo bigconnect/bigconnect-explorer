@@ -114,8 +114,8 @@ define([
                         .then(() => this.props.saveHandler(this.state.concept))
                         .catch(e => {
                             swal({
-                                title: 'Error!',
-                                text: 'The concept could not be saved',
+                                title: 'Eroare!',
+                                text: 'Conceptul nu a putut fi salvat',
                                 type: 'error',
                             });
                         })
@@ -128,11 +128,11 @@ define([
             let errors = [];
 
             if(!concept.title) {
-                errors.push('Title is required');
+                errors.push('Titlul este obligatoriu');
             }
 
             if(!concept.displayName) {
-                errors.push('Display Name is required');
+                errors.push('Nume Display este obligatoriu');
             }
 
             this.setState({extra_errors: errors});
