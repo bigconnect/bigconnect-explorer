@@ -57,7 +57,7 @@ define([
 
         getDefaultProps() {
             return {
-                showWorkspaceSelector: true,
+                showWorkspaceSelector: false,
             };
         },
 
@@ -217,8 +217,8 @@ define([
                                 .then(() => this.loadData())
                                 .catch(e => {
                                     swal({
-                                        title: 'Error!',
-                                        text: 'The property could not be added',
+                                        title: 'Eroare!',
+                                        text: 'Proprietatea nu a putut fi adaugataThe',
                                         type: 'error',
                                     });
                                 })
@@ -244,8 +244,8 @@ define([
                             .then(() => this.loadData())
                             .catch(e => {
                                 swal({
-                                    title: 'Error!',
-                                    text: 'The property could not be added',
+                                    title: 'Eroare!',
+                                    text: 'Proprietatea nu a putut fi adaugata',
                                     type: 'error',
                                 });
                             })
@@ -264,8 +264,8 @@ define([
                                 .then(() => { this.refreshAppMessage(); this.loadData() })
                                 .catch(e => {
                                     swal({
-                                        title: 'Error!',
-                                        text: 'The property could not be updated',
+                                        title: 'Eroare!',
+                                        text: 'Proprietatea nu a putut fi actualizata',
                                         type: 'error',
                                     });
                                 })
@@ -274,8 +274,8 @@ define([
                                 .then(() => { this.refreshAppMessage(); this.loadData(); })
                                 .catch(e => {
                                     swal({
-                                        title: 'Error!',
-                                        text: 'The property could not be deleted',
+                                        title: 'Eroare!',
+                                        text: 'Proprietatea nu a putut fi stearsa',
                                         type: 'error',
                                     });
                                 })
@@ -286,8 +286,8 @@ define([
 
         refreshAppMessage() {
             swal({
-                title: 'Ontology updated',
-                text: 'Please relogin for changes to take effect',
+                title: 'Actualizare cu succes',
+                text: 'Va rugam sa va reconectati la sistem',
                 type: 'info',
             });
         },
@@ -312,8 +312,8 @@ define([
             const propId = row.original.title;
 
             swal({
-                title: 'Are you sure ?',
-                text: "This action cannot be undone",
+                title: 'Sunteti sigur ?',
+                text: "Aceasta actiune este ireversibila",
                 type: 'warning',
                 showCancelButton: true,
             }).then((result) => {
@@ -323,8 +323,8 @@ define([
                             .then(() => this.loadData())
                             .catch(e => {
                                 swal({
-                                    title: 'Error!',
-                                    text: 'The property could not be deleted',
+                                    title: 'Eroare!',
+                                    text: 'Proprietatea nu a putut fi stearsa',
                                     type: 'error',
                                 });
                             })
@@ -337,8 +337,8 @@ define([
             const propId = row.original.title;
 
             swal({
-                title: 'Question',
-                text: "Unassign property from object ?",
+                title: 'Intrebare',
+                text: "Deconectam proprietatea de la acest obiect ?",
                 type: 'info',
                 showCancelButton: true,
                 confirmButtonText: 'Unassign',
@@ -349,8 +349,8 @@ define([
                             .then(() => this.loadData())
                             .catch(e => {
                                 swal({
-                                    title: 'Error!',
-                                    text: 'The property could not be unassigned',
+                                    title: 'Eroare!',
+                                    text: 'Proprietatea nu a putut fi deconectata',
                                     type: 'error',
                                 });
                             })
@@ -365,21 +365,21 @@ define([
             ));
 
             const columns = [{
-                Header: 'Name',
+                Header: 'Cod',
                 accessor: 'title'
             }, {
                 id: 'displayName',
-                Header: 'Display name',
+                Header: 'Nume',
                 accessor: (row) => (row.displayName && row.displayName.length > 30) ? row.displayName.substring(0, 20) + '...' : row.displayName
             }, {
-                Header: 'Data Type',
+                Header: 'Tip',
                 accessor: 'dataType'
             }, {
                 id: 'systemProperty',
-                Header: 'System',
+                Header: 'Sistem',
                 accessor: (row) => String(row.systemProperty)
             }, {
-                Header: 'Actions',
+                Header: 'Actiuni',
                 accessor: 'id',
                 width: 150,
                 filterable: false,
@@ -388,13 +388,13 @@ define([
                 Cell: row => (
                     <div className="text-center">
                         <div className="btn-group btn-group-sm">
-                            <button title="Edit" data-placement='bottom' className="btn btn-link  showToolTip"
+                            <button title="Editeaza" data-placement='bottom' className="btn btn-link  showToolTip"
                                     onClick={(e) => this.handleEdit(e, row)}>
                                 <i className="material-icons md-18">create</i>
                             </button>
 
                             {this.isDirectProperty(row) && (
-                                <button title="Unassign" data-placement='bottom' className="btn btn-link  showToolTip"
+                                <button title="Deconecteaza" data-placement='bottom' className="btn btn-link  showToolTip"
                                         disabled={this.isSystemProperty(row)}
                                         onClick={(e) => this.handleUnassign(e, row)}>
                                     <i className="material-icons md-18">radio_button_unchecked</i>
@@ -402,7 +402,7 @@ define([
                             )}
 
                             {this.isDirectProperty(row) && (
-                                <button title="Delete" data-placement='bottom' className="btn btn-link showToolTip"
+                                <button title="Sterge" data-placement='bottom' className="btn btn-link showToolTip"
                                         disabled={this.isSystemProperty(row)}
                                         onClick={(e) => this.handleDelete(e, row)}>
                                     <i className="material-icons md-18">delete_forever</i>
@@ -419,8 +419,8 @@ define([
                         (<div className="col-sm-12">
                             <div className="tableButtonBar">
                                 <div className="btn-group pull-right">
-                                    <button className="btn btn-blue m-x-1" onClick={this.handleSelectProperty}>Assign existing</button>
-                                    <button className="btn btn-blue" onClick={this.handleAdd}>Add new</button>
+                                    <button className="btn btn-blue m-x-1" onClick={this.handleSelectProperty}>Conecteaza</button>
+                                    <button className="btn btn-blue" onClick={this.handleAdd}>Adauga</button>
                                 </div>
                             </div>
                         </div>)
@@ -429,12 +429,11 @@ define([
                     {this.props.showWorkspaceSelector &&
                         (<div className="col-sm-12">
                             <div className="form-group">
-                                <label className="control-label" htmlFor="workspaceSelector">Workspace</label>
+                                <label className="control-label" htmlFor="workspaceSelector">Spatiu de lucru</label>
                                 <select className="custom-select form-control" id="workspaceSelector"
                                         value={this.state.selectedWorkspace}
                                         onChange={(e) => { this.workspaceChanged(e.target.value) }}>
                                     <option key={ONTOLOGY_CONSTANTS.PUBLIC_ONTOLOGY} value={ONTOLOGY_CONSTANTS.PUBLIC_ONTOLOGY}>PUBLIC</option>
-                                    {workspaceOptions}
                                 </select>
                             </div>
                         </div>)

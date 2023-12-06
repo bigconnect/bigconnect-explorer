@@ -178,7 +178,7 @@ define([
             return (
                 <Modal>
                     <div className='modal-header'>
-                        <h4 className='modal-title'>Edit Property</h4>
+                        <h4 className='modal-title'>Editare Proprietate</h4>
                     </div>
                     <div className='modal-body'>
                         {this.state.extra_errors.length > 0 && (
@@ -203,9 +203,9 @@ define([
                                     <div id="collapse1" className="panel-collapse collapse in">
                                         <div className="panel-body">
                                             <div className="form-group">
-                                                <label htmlFor="title" className="col-md-3 control-label">Name</label>
+                                                <label htmlFor="title" className="col-md-3 control-label">Cod</label>
                                                 <div className="col-md-9">
-                                                    <input id="title" type="text" className="form-control" placeholder="Title"
+                                                    <input id="title" type="text" className="form-control" placeholder="Cod intern"
                                                            required
                                                            disabled={property.systemProperty}
                                                            value={property.title}
@@ -215,9 +215,9 @@ define([
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="displayName" className="col-md-3 control-label">Display Name</label>
+                                                <label htmlFor="displayName" className="col-md-3 control-label">Nume</label>
                                                 <div className="col-md-9">
-                                                    <input id="displayName" type="text" className="form-control" placeholder="Display name"
+                                                    <input id="displayName" type="text" className="form-control" placeholder="Numele sub care este afisat"
                                                            required
                                                            value={property.displayName}
                                                            onChange={(e) => { this.setPropertyState('displayName', e.target.value) }}
@@ -226,7 +226,7 @@ define([
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="dataType" className="col-md-3 control-label">Type</label>
+                                                <label htmlFor="dataType" className="col-md-3 control-label">Tip</label>
                                                 <div className="col-md-9">
                                                     <select id="dataType" className="custom-select form-control" required
                                                             value={property.dataType}
@@ -253,7 +253,7 @@ define([
                                                                    onChange={(e) => { this.setPropertyState('userVisible', e.target.checked ) }}
                                                             />
                                                             <span className="custom-control-indicator"></span>
-                                                            Visible
+                                                            Vizibila
                                                         </label>
                                                     </div>
                                                 </div>
@@ -269,7 +269,7 @@ define([
                                                                    onChange={(e) => { this.setPropertyState('searchable', e.target.checked ) }}
                                                             />
                                                             <span className="custom-control-indicator"></span>
-                                                            Searchable
+                                                            Se poate cauta
                                                         </label>
                                                     </div>
                                                 </div>
@@ -284,14 +284,14 @@ define([
                                                                    onChange={(e) => { this.setPropertyState('searchFacet', e.target.checked ) }}
                                                             />
                                                             <span className="custom-control-indicator"></span>
-                                                            Show as Search Facet
+                                                            Fateta de cautare
                                                         </label>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="textIndexHints" className="col-md-3 control-label">Text Index Hints</label>
+                                                <label htmlFor="textIndexHints" className="col-md-3 control-label">Tip Index</label>
                                                 <div className="col-md-9">
                                                     <select id="textIndexHints" className="form-control"
                                                             value={textIndexHints}
@@ -319,7 +319,7 @@ define([
                                                                    onChange={(e) => { this.setPropertyState('deleteable', e.target.checked ) }}
                                                             />
                                                             <span className="custom-control-indicator"></span>
-                                                            Deleteable
+                                                            Se poate sterge
                                                         </label>
                                                     </div>
                                                 </div>
@@ -335,7 +335,7 @@ define([
                                                                    onChange={(e) => { this.setPropertyState('addable', e.target.checked ) }}
                                                             />
                                                             <span className="custom-control-indicator"></span>
-                                                            Addable
+                                                            Se poate adauga
                                                         </label>
                                                     </div>
                                                 </div>
@@ -351,14 +351,14 @@ define([
                                                                    onChange={(e) => { this.setPropertyState('updateable', e.target.checked ) }}
                                                             />
                                                             <span className="custom-control-indicator"></span>
-                                                            Updateable
+                                                            Se poate edita
                                                         </label>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="form-group">
-                                                <label htmlFor="intents" className="col-md-3 control-label">Intents</label>
+                                            <div className="form-group" style={{display: 'none'}}>
+                                                <label htmlFor="intents" className="col-md-3 control-label">Intentii</label>
                                                 <div className="col-md-9">
                                                     <input id="intents" type="text" className="form-control" placeholder="Comma separated values"
                                                            value={property.intents ? property.intents.join(',') : ''}
@@ -378,23 +378,23 @@ define([
                                 <div className="panel">
                                     <div className="panel-heading">
                                         <h4 data-toggle="collapse" data-parent="#accordion" href="#collapse2" className="accordion-toggle collapsed panel-title">
-                                            <a href="#">Aggregation</a>
+                                            <a href="#">Agregare</a>
                                         </h4>
                                     </div>
                                     <div id="collapse2" className="panel-collapse collapse">
                                         <div className="panel-body">
                                             <div className="form-group">
-                                                <label htmlFor="aggType" className="col-md-3 control-label">Aggregation</label>
+                                                <label htmlFor="aggType" className="col-md-3 control-label">Tip Agregare</label>
                                                 <div className="col-md-9">
                                                     <select id="aggType" className="custom-select form-control"
                                                             value={property.aggType}
                                                             onChange={(e) => { this.setPropertyState('aggType', e.target.value)} }
                                                     >
                                                         <option value="">None</option>
-                                                        <option value="term">Term</option>
-                                                        <option value="histogram">Histogram</option>
+                                                        <option value="term">Termeni</option>
+                                                        <option value="histogram">Histograma</option>
                                                         <option value="geohash">GeoHash</option>
-                                                        <option value="statistics">Statistics</option>
+                                                        <option value="statistics">Statistica</option>
                                                         <option value="calendar">Calendar</option>
                                                     </select>
                                                 </div>
@@ -408,14 +408,14 @@ define([
                                                            onChange={(e) => { this.setPropertyState('aggInterval', e.target.value) }}
                                                     />
                                                     <p className="help-block">
-                                                        For date fields: year, quarter, month, week, day, hour, minute, second
-                                                        For numeric fields: a positive decimal
+                                                        Pentru tip data: year, quarter, month, week, day, hour, minute, second
+                                                        Pentru tip numeric: a positive decimal
                                                     </p>
                                                 </div>
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="aggMinDocumentCount" className="col-md-3 control-label">Min Document Count</label>
+                                                <label htmlFor="aggMinDocumentCount" className="col-md-3 control-label">Numar min. documente</label>
                                                 <div className="col-md-9">
                                                     <input id="aggMinDocumentCount" type="number" className="form-control"
                                                            value={property.aggMinDocumentCount}
@@ -426,24 +426,24 @@ define([
 
 
                                             <div className="form-group">
-                                                <label htmlFor="aggCalendarField" className="col-md-3 control-label">Calendar Field</label>
+                                                <label htmlFor="aggCalendarField" className="col-md-3 control-label">Tip Calendar</label>
                                                 <div className="col-md-9">
                                                     <select id="aggCalendarField" className="custom-select form-control"
                                                             value={property.aggCalendarField}
                                                             onChange={(e) => { this.setPropertyState('aggCalendarField', e.target.value)} }
                                                     >
                                                         <option value="">None</option>
-                                                        <option value="DAY_OF_MONTH">Day of the month</option>
-                                                        <option value="DAY_OF_WEEK">Day of the week</option>
-                                                        <option value="HOUR_OF_DAY">Hour of day</option>
-                                                        <option value="MONTH_OF_YEAR">Month</option>
-                                                        <option value="YEAR">Year</option>
+                                                        <option value="DAY_OF_MONTH">Zi a lunii</option>
+                                                        <option value="DAY_OF_WEEK">Zi a saptamanii</option>
+                                                        <option value="HOUR_OF_DAY">Ora a zilei</option>
+                                                        <option value="MONTH_OF_YEAR">Luna</option>
+                                                        <option value="YEAR">An</option>
                                                     </select>
                                                 </div>
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="aggTimeZone" className="col-md-3 control-label">Calendar TimeZone</label>
+                                                <label htmlFor="aggTimeZone" className="col-md-3 control-label">Zone de timp</label>
                                                 <div className="col-md-9">
                                                     <select id="aggTimeZone" className="custom-select form-control"
                                                             value={property.aggTimeZone}
@@ -460,7 +460,7 @@ define([
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="aggPrecision" className="col-md-3 control-label">GeoHash Precision</label>
+                                                <label htmlFor="aggPrecision" className="col-md-3 control-label">Precizie GeoHash</label>
                                                 <div className="col-md-9">
                                                     <input id="aggPrecision" type="number" className="form-control" min={1} max={12}
                                                            value={property.aggPrecision}
@@ -476,34 +476,34 @@ define([
                                 <div className="panel">
                                     <div className="panel-heading">
                                         <h4 data-toggle="collapse" data-parent="#accordion" href="#collapse3" className="accordion-toggle collapsed panel-title">
-                                            <a href="#">Display</a>
+                                            <a href="#">Afisare</a>
                                         </h4>
                                     </div>
                                     <div id="collapse3" className="panel-collapse collapse">
                                         <div className="panel-body">
                                             <div className="form-group">
-                                                <label htmlFor="displayType" className="col-md-3 control-label">Custom Display</label>
+                                                <label htmlFor="displayType" className="col-md-3 control-label">Tip</label>
                                                 <div className="col-md-9">
                                                     <select id="displayType" className="custom-select form-control"
                                                             value={property.displayType}
                                                             onChange={(e) => { this.setPropertyState('displayType', e.target.value)} }
                                                     >
-                                                        <option value="">None</option>
-                                                        <option value="longText">Long Text</option>
+                                                        <option value="">Ascunsa</option>
+                                                        <option value="longText">Text lung</option>
                                                         <option value="link">Web Link</option>
-                                                        <option value="duration">Duration</option>
-                                                        <option value="bytes">Size (Bytes)</option>
-                                                        <option value="dateOnly">Date (no Time)</option>
+                                                        <option value="duration">Durata</option>
+                                                        <option value="bytes">Dimensiune (Bytes)</option>
+                                                        <option value="dateOnly">Data (fara timp)</option>
                                                         <option value="heading">Heading</option>
-                                                        <option value="geoLocation">Geo-Location</option>
+                                                        <option value="geoLocation">Geo-Locatie</option>
                                                     </select>
                                                 </div>
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="propertyGroup" className="col-md-3 control-label">Property Group</label>
+                                                <label htmlFor="propertyGroup" className="col-md-3 control-label">Grup</label>
                                                 <div className="col-md-9">
-                                                    <input id="propertyGroup" type="text" className="form-control" placeholder="Property Group"
+                                                    <input id="propertyGroup" type="text" className="form-control" placeholder="Grup"
                                                            value={property.propertyGroup}
                                                            onChange={(e) => { this.setPropertyState('propertyGroup', e.target.value) }}
                                                     />
@@ -511,7 +511,7 @@ define([
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="possibleValues" className="col-md-3 control-label">Possible values</label>
+                                                <label htmlFor="possibleValues" className="col-md-3 control-label">Valori posibile</label>
                                                 <div className="col-md-9">
                                                     <textarea id="possibleValues" rows="5" className="form-control"
                                                               placeholder='{ "key1": "value1", "key2": "value2" }'
@@ -522,9 +522,9 @@ define([
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="displayFormula" className="col-md-3 control-label">Display Formula</label>
+                                                <label htmlFor="displayFormula" className="col-md-3 control-label">Formula afisare</label>
                                                 <div className="col-md-9">
-                                                    <textarea id="displayFormula" rows="5" className="form-control" placeholder="JavaScript snippet with return statement. Available functions on the current element: prop(name), propRaw(name)"
+                                                    <textarea id="displayFormula" rows="5" className="form-control" placeholder="Snippet JavaScript cu instructiune de return"
                                                               value={property.displayFormula}
                                                               onChange={(e) => { this.setPropertyState('displayFormula', e.target.value) }}
                                                     />
@@ -532,9 +532,9 @@ define([
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="validationFormula" className="col-md-3 control-label">Validation Formula</label>
+                                                <label htmlFor="validationFormula" className="col-md-3 control-label">Formula validare</label>
                                                 <div className="col-md-9">
-                                                    <textarea id="validationFormula" rows="5" className="form-control" placeholder="JavaScript snippet with return statement (true,false). Available functions on the current element: prop(name), propRaw(name)"
+                                                    <textarea id="validationFormula" rows="5" className="form-control" placeholder="Snippet JavaScript cu instructiune de return"
                                                               value={property.validationFormula}
                                                               onChange={(e) => { this.setPropertyState('validationFormula', e.target.value) }}
                                                     />
@@ -553,7 +553,7 @@ define([
                                 type='button'
                                 className='btn btn-raised btn-danger'
                                 onClick={this.promise.reject}
-                            >Cancel</button>
+                            >Anuleaza</button>
                             {' '}
                             <button
                                 style={{display: (this.props.addmode || property.systemProperty) ? 'none' : 'inline-block'}}
@@ -561,14 +561,14 @@ define([
                                 type='button'
                                 className='btn btn-raised btn-danger'
                                 onClick={this.delete}
-                            >Delete</button>
+                            >Sterge</button>
                             {' '}
                             <button
                                 role='confirm'
                                 type='button'
                                 className='btn btn-raised btn-primary'
                                 onClick={this.save}
-                            >Save</button>
+                            >Salveaza</button>
                         </div>
                     </div>
                 </Modal>

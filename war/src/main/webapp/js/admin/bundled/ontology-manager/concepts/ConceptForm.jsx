@@ -172,7 +172,7 @@ define([
                     <div className="col-md-12">
                         <div className="panel">
                             <div className="panel-heading">
-                                <div className="panel-heading-title">{concept.title ? 'Concept: '+concept.title : 'New Concept'}</div>
+                                <div className="panel-heading-title">{concept.title ? 'Concept: '+concept.title : 'Concept nou'}</div>
                             </div>
 
                             <div className="panel-body">
@@ -181,7 +181,7 @@ define([
                                         <a href="#general" aria-controls="general" role="tab" data-toggle="tab">General</a>
                                     </li>
                                     <li style={{visibility: isNewConcept ? 'hidden' : 'visible'}}>
-                                        <a href="#props" aria-controls="props" role="tab" data-toggle="tab">Properties</a>
+                                        <a href="#props" aria-controls="props" role="tab" data-toggle="tab">Proprietati</a>
                                     </li>
                                 </ul>
 
@@ -205,9 +205,9 @@ define([
                                                 <div className="panel panel-default">
                                                     <div className="panel-body">
                                                         <div className="form-group">
-                                                            <label htmlFor="title" className="col-md-3 control-label">Name</label>
+                                                            <label htmlFor="title" className="col-md-3 control-label">Cod</label>
                                                             <div className="col-md-9">
-                                                                <input id="title" type="text" className="form-control" placeholder="Title"
+                                                                <input id="title" type="text" className="form-control" placeholder="Codul intern"
                                                                        required
                                                                        value={concept.title}
                                                                        disabled={concept.coreConcept || !isNewConcept}
@@ -217,9 +217,9 @@ define([
                                                         </div>
 
                                                         <div className="form-group">
-                                                            <label htmlFor="displayName" className="col-md-3 control-label">Display Name</label>
+                                                            <label htmlFor="displayName" className="col-md-3 control-label">Nume</label>
                                                             <div className="col-md-9">
-                                                                <input id="displayName" type="text" className="form-control" placeholder="Display name"
+                                                                <input id="displayName" type="text" className="form-control" placeholder="Numele sub care este afisat"
                                                                        required
                                                                        disabled={concept.coreConcept}
                                                                        value={concept.displayName}
@@ -229,7 +229,7 @@ define([
                                                         </div>
 
                                                         <div className="form-group">
-                                                            <label htmlFor="glyphIconHref" className="col-md-3 control-label">Icon</label>
+                                                            <label htmlFor="glyphIconHref" className="col-md-3 control-label">Imagine</label>
                                                             <div className="col-md-9">
                                                                 <GlyphSelector
                                                                     placeholder='Concept icon'
@@ -250,7 +250,7 @@ define([
                                                                                onChange={(e) => { this.setConceptState('userVisible', e.target.checked ) }}
                                                                         />
                                                                         <span className="custom-control-indicator"></span>
-                                                                        Visible
+                                                                        Vizibil
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -266,7 +266,7 @@ define([
                                                                                onChange={(e) => { this.setConceptState('searchable', e.target.checked ) }}
                                                                         />
                                                                         <span className="custom-control-indicator"></span>
-                                                                        Searchable
+                                                                        Se poate cauta
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -282,7 +282,7 @@ define([
                                                                                onChange={(e) => { this.setConceptState('deleteable', e.target.checked ) }}
                                                                         />
                                                                         <span className="custom-control-indicator"></span>
-                                                                        Deleteable
+                                                                        Se poate sterge
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -298,14 +298,14 @@ define([
                                                                                onChange={(e) => { this.setConceptState('updateable', e.target.checked ) }}
                                                                         />
                                                                         <span className="custom-control-indicator"></span>
-                                                                        Updateable
+                                                                        Se poate edita
                                                                     </label>
                                                                 </div>
                                                             </div>
                                                         </div>
 
-                                                        <div className="form-group">
-                                                            <label htmlFor="intents" className="col-md-3 control-label">Intents</label>
+                                                        <div className="form-group" style={{display: 'none'}}>
+                                                            <label htmlFor="intents" className="col-md-3 control-label">Intentii</label>
                                                             <div className="col-md-9">
                                                                 <input id="intents" type="text" className="form-control" placeholder="Comma separated values"
                                                                        value={concept.intents ? concept.intents.join(',') : ''}
@@ -324,12 +324,12 @@ define([
                                                 <div className="panel panel-default">
                                                     <div className="panel-heading">
                                                         <h4 data-toggle="collapse" data-parent="#accordion" href="#collapse2" className="panel-title expand">
-                                                            <a href="#">Display</a>
+                                                            <a href="#">Afisare</a>
                                                         </h4>
                                                     </div>
                                                     <div className="panel-body">
                                                         <div className="form-group">
-                                                            <label htmlFor="dataType" className="col-md-3 control-label">Display Type</label>
+                                                            <label htmlFor="dataType" className="col-md-3 control-label">Tip</label>
                                                             <div className="col-md-9">
                                                                 <select id="displayType" className="custom-select form-control" required
                                                                         value={concept.displayType}
@@ -346,16 +346,16 @@ define([
                                                         </div>
 
                                                         <div className="form-group">
-                                                            <label htmlFor="color" className="col-md-3 control-label">Color</label>
+                                                            <label htmlFor="color" className="col-md-3 control-label">Culoare</label>
                                                             <div className="col-md-9">
                                                                 <ColorSelector value={concept.color} onSelected={(c) => this.setConceptState('color', c)} />
                                                             </div>
                                                         </div>
 
                                                         <div className="form-group">
-                                                            <label htmlFor="titleFormula" className="col-md-3 control-label">Title Formula</label>
+                                                            <label htmlFor="titleFormula" className="col-md-3 control-label">Formula Titlu</label>
                                                             <div className="col-md-9">
-                                                                    <textarea id="titleFormula" rows="5" className="form-control" placeholder="JavaScript snippet with return statement"
+                                                                    <textarea id="titleFormula" rows="5" className="form-control" placeholder="Snippet JavaScript cu instructiune de return"
                                                                               value={concept.titleFormula}
                                                                               onChange={(e) => { this.setConceptState('titleFormula', e.target.value) }}
                                                                     />
@@ -363,9 +363,9 @@ define([
                                                         </div>
 
                                                         <div className="form-group">
-                                                            <label htmlFor="subtitleFormula" className="col-md-3 control-label">Subtitle Formula</label>
+                                                            <label htmlFor="subtitleFormula" className="col-md-3 control-label">Formula Subtitlu</label>
                                                             <div className="col-md-9">
-                                                                    <textarea id="subtitleFormula" rows="5" className="form-control" placeholder="JavaScript snippet with return statement"
+                                                                    <textarea id="subtitleFormula" rows="5" className="form-control" placeholder="Snippet JavaScript cu instructiune de return"
                                                                               value={concept.subtitleFormula}
                                                                               onChange={(e) => { this.setConceptState('subtitleFormula', e.target.value) }}
                                                                     />
@@ -373,9 +373,9 @@ define([
                                                         </div>
 
                                                         <div className="form-group">
-                                                            <label htmlFor="timeFormula" className="col-md-3 control-label">Time Formula</label>
+                                                            <label htmlFor="timeFormula" className="col-md-3 control-label">Formula Timp</label>
                                                             <div className="col-md-9">
-                                                                    <textarea id="timeFormula" rows="5" className="form-control" placeholder="JavaScript snippet with return statement"
+                                                                    <textarea id="timeFormula" rows="5" className="form-control" placeholder="Snippet JavaScript cu instructiune de return"
                                                                               value={concept.timeFormula}
                                                                               onChange={(e) => { this.setConceptState('timeFormula', e.target.value) }}
                                                                     />
@@ -394,14 +394,14 @@ define([
                                                     type='button'
                                                     className='btn btn-raised btn-danger'
                                                     onClick={this.delete}
-                                                >Delete</button>
+                                                >Sterge</button>
                                                 {' '}
                                                 <button
                                                     role='confirm'
                                                     type='button'
                                                     className='btn btn-raised btn-primary'
                                                     onClick={this.save}
-                                                >Save</button>
+                                                >Salveaza</button>
                                             </div>
                                         </div>
                                     </div>
@@ -423,7 +423,7 @@ define([
                                                                         <div className="switcher-yes">YES</div>
                                                                         <div className="switcher-no">NO</div>
                                                                     </div>
-                                                                    Show Inherited Properties
+                                                                    Arata proprietatile mostenite
                                                                 </label>
                                                             </div>
                                                         </div>

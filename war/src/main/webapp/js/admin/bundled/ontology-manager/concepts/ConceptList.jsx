@@ -177,7 +177,7 @@ define([
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-md-3">
-                            <div className="form-group">
+                            <div className="form-group" style={{display: 'none'}}>
                                 <label className="control-label" htmlFor="workspaceSelector">Spatii de lucru</label>
                                 <select className="custom-select form-control" id="workspaceSelector"
                                         value={this.state.selectedWorkspace}

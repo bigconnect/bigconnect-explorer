@@ -62,12 +62,12 @@ define([
             return (
                 <Modal>
                     <div className='modal-header'>
-                        <h4 className='modal-title'>Choose Property</h4>
+                        <h4 className='modal-title'>Alege proprietatea</h4>
                     </div>
 
                     <div className='modal-body form-horizontal'>
                         <div className="form-group">
-                            <label htmlFor="property" className="col-md-3 control-label">Property</label>
+                            <label htmlFor="property" className="col-md-3 control-label">Proprietate</label>
                             <div className="col-md-9">
                                 <select id="property" className="custom-select form-control" required
                                         value={this.state.selected}
@@ -91,7 +91,7 @@ define([
                                 type='button'
                                 className='btn btn-danger'
                                 onClick={this.promise.reject}
-                            >Cancel</button>
+                            >Anuleaza</button>
                             {' '}
                             <button
                                 role='confirm'

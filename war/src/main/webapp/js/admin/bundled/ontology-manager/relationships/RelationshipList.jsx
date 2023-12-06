@@ -147,8 +147,8 @@ define([
                                 .then(() => this.loadData())
                                 .catch(e => {
                                     swal({
-                                        title: 'Error!',
-                                        text: 'The property could not be added',
+                                        title: 'Eroare!',
+                                        text: 'Relatia nu a putut fi adaugata',
                                         type: 'error',
                                     });
                                 });
@@ -156,12 +156,12 @@ define([
                             dataRequest('admin', 'ontologyRelDelete', this.state.selectedWorkspace, relationship.title)
                                 .then(() => this.loadData())
                                 .catch(e => {
-                                    let text = 'The relationship cannot be deleted';
+                                    let text = 'Relatia nu a putut fi stearsa';
                                     if (e.json && e.json.error) {
                                         text = e.json.error;
                                     }
                                     swal({
-                                        title: 'Error!',
+                                        title: 'Eroare!',
                                         text,
                                         type: 'error',
                                     });
@@ -175,8 +175,8 @@ define([
             const relId = row.original.title;
 
             swal({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                title: 'Sunteti sigur?',
+                text: "Aceasta actiune este ireversibila",
                 type: 'warning',
                 showCancelButton: true
             }).then((result) => {
@@ -185,7 +185,7 @@ define([
                         dataRequest('admin', 'ontologyRelDelete', this.state.selectedWorkspace, relId)
                             .then(() => this.loadData())
                             .catch(e => {
-                                let text = 'The relationship cannot be deleted';
+                                let text = 'Relatia nu a putut fi stearsa';
                                 if (e.json && e.json.error) {
                                     text = e.json.error;
                                 }
@@ -206,25 +206,25 @@ define([
             ));
 
             const columns = [{
-                Header: 'Name',
+                Header: 'Cod',
                 accessor: 'title'
             }, {
-                Header: 'Display Name',
+                Header: 'Nume',
                 accessor: 'displayName'
             }, {
                 id: 'domainConceptIris',
-                Header: 'Source',
+                Header: 'Sursa',
                 accessor: (row) => String(row.domainConceptIris.join(', '))
             }, {
                 id: 'rangeConceptIris',
-                Header: 'Target',
+                Header: 'Destinatie',
                 accessor: (row) => String(row.rangeConceptIris.join(', '))
             }, {
                 id: 'coreConcept',
-                Header: 'System',
+                Header: 'Sistem',
                 accessor: (row) => String(row.coreConcept)
             }, {
-                Header: 'Actions',
+                Header: 'Actiuni',
                 accessor: 'id',
                 width: 150,
                 filterable: false,
@@ -233,13 +233,13 @@ define([
                 Cell: row => (
                     <div className="text-center">
                         <div className="btn-group btn-group-sm">
-                            <button title="Edit" data-placement='bottom' className="btn btn-link showToolTip"
+                            <button title="Editeaza" data-placement='bottom' className="btn btn-link showToolTip"
                                     onClick={(e) => this.handleEdit(e, row)}>
                                 <i className="material-icons md-18">create</i>
                             </button>
 
                             {!row.original.coreConcept && (
-                                <button title="Delete" data-placement='bottom' className="btn btn-link showToolTip"
+                                <button title="Sterge" data-placement='bottom' className="btn btn-link showToolTip"
                                         onClick={(e) => this.handleDelete(e, row)}>
                                     <i className="material-icons md-18">delete_forever</i>
                                 </button>
@@ -252,9 +252,9 @@ define([
             return (
                 <div className="panel">
                     <div className="panel-heading">
-                        <div className="panel-heading-title">Relationships</div>
+                        <div className="panel-heading-title">Relatii</div>
                         <div className="panel-heading-subtitle text-muted">
-                            Manage types of relationships between concepts
+                            Relatii posibile intre concepte
                         </div>
 
                         <div className="btn-group">
@@ -266,13 +266,12 @@ define([
                     </div>
 
                     <div className="panel-body">
-                        <div className="form-group">
+                        <div className="form-group" style={{display: 'none'}}>
                             <label className="control-label" htmlFor="workspaceSelector">Workspace</label>
                             <select className="custom-select form-control" id="workspaceSelector"
                                     value={this.state.selectedWorkspace}
                                     onChange={(e) => { this.workspaceChanged(e.target.value) }}>
                                 <option key={ONTOLOGY_CONSTANTS.PUBLIC_ONTOLOGY} value={ONTOLOGY_CONSTANTS.PUBLIC_ONTOLOGY}>PUBLIC</option>
-                                {workspaceOptions}
                             </select>
                         </div>
 
