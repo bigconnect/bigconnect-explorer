@@ -301,10 +301,10 @@ define([
                                                                 this.setPropertyState('textIndexHints', hints )}
                                                             }
                                                     >
-                                                        <option value="NONE">None</option>
+                                                        <option value="NONE">Fara</option>
                                                         <option value="FULL_TEXT">Full-Text</option>
                                                         <option value="EXACT_MATCH">Exact Match</option>
-                                                        <option value="ALL">Both</option>
+                                                        <option value="ALL">Ambele</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -393,8 +393,6 @@ define([
                                                         <option value="">None</option>
                                                         <option value="term">Termeni</option>
                                                         <option value="histogram">Histograma</option>
-                                                        <option value="geohash">GeoHash</option>
-                                                        <option value="statistics">Statistica</option>
                                                         <option value="calendar">Calendar</option>
                                                     </select>
                                                 </div>
@@ -443,7 +441,7 @@ define([
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="aggTimeZone" className="col-md-3 control-label">Zone de timp</label>
+                                                <label htmlFor="aggTimeZone" className="col-md-3 control-label">Timezone</label>
                                                 <div className="col-md-9">
                                                     <select id="aggTimeZone" className="custom-select form-control"
                                                             value={property.aggTimeZone}
@@ -456,16 +454,6 @@ define([
                                                             ))
                                                         }
                                                     </select>
-                                                </div>
-                                            </div>
-
-                                            <div className="form-group">
-                                                <label htmlFor="aggPrecision" className="col-md-3 control-label">Precizie GeoHash</label>
-                                                <div className="col-md-9">
-                                                    <input id="aggPrecision" type="number" className="form-control" min={1} max={12}
-                                                           value={property.aggPrecision}
-                                                           onChange={(e) => { this.setPropertyState('aggPrecision', e.target.value) }}
-                                                    />
                                                 </div>
                                             </div>
                                         </div>
