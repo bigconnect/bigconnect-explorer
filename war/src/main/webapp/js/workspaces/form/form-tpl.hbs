@@ -8,7 +8,7 @@
                 <span class="form-title-error">{{ i18n 'workspaces.form.title.unique.error' }}</span>
             </li>
 
-            <li>
+            <li style="display: none">
                 <label>
                     <input type="checkbox" class="workspace-staging" style="width: 2em" {{#if workspace.staging}}checked{{/if}} required>
                     <span>Enable staging</span>
@@ -21,11 +21,11 @@
         <li class="share-form" style="display:none">
         </li>
     </ul>
-</div>
 
-<div class="buttons">
-    {{#if editable}}
-        <button class="delete btn btn-danger btn-raised"> {{ i18n 'workspaces.form.button.delete' }}</button>
-    {{/if}}
+    <div class="buttons">
+        {{#if editable}}
+            <button class="delete btn btn-danger btn-raised"> {{ i18n 'workspaces.form.button.delete' }}</button>
+        {{/if}}
+    </div>
 </div>
 

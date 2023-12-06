@@ -1,9 +1,5 @@
 @import (reference) "../util/positioning.less";
 
-width: auto;
-height: 35em;
-
-
 .content {
   position: relative;
   display: block;
@@ -76,7 +72,7 @@ li {
 }
 
 .workspaces-list {
-  width: 20em;
+  width: 25em;
   padding: 0 0.5em;
 
   li a {
@@ -130,9 +126,7 @@ li {
 }
 
 .workspace-form {
-  width: 260px;
   background: @pane-background;
-  height: 100%;
   z-index: 89; // so it floats above graph, but below splitbar handles
   border-left: 1px solid #ccc;
 
@@ -175,25 +169,17 @@ li {
     }
   }
   .scroller {
-    position: absolute;
-    bottom: 8em;
-    top: 0;
+    background-color: rgba(0,0,0,.05);
     overflow: auto;
-    left: 0;
-    width: 100%;
-    padding: 0 1em;
+    padding: 1em;
+    margin: 1em 0;
     .box-sizing(border-box);
   }
 
   .buttons {
-    position: absolute;
-    bottom: 0;
-    right: 1em;
-    left: 1em;
-
+    text-align: center;
     button {
-      margin-bottom: 1em;
-      width: 100%;
+      margin: 1em 0;
     }
   }
 

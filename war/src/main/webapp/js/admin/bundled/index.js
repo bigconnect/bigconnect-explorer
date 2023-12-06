@@ -42,20 +42,6 @@ define([
     var adminExtensionPoint = 'org.bigconnect.admin';
 
     registry.registerExtension(adminExtensionPoint, {
-        componentPath: 'admin/bundled/uiExtensionList/index',
-        section: 'Plugin',
-        name: 'UI Extensions',
-        subtitle: 'Extensions Available / Usages'
-    });
-
-    registry.registerExtension(adminExtensionPoint, {
-        componentPath: 'admin/bundled/pluginList/PluginList',
-        section: 'Plugin',
-        name: 'List',
-        subtitle: 'Loaded plugins'
-    });
-
-    registry.registerExtension(adminExtensionPoint, {
         componentPath: 'admin/bundled/users/UserManager',
         section: 'Security',
         name: 'Users',
@@ -67,13 +53,6 @@ define([
         section: 'Security',
         name: 'Roles',
         subtitle: 'Manage Roles'
-    });
-
-    registry.registerExtension(adminExtensionPoint, {
-        componentPath: 'admin/bundled/notifications/list',
-        section: 'System Notifications',
-        name: 'List',
-        subtitle: 'View all Notifications'
     });
 
     registry.registerExtension(adminExtensionPoint, {
@@ -95,26 +74,5 @@ define([
         section: 'Schema',
         name: 'Relationships',
         subtitle: 'Manage relationships'
-    });
-
-    registry.registerExtension(adminExtensionPoint, {
-        componentPath: 'admin/bundled/behaviour/BehaviourManager',
-        section: 'Behaviour',
-        name: 'Manage',
-        subtitle: 'Manage Behaviours'
-    });
-
-    registry.registerExtension(adminExtensionPoint, {
-        componentPath: 'admin/bundled/regex/RegexManager',
-        section: 'Extract',
-        name: 'Regex',
-        subtitle: 'Manage Regex Expressions'
-    });
-
-    registry.registerExtension(adminExtensionPoint, {
-        componentPath: 'admin/bundled/data/delete/DeleteData',
-        section: 'Data',
-        name: 'Delete',
-        subtitle: 'Delete elements identified by a saved search'
     });
 })
