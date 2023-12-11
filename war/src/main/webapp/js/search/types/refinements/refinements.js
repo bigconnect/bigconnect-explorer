@@ -40,7 +40,7 @@ define([
     'util/withDataRequest',
     './refinement.hbs',
     './termRefinement',
-    './histogramRefinement'
+    './histogramRefinement',
 ], function(
     defineComponent,
     withDataRequest,
@@ -72,7 +72,7 @@ define([
                         if (bucket.label != 'N/A') totalNonNAcount+=bucket.count;
                     });
 
-                    // show refinement if it it has at least two values
+                    // show refinement if it has at least two values
                     if(_.reject(ref.buckets,function(bucket) {
                             return bucket.count === 0 || (bucket.label == 'N/A' && bucket.count == totalNonNAcount);
                         }).length > 1) {
@@ -100,7 +100,7 @@ define([
                 $refDelete = $('<div class="applied-ref-delete">'),
                 self = this;
 
-            $refName.append('<span>' + data.category + ':' + data.bucketLabel + '</span>');
+            $refName.append('<span>' + data.category + ':' + data.displayName + '</span>');
             $refDelete.html('x');
             $refDelete.click(function() {
                 self.removeAppliedRefinement($appliedRef, data);

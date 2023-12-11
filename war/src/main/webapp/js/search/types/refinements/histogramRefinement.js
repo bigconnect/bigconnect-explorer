@@ -38,11 +38,13 @@
 define([
     'flight/lib/component',
     'util/withDataRequest',
-    './histogramRefinement.hbs'
+    './histogramRefinement.hbs',
+    'util/requirejs/promise!util/service/ontologyPromise'
 ], function(
     defineComponent,
     withDataRequest,
-    template
+    template,
+    ontology
 ) {
     'use strict';
 
@@ -63,7 +65,14 @@ define([
                 .toArray()
                 .value()
                 .sort((a,b) => parseInt(b.fromValue) - parseInt(a.fromValue))
-                .map((item) => { return { refItemText: item.label, refItemKey: item.key, refItemCount: item.count } })
+                .map((item) => {
+                    const concept = ontology.concepts.byId[label];
+                    return {
+                        refItemText: concept.displayName || concept.title,
+                        refItemKey: item.key,
+                        refItemCount: item.count
+                    }
+                })
 
             this.$node.html(template({ refItems }));
         });
@@ -72,7 +81,8 @@ define([
             const $refLink = $(event.target),
                 refBucketKey = $refLink.attr('bucket-key'),
                 self = this,
-                refBucket = this.attr.refinement.buckets[refBucketKey];
+                refBucket = this.attr.refinement.buckets[refBucketKey],
+                concept = ontology.concepts.byId[refBucketKey];
 
             this.trigger('applyRefinement', {
                 field: self.attr.refinement.field,
@@ -81,6 +91,7 @@ define([
                 bucketToValue: refBucket.toValue,
                 bucketLabel: refBucket.label,
                 category: self.attr.refinement.title,
+                displayName: concept.displayName || concept.title,
                 type: 'histogram'
             });
         }

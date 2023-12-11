@@ -37,11 +37,13 @@
 define([
     'flight/lib/component',
     'util/withDataRequest',
-    './termRefinement.hbs'
+    './termRefinement.hbs',
+    'util/requirejs/promise!util/service/ontologyPromise'
 ], function(
     defineComponent,
     withDataRequest,
-    template
+    template,
+    ontology
 ) {
     'use strict';
 
@@ -81,11 +83,15 @@ define([
                 refItems: _.keys(this.attr.finalRefinement)
                     .sort((a, b) => self.attr.finalRefinement[b].count - self.attr.finalRefinement[a].count)
                     .map(function(key) {
-						if (self.attr.finalRefinement[key].label !== null)
-                        return {
-                            refItemText: self.attr.finalRefinement[key].label,
-                            refItemKey: key,
-                            refItemCount: self.attr.finalRefinement[key].count,
+                        const label = self.attr.finalRefinement[key].label;
+                        const count = self.attr.finalRefinement[key].count;
+						if (label !== null) {
+                            const concept = ontology.concepts.byId[label];
+                            return {
+                                refItemText: concept.displayName || concept.title,
+                                refItemKey: key,
+                                refItemCount: count,
+                            }
                         }
                     })
             }))
@@ -95,7 +101,8 @@ define([
             const $refLink = $(event.target),
                 refBucketKey = $refLink.attr('bucket-key'),
                 refBucket = this.attr.finalRefinement[refBucketKey],
-                self = this;
+                self = this,
+                concept = ontology.concepts.byId[refBucketKey];
 
             this.trigger('applyRefinement', {
                 field: self.attr.refinement.field,
@@ -103,6 +110,7 @@ define([
                 bucketValue: refBucket.label,
                 bucketLabel: refBucket.label,
                 category: self.attr.refinement.title,
+                displayName: concept.displayName || concept.title,
                 type: 'term'
             });
         }
