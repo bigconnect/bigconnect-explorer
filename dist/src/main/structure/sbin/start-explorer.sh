@@ -14,6 +14,7 @@ BC_JAVA_OPTS="$BC_JAVA_OPTS -XX:+UseG1GC -XX:-OmitStackTraceInFastThrow -XX:+Alw
 BC_JAVA_OPTS="$BC_JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 -XX:+TrustFinalNonStaticFields -XX:+DisableExplicitGC"
 BC_JAVA_OPTS="$BC_JAVA_OPTS -Dfile.encoding=UTF-8 -Dfile.encoding=utf8 -Djava.net.preferIPv4Stack=true"
 BC_JAVA_OPTS="$BC_JAVA_OPTS -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -Djava.io.tmpdir=$EXPLORER_DATA_DIR/tmp"
+BC_JAVA_OPTS="$BC_JAVA_OPTS $JAVA_OPTS"
 
 "$JAVA_HOME/bin/java" \
   $BC_JAVA_OPTS \
