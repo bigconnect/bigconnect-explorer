@@ -67,14 +67,15 @@ import com.mware.web.routes.config.Configuration;
 import com.mware.web.routes.search.WebSearchOptionsFactory;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
-
+import org.json.JSONObject;
+import com.mware.web.util.DateUtils;
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class GeObjectSearchBase {
@@ -100,6 +101,7 @@ public abstract class GeObjectSearchBase {
         this.auditService = auditService;
         this.objectMapper = ObjectMapperFactory.getInstance();
         this.configuration = configuration;
+
     }
 
     @Handle
@@ -127,6 +129,61 @@ public abstract class GeObjectSearchBase {
                 return results;
             }
         }
+
+        JSONArray filterJson = searchOptions.getRequiredParameter("filter", JSONArray.class);
+        JSONArray updatedFilterJson = new JSONArray();
+
+        for (int i = 0; i < filterJson.length(); i++) {
+            JSONObject filterObject = filterJson.getJSONObject(i);
+            String propertyId = filterObject.getString("propertyId");
+            DateUtils dateUtils = new DateUtils();
+
+            if ("last_modified".equals(propertyId)) {
+                Object value = filterObject.getJSONArray("values").get(0);
+                long unixTimestamp;
+
+                if (value instanceof String) {
+                    // If value is a date string
+                    Date date = dateUtils.parseDateString((String) value);
+                    unixTimestamp = date.getTime() / 1000L;
+                } else if (value instanceof JSONObject) {
+                    // If value is a relative date object
+                    JSONObject relativeDate = (JSONObject) value;
+                    int unit = relativeDate.getInt("unit");
+                    int amount = relativeDate.getInt("amount");
+
+                    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                    calendar.setTime(new Date());
+
+                    switch (unit) {
+                        case 1: // Years
+                            calendar.add(Calendar.YEAR, amount);
+                            break;
+                        case 2: // Months
+                            calendar.add(Calendar.MONTH, amount);
+                            break;
+                        case 3: // Weeks
+                            calendar.add(Calendar.WEEK_OF_YEAR, amount);
+                            break;
+                        case 5: // Days
+                            calendar.add(Calendar.DAY_OF_YEAR, amount);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unsupported unit: " + unit);
+                    }
+
+                    unixTimestamp = calendar.getTimeInMillis() / 1000L;
+                } else {
+                    throw new IllegalArgumentException("Unsupported value type for last_modified filter");
+                }
+
+                filterObject.put("values", new JSONArray().put(unixTimestamp));
+            }
+
+            updatedFilterJson.put(filterObject);
+        }
+
+        searchOptions.getParameters().put("filter", updatedFilterJson.toString());
 
         try (QueryResultsIterableSearchResults searchResults = this.searchRunner.run(searchOptions, user, authorizations)) {
             List<ClientApiGeObject> geObjects = convertElementsToClientApi(
@@ -158,6 +215,7 @@ public abstract class GeObjectSearchBase {
             return results;
         }
     }
+
 
 
     protected List<ClientApiGeObject> findReferencedElements(

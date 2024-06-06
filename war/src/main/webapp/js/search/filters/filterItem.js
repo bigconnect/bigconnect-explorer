@@ -359,6 +359,8 @@ define([
 
             if (isCompoundField) {
                 fieldComponent = 'fields/compound/compound';
+            } else if (property.title === 'last_modified') {
+                fieldComponent = 'search/filters/dateField';
             } else if (property.displayType === 'duration') {
                 fieldComponent = 'fields/duration';
             } else if (property.dataType === 'date') {
