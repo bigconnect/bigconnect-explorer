@@ -86,7 +86,6 @@ public class ExportToWordHelper {
     private static final BcLogger LOGGER = BcLoggerFactory.getLogger(ExportToWordHelper.class);
     public static final String EXPORT_FILE_EXT = ".docx";
     public static final String EXPORT_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-
     private Graph graph;
     private WebQueueRepository webQueueRepository;
     private final SchemaRepository schemaRepository;
