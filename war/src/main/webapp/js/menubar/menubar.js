@@ -42,17 +42,23 @@ define([
     'admin/admin',
     'util/requirejs/promise!util/service/propertiesPromise',
     'util/component/attacher',
-], function(defineComponent, registry, Activity, template, AdminList, config, Attacher) {
+], function (defineComponent, registry, Activity, template, AdminList, config, Attacher) {
     'use strict';
 
     const enableCypherLabLink = config['cypher.lab'] || "true";
 
     // Add class name of <li> buttons here
-    const
-        BUTTONS = 'dashboard ingest search workspaces admin activity logout products user-profile'.split(' '),
+    const BUTTONS = 'dashboard ingest search workspaces admin activity logout products user-profile aiAssistant'.split(' '),
 
         PANE_AUXILIARY = {
-            products: { name: 'products-full', action: { type: 'full', componentPath: 'product/ProductDetailContainer' } }
+            products: {name: 'products-full', action: {type: 'full', componentPath: 'product/ProductDetailContainer'}},
+            aiAssistant: {
+                name: 'ai-assistant-full',
+                action: {
+                    type: 'full',
+                    componentPath: 'aiAssistant/AIAssistantContainer'
+                }
+            }
         },
 
         TOOLTIPS = {
@@ -63,19 +69,25 @@ define([
             workspaces: i18n('menubar.icons.workspaces.tooltip'),
             products: i18n('menubar.icons.products.tooltip'),
             admin: i18n('menubar.icons.admin.tooltip'),
-            logout: i18n('menubar.icons.logout.tooltip')
+            logout: i18n('menubar.icons.logout.tooltip'),
+            aiAssistant: i18n('menubar.icons.aiAssistant.tooltip'),
         },
 
         // Which cannot both be active
         MUTALLY_EXCLUSIVE_SWITCHES = [
-            { names: ['dashboard', 'ingest', 'search', 'products', 'admin'], options: { allowCollapse: false } },
-            { names: ['dashboard', 'ingest', 'search', 'products-full', 'admin'], options: { allowCollapse: false } }
+            {
+                names: ['dashboard', 'ingest', 'search', 'products', 'admin', 'aiAssistant', 'reports'],
+                options: {allowCollapse: false}
+            },
         ],
 
         ACTION_TYPES = {
             full: MUTALLY_EXCLUSIVE_SWITCHES[0],
             dropdown: MUTALLY_EXCLUSIVE_SWITCHES[1],
-            url: { names: [], options: {}}
+            url: {
+                names: ['aiAssistant'],
+                options: {}
+            }
         },
 
         // Don't change state to highlighted on click
@@ -88,11 +100,25 @@ define([
     function menubarItemHandler(name) {
         var sel = name + 'IconSelector';
 
-        return function(e) {
+        return function (e) {
             e.preventDefault();
 
             var self = this,
                 isSwitch = false;
+            if (name === 'aiAssistant') {
+                const jwt = bcData.currentUser.properties.jwt;
+
+                // Make AJAX call to get the URL
+                $.get('/webui-static-url')
+                    .done(function(response) {
+                        const url = response.url;
+                        window.location.href = `${url}?token=${jwt}`;
+                    })
+                    .fail(function(error) {
+                        console.error('Error fetching static URL:', error);
+                    });
+                return;
+            }
 
             var itemName = name;
             if (name in self.extensions) {
@@ -103,7 +129,7 @@ define([
             }
 
             if (DISABLE_ACTIVE_SWITCH.indexOf(itemName) === -1) {
-                MUTALLY_EXCLUSIVE_SWITCHES.forEach(function(exclusive, i) {
+                MUTALLY_EXCLUSIVE_SWITCHES.forEach(function (exclusive, i) {
                     if (exclusive.names.indexOf(itemName) !== -1 && exclusive.options.allowCollapse === false) {
                         isSwitch = true;
                     }
@@ -117,11 +143,12 @@ define([
             if (isSwitch && icon.hasClass('active')) {
                 icon.toggleClass('toggled');
             } else {
-                requestAnimationFrame(function() {
-                    var data = { name: itemName };
-                    if (data.action && data.action.type === 'url') {
+                requestAnimationFrame(function () {
+                    var data = {name: itemName};
+                    // Check if this is an extension with a URL action
+                    if (self.extensions[itemName] && self.extensions[itemName].action.type === 'url') {
                         flashIcon(icon);
-                        window.open(data.action.url);
+                        window.open(self.extensions[itemName].action.url);
                     } else {
                         var aux = PANE_AUXILIARY[itemName];
                         if (aux) {
@@ -142,7 +169,7 @@ define([
 
     function flashIcon(icon) {
         icon.addClass('active');
-        _.delay(function() {
+        _.delay(function () {
             icon.removeClass('active');
         }, 200);
     }
@@ -150,7 +177,7 @@ define([
     function Menubar() {
         var attrs = {}, events = {};
 
-        BUTTONS.forEach(function(name) {
+        BUTTONS.forEach(function (name) {
             var sel = name + 'IconSelector';
 
             attrs[sel] = '.' + name;
@@ -195,7 +222,7 @@ define([
          */
         registry.documentExtensionPoint('org.bigconnect.menubar',
             'Add items to menubar',
-            function(e) {
+            function (e) {
                 return ('title' in e) &&
                     ('identifier' in e) &&
                     ('action' in e) &&
@@ -203,8 +230,9 @@ define([
             },
             'https://docs.bigconnect.io/developer-guide/plugin-development/web-plugins/extension-point-reference-1/menu-bar'
         );
+
         registry.extensionsForPoint('org.bigconnect.menubar')
-            .forEach(function(data) {
+            .forEach(function (data) {
                 var cls = data.identifier,
                     type = data.action.type;
 
@@ -227,9 +255,9 @@ define([
             addItemsSelector: '.add-items'
         });
 
-        this.after('initialize', function() {
+        this.after('initialize', function () {
             const self = this,
-                boltURL = 'bolt://'+bcData.currentUser.userName+'@'+config['bolt.server'],
+                boltURL = 'bolt://' + bcData.currentUser.userName + '@' + config['bolt.server'],
                 jwt = (bcData.currentUser.properties && bcData.currentUser.properties.jwt) || '';
 
             const userPrivileges = bcData.currentUser.privileges,
@@ -238,7 +266,8 @@ define([
                 showDiscover = editPrivilege || userPrivileges.includes('DISCOVER'),
                 showAnalyze = editPrivilege || userPrivileges.includes('ANALYZE'),
                 showAddItems = editPrivilege || userPrivileges.includes('ADMIN'),
-                showSpaces = editPrivilege || userPrivileges.includes('SPACES');
+                showSpaces = editPrivilege || userPrivileges.includes('SPACES'),
+                showAIAssistant = editPrivilege || userPrivileges.includes('AI_ASSISTANT');
 
             this.$node.html(template({
                 isAdmin: AdminList.getExtensions().length > 0,
@@ -247,25 +276,27 @@ define([
                 showAnalyze,
                 showAddItems,
                 showSpaces,
+                showAIAssistant, // Add this line
                 enableCypherLabLink: (enableCypherLabLink === "true"),
                 currentUser: bcData.currentUser,
                 jwtToken: jwt,
                 connectURL: boltURL
             }));
+            console.log(bcData.currentUser);
             this.extensions = extensions;
 
             this.insertExtensions();
 
-            BUTTONS.forEach(function(button) {
+            BUTTONS.forEach(function (button) {
                 self.$node.find('.' + button).attr('data-identifier', button);
             });
 
-            Object.keys(TOOLTIPS).forEach(function(selectorClass) {
+            Object.keys(TOOLTIPS).forEach(function (selectorClass) {
                 self.$node.find('.' + selectorClass).tooltip({
                     placement: 'bottom',
                     html: true,
                     title: (TOOLTIPS[selectorClass].html || TOOLTIPS[selectorClass]).replace(/\s+/g, '&nbsp;'),
-                    delay: { show: 250, hide: 0 }
+                    delay: {show: 250, hide: 0}
                 });
             });
 
@@ -274,13 +305,13 @@ define([
             Activity.attachTo(this.select('activityIconSelector'));
 
             this.on('dragenter', {
-                productsIconSelector: function(event) {
+                productsIconSelector: function (event) {
                     if (!this.select('productsIconSelector').hasClass('active')) {
-                        this.trigger('menubarToggleDisplay', { name: 'products' });
+                        this.trigger('menubarToggleDisplay', {name: 'products'});
                     }
                 }
             })
-            $(document).on('dragstart', function(event) {
+            $(document).on('dragstart', function (event) {
                 const dataTransfer = event.originalEvent.dataTransfer;
                 if (dataTransfer && !$('.products-pane.visible').length) {
                     if (_.any(dataTransfer.types, type => type === BC_MIMETYPES.ELEMENTS)) {
@@ -305,43 +336,43 @@ define([
                 return true;
             }
 
-            const position = { x: window.lastMousePositionX, y: window.lastMousePositionY };
+            const position = {x: window.lastMousePositionX, y: window.lastMousePositionY};
             const self = this;
 
             Promise.require('util/popovers/fileImport/fileImport')
                 .then(CreateVertex => {
                     CreateVertex.attachTo(self.$node, {
-                        anchorTo: { page: position }
+                        anchorTo: {page: position}
                     });
                 });
         };
 
-        this.setWorkspaceName = function(name) {
+        this.setWorkspaceName = function (name) {
             // this.select('workspaceNameSelector').text(name);
         };
 
-        this.onWorkspaceLoaded = function(event, data) {
+        this.onWorkspaceLoaded = function (event, data) {
             this.setWorkspaceName(data.title);
         };
 
-        this.onWorkspaceUpdated = function(event, data) {
+        this.onWorkspaceUpdated = function (event, data) {
             if (bcData.currentWorkspaceId === data.workspace.workspaceId) {
                 this.setWorkspaceName(data.workspace.title);
             }
         };
 
-        this.onWorkspaceSaved = function(event, data) {
+        this.onWorkspaceSaved = function (event, data) {
             if (data.title) {
                 this.setWorkspaceName(data.title);
             }
         };
 
-        this.insertExtensions = function() {
+        this.insertExtensions = function () {
             var self = this,
                 identifiers = _.pluck(this.extensions, 'identifier'),
                 dependenciesForId = {},
                 sorted = _.chain(this.extensions)
-                    .each(function(e) {
+                    .each(function (e) {
                         var placementHint = e.options && (e.options.placementHintAfter || e.options.placementHintBefore || '');
                         if (placementHint && _.contains(identifiers, placementHint)) {
                             if (!dependenciesForId[placementHint]) {
@@ -358,7 +389,7 @@ define([
                     })
                     .values()
                     .value()
-                    .sort(function(e1, e2) {
+                    .sort(function (e1, e2) {
                         var deps1 = dependenciesForId[e1.identifier] || [],
                             deps2 = dependenciesForId[e2.identifier] || [];
 
@@ -371,7 +402,7 @@ define([
                         return 0;
                     });
 
-            _.each(sorted, function(item) {
+            _.each(sorted, function (item) {
                 var cls = item.identifier,
                     options = $.extend({
                         placementHint: 'top',
@@ -390,8 +421,8 @@ define([
                         .css(options.anchorCss);
                     Attacher().node(newItemInner)
                         .path(item.componentPath)
-                        .params({ item })
-                        .attach({ teardown: true, empty: true });
+                        .params({item})
+                        .attach({teardown: true, empty: true});
                 } else {
                     newItemInner = $('<a>')
                         .text(item.title)
@@ -400,10 +431,10 @@ define([
                 }
 
                 const newItem = $('<li>')
-                        .addClass(cls)
-                        .addClass(options.extraClass)
-                        .attr('data-identifier', item.identifier)
-                        .append(newItemInner);
+                    .addClass(cls)
+                    .addClass(options.extraClass)
+                    .attr('data-identifier', item.identifier)
+                    .append(newItemInner);
 
                 if ($placement) {
                     if ($placement.length) {
@@ -421,7 +452,7 @@ define([
             })
         };
 
-        this.onMenubarToggle = function(e, data) {
+        this.onMenubarToggle = function (e, data) {
             var self = this,
                 auxName = data && _.findKey(PANE_AUXILIARY, a => a.name === data.name),
                 isAux = Boolean(auxName),
@@ -429,11 +460,11 @@ define([
                 icon = this.select(name + 'IconSelector'),
                 active = isAux ? icon.hasClass('active-aux') : icon.hasClass('active');
 
-            if(data.name === 'user-profile') {
+            if (data.name === 'user-profile') {
                 require([
                     'userAccount/modal.hbs',
                     'userAccount/userAccount'
-                ], function(modalTemplate, UserAccount) {
+                ], function (modalTemplate, UserAccount) {
                     var modal = $(modalTemplate({
                         userName: bcData.currentUser.userName
                     })).appendTo(document.body);
@@ -454,28 +485,28 @@ define([
                 var isSwitch = false;
 
                 if (!active) {
-                    MUTALLY_EXCLUSIVE_SWITCHES.forEach(function(exclusive, i) {
+                    MUTALLY_EXCLUSIVE_SWITCHES.forEach(function (exclusive, i) {
                         if (exclusive.names.indexOf(data.name) !== -1) {
                             isSwitch = true;
-                                exclusive.names.forEach(function(exclusiveName) {
-                                    if (exclusiveName !== data.name) {
-                                        var otherIcon = self.select(exclusiveName + 'IconSelector');
-                                        var otherIsActive = false;
-                                        if (otherIcon.length) {
-                                            otherIsActive = otherIcon.hasClass('active');
-                                        } else {
-                                            var auxName = _.findKey(PANE_AUXILIARY, a => a.name === exclusiveName);
-                                            if (auxName) {
-                                                otherIcon = self.select(auxName + 'IconSelector');
-                                                otherIsActive = otherIcon.hasClass('active-aux');
-                                            }
+                            exclusive.names.forEach(function (exclusiveName) {
+                                if (exclusiveName !== data.name) {
+                                    var otherIcon = self.select(exclusiveName + 'IconSelector');
+                                    var otherIsActive = false;
+                                    if (otherIcon.length) {
+                                        otherIsActive = otherIcon.hasClass('active');
+                                    } else {
+                                        var auxName = _.findKey(PANE_AUXILIARY, a => a.name === exclusiveName);
+                                        if (auxName) {
+                                            otherIcon = self.select(auxName + 'IconSelector');
+                                            otherIsActive = otherIcon.hasClass('active-aux');
                                         }
-                                        if (otherIsActive) {
-                                            self.trigger(document, 'menubarToggleDisplay', {
-                                                name: exclusiveName,
-                                                isSwitchButCollapse: true
-                                            });
-                                        }
+                                    }
+                                    if (otherIsActive) {
+                                        self.trigger(document, 'menubarToggleDisplay', {
+                                            name: exclusiveName,
+                                            isSwitchButCollapse: true
+                                        });
+                                    }
                                 } else {
                                     if (isAux) {
                                         icon.addClass('active-aux');
@@ -483,7 +514,7 @@ define([
                                         icon.addClass('active');
                                     }
                                 }
-                                });
+                            });
                         }
                     });
                 }
@@ -497,7 +528,7 @@ define([
                     if (aux) {
                         active = icon.hasClass('active');
                         if (active && !icon.hasClass('active-aux')) {
-                            this.trigger(document, 'menubarToggleDisplay', { name: aux.name, action: aux.action });
+                            this.trigger(document, 'menubarToggleDisplay', {name: aux.name, action: aux.action});
                         }
                     }
                 }
@@ -506,26 +537,26 @@ define([
 
                 // Just highlight briefly to show click worked
                 icon.addClass('active');
-                setTimeout(function() {
+                setTimeout(function () {
                     icon.removeClass('active');
                 }, 200);
             }
 
             // position popovers for workspaces and activity
-            if(data.name === 'workspaces') {
+            if (data.name === 'workspaces') {
                 let $popover = $(this.attr.workspacesPopoverSelector),
                     pos = this.$node.find('.workspaces').position(),
                     workspacesPaneWidth = 585;
 
-                    $popover.css('left', (pos.left - workspacesPaneWidth/2 + 70)+ 'px');
-                    // $popover.css('right',  popoverWidth + 'px');
+                $popover.css('left', (pos.left - workspacesPaneWidth / 2 + 70) + 'px');
+                // $popover.css('right',  popoverWidth + 'px');
 
-            } else if(data.name === 'activity') {
+            } else if (data.name === 'activity') {
                 let $popover = $(this.attr.activityPopoverSelector),
                     pos = this.$node.find('.activity').position(),
                     activityPaneWidth = 350;
 
-                $popover.css('left', (pos.left - activityPaneWidth/2 - 30) + 'px');
+                $popover.css('left', (pos.left - activityPaneWidth / 2 - 30) + 'px');
             }
         };
     }

@@ -94,6 +94,7 @@ import com.mware.web.routes.vertex.*;
 import com.mware.web.routes.watchList.CreateWatch;
 import com.mware.web.routes.watchList.DeleteWatch;
 import com.mware.web.routes.watchList.ListWatches;
+import com.mware.web.routes.webui.StaticUrlGet;
 import com.mware.web.routes.workspace.*;
 import com.mware.web.webEventListeners.WebEventListener;
 
@@ -134,6 +135,7 @@ public class Router extends HttpServlet {
 
             app.get("/", UserAgentFilter.class, csrfProtector, Index.class);
             app.get("/configuration", csrfProtector, com.mware.web.routes.config.Configuration.class);
+            app.get("/webui-static-url", authenticator, csrfProtector, ReadPrivilegeFilter.class, StaticUrlGet.class);
             app.post("/logout", csrfProtector, Logout.class);
             app.get("/sso", csrfProtector, SSOHandler.class);
             app.post("/download", authenticator, csrfProtector, EditPrivilegeFilter.class, Download.class);
