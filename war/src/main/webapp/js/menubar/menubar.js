@@ -530,6 +530,9 @@ define([
                         if (active && !icon.hasClass('active-aux')) {
                             this.trigger(document, 'menubarToggleDisplay', {name: aux.name, action: aux.action});
                         }
+                        else if(icon.hasClass('active-aux')){
+                            this.trigger(document, 'menubarToggleDisplay', {name: aux.name, action: aux.action});
+                        }
                     }
                 }
 
