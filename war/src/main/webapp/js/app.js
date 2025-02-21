@@ -138,7 +138,6 @@ define([
 
         this.after('initialize', function() {
             var self = this;
-
             registry.documentExtensionPoint('org.bigconnect.fileImport',
                 'Override file import based on mime/type',
                 function(e) {
@@ -820,18 +819,22 @@ define([
         };
 
         this.mouseClikedOutsidePane = function(event, selector) {
-            const pane = this.select(selector),
-                position = pane.position(),
-                width = pane.width(),
-                height = pane.height(),
-                evtX = event.clientX,
-                evtY = event.clientY;
+            const $pane = this.select(selector);
 
-            if(position && width && height && evtX && evtY) {
-                return evtX < position.left || evtX > (position.left + width) || (evtY > position.top + height);
+            // Early exit if the pane isn't found.  This avoids errors and is more efficient.
+            if ($pane.length === 0) {
+                return true; // Treat as outside if the element doesn't exist.
             }
 
-            return true;
+            const paneRect = $pane[0].getBoundingClientRect(); // Use getBoundingClientRect for better accuracy.
+
+            // Check if the click is outside the pane's boundaries.  Simplified logic.
+            return (
+                event.clientX < paneRect.left ||
+                event.clientX > paneRect.right ||
+                event.clientY < paneRect.top ||
+                event.clientY > paneRect.bottom
+            );
         };
 
         this.collapseAllPanes = function(event) {
