@@ -136,8 +136,16 @@ define([
             this.$node.empty();
         });
 
+        this.setCssForTimeline = function() {
+            $(document).ready(function() {
+                $('.workspace-timeline').css('z-index', '999');
+                $('.workspace-overlay').css('z-index', '999');
+            });
+        }
+
         this.after('initialize', function() {
             var self = this;
+            this.setCssForTimeline()
             registry.documentExtensionPoint('org.bigconnect.fileImport',
                 'Override file import based on mime/type',
                 function(e) {
