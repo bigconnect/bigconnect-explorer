@@ -115,7 +115,7 @@ public class VertexNew implements ParameterizedHandler {
         this.workspaceHelper = workspaceHelper;
         this.auditService = auditService;
     }
-
+//TODO fix should take publish value from autopubish propriety from config
     @Handle
     public ClientApiVertex handle(
             @Optional(name = "vertexId", allowEmpty = false) String vertexId,
@@ -125,7 +125,7 @@ public class VertexNew implements ParameterizedHandler {
             @Optional(name = "lat") double latitude,
             @Optional(name = "lon") double longitude,
             @Optional(name = "properties", allowEmpty = false) String propertiesJsonString,
-            @Optional(name = "publish", defaultValue = "false") boolean shouldPublish,
+            @Optional(name = "publish", defaultValue = "true") boolean shouldPublish,
             @JustificationText String justificationText,
             ClientApiSourceInfo sourceInfo,
             @ActiveWorkspaceId(required = false) String workspaceId,
