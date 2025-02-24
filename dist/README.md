@@ -1,4 +1,4 @@
-1. Build Graph Engine:
+java1. Build Graph Engine:
 ```shell
 git clone https://github.com/bigconnect/bigconnect.git
 mvn install -DskipTests
@@ -39,3 +39,9 @@ Se creaza un nou Run configuration de tip Application, cu urmatoarele setari:
 - Program arguments: --webAppDir ```<calea catre>/bigconnect-explorer/war/src/main/webapp``` --port 8888
 - Working directory: ```$MODULE_DIR$```
 - Environment variables: ```BIGCONNECT_DIR=$MODULE_DIR$/../..;GOOGLE_APPLICATION_CREDENTIALS=$MODULE_DIR$/../../config/bigconnect-um-f7289cd1202f.json```
+
+
+### INSTRUCTIUNI BUILD:
+  - Go to dist dir
+  - Find build-docker.sh
+  - Run it
