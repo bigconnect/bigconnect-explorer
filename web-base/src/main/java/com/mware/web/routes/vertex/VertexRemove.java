@@ -41,40 +41,107 @@ import com.google.inject.Singleton;
 import com.mware.core.exception.BcAccessDeniedException;
 import com.mware.core.exception.BcResourceNotFoundException;
 import com.mware.core.model.clientapi.dto.SandboxStatus;
+import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.workQueue.Priority;
 import com.mware.core.model.workspace.WorkspaceHelper;
 import com.mware.core.security.AuditEventType;
 import com.mware.core.security.AuditService;
 import com.mware.core.user.User;
+import com.mware.core.util.BcLogger;
+import com.mware.core.util.BcLoggerFactory;
 import com.mware.core.util.SandboxStatusUtil;
 import com.mware.ge.Authorizations;
 import com.mware.ge.Graph;
 import com.mware.ge.Vertex;
+import com.mware.ge.store.StorableVertex;
 import com.mware.security.ACLProvider;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
 import com.mware.web.framework.annotations.Required;
+import com.mware.web.framework.utils.StringUtils;
 import com.mware.web.model.ClientApiSuccess;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
+import com.mware.core.config.Configuration;
+import io.bigconnect.dw.image.face.CompreFaceService;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Singleton
 public class VertexRemove implements ParameterizedHandler {
+    private static final BcLogger LOGGER = BcLoggerFactory.getLogger(VertexRemove.class);
+    public static final String CONFIG_BASE_URL = "base-compre-face.url";
+    public static final String CONFIG_API_KEY = "face-detector.api.key";
+
     private final Graph graph;
     private final WorkspaceHelper workspaceHelper;
     private final ACLProvider aclProvider;
     private final AuditService auditService;
+    private final Configuration configuration;
+    private CompreFaceService compreFaceService;
 
     @Inject
     public VertexRemove(
             final Graph graph,
             final WorkspaceHelper workspaceHelper,
             final ACLProvider aclProvider,
-            final AuditService auditService) {
+            final AuditService auditService,
+            final Configuration configuration) {
         this.graph = graph;
         this.workspaceHelper = workspaceHelper;
         this.aclProvider = aclProvider;
         this.auditService = auditService;
+        this.configuration = configuration;
+        prepare();
+    }
+
+    // Modified prepare method to use injected configuration
+    private void prepare() {
+        String baseUrl = configuration.get(CONFIG_BASE_URL, null);
+        if (!StringUtils.isEmpty(baseUrl)) {
+            Retrofit compreFaceRetrofit = new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .addConverterFactory(JacksonConverterFactory.create())
+                    .build();
+            compreFaceService = compreFaceRetrofit.create(CompreFaceService.class);
+        }
+    }
+
+    private void handlePersonDelete(Vertex vertex) {
+        try {
+            String title = BcSchema.TITLE.getFirstPropertyValue(vertex);
+            if (!StringUtils.isEmpty(title)) {
+                String apiKey = configuration.get(CONFIG_API_KEY, "");
+
+                try {
+                    Response<Void> response = compreFaceService.deleteSubject(apiKey, title).execute();
+
+                    if (response.isSuccessful()) {
+                        LOGGER.info("Successfully deleted person from face recognition system: " + title);
+                    } else {
+                        LOGGER.warn("Failed to delete person from face recognition system: " + title +
+                                ", status code: " + response.code());
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Error calling face recognition API to delete person: " + title, e);
+                }
+            } else {
+                LOGGER.warn("Cannot delete person from face recognition system - no title property found");
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error handling person deletion", e);
+        }
+    }
+
+    private void handleImageDelete(Vertex vertex) {
+        try {
+            // TODO: Implement API call to remove image from face recognition system
+            String id = vertex.getId();
+            LOGGER.info("Handling image deletion for: " + id);
+        } catch (Exception e) {
+            LOGGER.error("Error handling image deletion", e);
+        }
     }
 
     @Handle
@@ -94,8 +161,15 @@ public class VertexRemove implements ParameterizedHandler {
                     graphVertexId);
         }
 
-        SandboxStatus sandboxStatus = SandboxStatusUtil.getSandboxStatus(vertex, workspaceId);
+        // Get concept type and handle special cases before deletion
+        String conceptType = ((StorableVertex) vertex).getConceptType();
+        if ("person".equalsIgnoreCase(conceptType)) {
+            handlePersonDelete(vertex);
+        } else if ("image".equalsIgnoreCase(conceptType)) {
+            handleImageDelete(vertex);
+        }
 
+        SandboxStatus sandboxStatus = SandboxStatusUtil.getSandboxStatus(vertex, workspaceId);
         boolean isPublicVertex = sandboxStatus == SandboxStatus.PUBLIC;
 
         workspaceHelper.deleteVertex(vertex, workspaceId, isPublicVertex, Priority.HIGH, authorizations, user);

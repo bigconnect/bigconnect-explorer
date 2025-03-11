@@ -19,24 +19,28 @@ import lombok.Data;
 
 import javax.inject.Inject;
 import java.util.Arrays;
-
+import com.mware.core.config.Configuration;
 public class ElementDelete implements ParameterizedHandler {
     private Graph graph;
     private ACLProvider aclProvider;
     private WorkspaceHelper workspaceHelper;
     private AuditService auditService;
+    private Configuration configuration;
 
     @Inject
     public ElementDelete(
             Graph graph,
             ACLProvider aclProvider,
             WorkspaceHelper workspaceHelper,
-            AuditService auditService
+            AuditService auditService,
+            Configuration configuration
     ) {
         this.graph = graph;
         this.aclProvider = aclProvider;
         this.workspaceHelper = workspaceHelper;
         this.auditService = auditService;
+        this.configuration = configuration;
+
     }
 
     @Handle
@@ -46,7 +50,7 @@ public class ElementDelete implements ParameterizedHandler {
             User user,
             Authorizations authorizations
     ) {
-        VertexRemove vertexRemover = new VertexRemove(graph, workspaceHelper, aclProvider, auditService);
+        VertexRemove vertexRemover = new VertexRemove(graph, workspaceHelper, aclProvider, auditService, configuration);
         Arrays.stream(elements)
                 .filter(e -> "vertex".equals(e.type))
                 .forEach(e -> {
