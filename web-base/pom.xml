@@ -230,6 +230,12 @@
             <artifactId>mockito-core</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-image-face-detector</artifactId>
+            <version>4.2.2-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
         <!--end-->
     </dependencies>
 
