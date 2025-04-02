@@ -221,11 +221,17 @@
             <version>${bigconnect.dw.version}</version>
         </dependency>
 
+
         <!-- Google -->
         <dependency>
             <groupId>io.bigconnect</groupId>
             <artifactId>dw-google-services-translate</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-text-zero-shot-classification</artifactId>
+            <version>${bigconnect.dw.version}</version>
         </dependency>
         <dependency>
             <groupId>io.bigconnect</groupId>

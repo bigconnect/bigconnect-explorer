@@ -172,6 +172,7 @@
             <artifactId>dw-classification-intellidockers-iptc</artifactId>
             <version>4.2.2-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>io.bigconnect</groupId>
             <artifactId>dw-text-summary</artifactId>
@@ -182,6 +183,11 @@
         <dependency>
             <groupId>io.bigconnect</groupId>
             <artifactId>dw-image-metadata-extractor</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-text-zero-shot-classification</artifactId>
             <version>${bigconnect.dw.version}</version>
         </dependency>
         <dependency>
