@@ -117,4 +117,11 @@ define([
         name: 'Delete',
         subtitle: 'Delete elements identified by a saved search'
     });
+
+    registry.registerExtension(adminExtensionPoint, {
+        componentPath: 'admin/bundled/reprocess/ReprocessManager',
+        section: 'Data',
+        name: 'Reprocess',
+        subtitle: 'Reprocess entities by type'
+    });
 })

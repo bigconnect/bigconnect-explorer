@@ -151,6 +151,16 @@
         </dependency>
         <dependency>
             <groupId>io.bigconnect</groupId>
+            <artifactId>dw-text-search</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
+            <artifactId>dw-text-zero-shot-classification</artifactId>
+            <version>${bigconnect.dw.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.bigconnect</groupId>
             <artifactId>dw-text-language-detector</artifactId>
             <version>${bigconnect.dw.version}</version>
         </dependency>
