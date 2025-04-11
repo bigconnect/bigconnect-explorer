@@ -1,5 +1,3 @@
-// admin/bundled/reprocess/ReprocessManager.jsx
-
 define([
     'flight/lib/component',
     'util/withFormFieldErrors',
@@ -7,21 +5,25 @@ define([
     'react-dom',
     'create-react-class',
     'public/v1/api'
-], function(
+], function (
     defineComponent,
     withFormFieldErrors,
     React,
     ReactDOM,
     createReactClass,
-    bcApi) {
+    bcApi
+) {
     'use strict';
 
     const ENTITY_TYPES = [
+        {id: 'youtubeVideo', name: 'Youtube Videos'},
         {id: 'instagramPost', name: 'Instagram Posts'},
-        {id: 'fbPost', name: 'Facebook Posts'},
-        {id: 'ttVideo', name: 'TikTok Videos'},
-        {id: 'twitterPost', name: 'Twitter Posts'},
         {id: 'instagramComment', name: 'Instagram Comments'},
+        {id: 'twitterPost', name: 'Twitter Posts'},
+        {id: 'twitterComment', name: 'Twitter Comment'},
+        {id: 'fbPost', name: 'Facebook Posts'},
+        {id: 'fbComment', name: 'Facebook Comment'},
+        {id: 'ttVideo', name: 'TikTok Videos'},
         {id: 'webArticle', name: 'Web Articles'}
     ];
 
@@ -30,10 +32,13 @@ define([
             return {
                 selectedTypes: {},
                 priority: 'LOW',
-                status: 'ready', // 'ready', 'processing', 'success', 'error'
+                status: 'ready',       // 'ready', 'processing', 'success', 'error'
+                deleteStatus: 'ready', // 'ready', 'processing', 'success', 'error'
                 errorMessage: '',
                 workspaceId: null,
-                workspaces: [] // Initialize workspaces array
+                workspaces: [],        // Initialize workspaces array
+                currentYear: false,    // New state for current_year flag
+                selectAll: false       // New state for select all checkbox
             };
         },
 
@@ -66,43 +71,75 @@ define([
         },
 
         handleWorkspaceChange(e) {
-            this.setState({ workspaceId: e.target.value });
+            this.setState({workspaceId: e.target.value});
         },
 
         handleCheckboxChange(e) {
-            const { value, checked } = e.target;
-            this.setState(state => ({
-                selectedTypes: {
+            const {value, checked} = e.target;
+            this.setState(state => {
+                const newSelectedTypes = {
                     ...state.selectedTypes,
                     [value]: checked
-                }
-            }));
+                };
+
+                // Check if all are selected to update selectAll state
+                const allSelected = ENTITY_TYPES.every(type => newSelectedTypes[type.id]);
+
+                return {
+                    selectedTypes: newSelectedTypes,
+                    selectAll: allSelected
+                };
+            });
+        },
+
+        // New handler for current_year checkbox
+        handleCurrentYearChange(e) {
+            this.setState({currentYear: e.target.checked});
+        },
+
+        // New handler for select all checkbox
+        handleSelectAllChange(e) {
+            const checked = e.target.checked;
+            const newSelectedTypes = {};
+
+            ENTITY_TYPES.forEach(type => {
+                newSelectedTypes[type.id] = checked;
+            });
+
+            this.setState({
+                selectAll: checked,
+                selectedTypes: newSelectedTypes
+            });
         },
 
         handlePriorityChange(e) {
-            this.setState({ priority: e.target.value });
+            this.setState({priority: e.target.value});
         },
 
         handleSubmit() {
-            const { selectedTypes, priority } = this.state;
+            const {selectedTypes, priority, currentYear} = this.state;
             const typesToProcess = Object.keys(selectedTypes).filter(key => selectedTypes[key]);
 
             if (typesToProcess.length === 0) {
-                this.setState({ errorMessage: 'Please select at least one entity type' });
+                this.setState({errorMessage: 'Please select at least one entity type'});
                 return;
             }
 
-            this.setState({ status: 'processing', errorMessage: '' });
-
+            this.setState({status: 'processing', errorMessage: ''});
             console.log('Starting reprocess with workspace ID:', this.getWorkspaceId());
+            console.log('Current year only:', currentYear);
+            console.log('Concepts to process:', typesToProcess);
 
+            // Still sending individual requests for each selected type
+            // This ensures we maintain the same behavior when using "Select All"
             const promises = typesToProcess.map(type => {
                 return $.ajax({
                     url: 'vertex/requeue-many',
                     method: 'GET',
                     data: {
                         concept: type,
-                        priority
+                        priority,
+                        currentYear: currentYear  // Add the current_year flag to the API call
                     },
                     headers: {
                         'bc-workspace-id': this.getWorkspaceId()
@@ -112,40 +149,93 @@ define([
 
             Promise.all(promises)
                 .then(() => {
-                    this.setState({ status: 'success' });
-                    setTimeout(() => this.setState({ status: 'ready' }), 2000);
+                    this.setState({status: 'success'});
+                    setTimeout(() => this.setState({status: 'ready'}), 2000);
                 })
                 .catch(error => {
                     console.error('Error reprocessing:', error);
-                    this.setState({ status: 'error' });
-                    setTimeout(() => this.setState({ status: 'ready' }), 2000);
+                    this.setState({status: 'error'});
+                    setTimeout(() => this.setState({status: 'ready'}), 2000);
                 });
         },
 
+        handleDelete() {
+            const {selectedTypes} = this.state;
+            const typesToDelete = Object.keys(selectedTypes).filter(key => selectedTypes[key]);
+
+            if (typesToDelete.length === 0) {
+                this.setState({errorMessage: 'Please select at least one entity type'});
+                return;
+            }
+
+            this.setState({deleteStatus: 'processing', errorMessage: ''});
+            console.log('Starting deletion for selected concept types:', typesToDelete);
+
+            // Sending individual requests for each selected type for deletion as well
+            const promises = typesToDelete.map(type => {
+                return $.ajax({
+                    url: 'vertex/remove-classification-props',
+                    method: 'GET',
+                    data: {
+                        concept: type
+                    },
+                    headers: {
+                        'bc-workspace-id': this.getWorkspaceId()
+                    }
+                });
+            });
+
+            Promise.all(promises)
+                .then(() => {
+                    this.setState({deleteStatus: 'success'});
+                    setTimeout(() => this.setState({deleteStatus: 'ready'}), 2000);
+                })
+                .catch(error => {
+                    console.error('Error deleting classification properties:', error);
+                    this.setState({deleteStatus: 'error'});
+                    setTimeout(() => this.setState({deleteStatus: 'ready'}), 2000);
+                });
+        },
+
+        getDeleteButtonProperties() {
+            const {deleteStatus} = this.state;
+            switch (deleteStatus) {
+                case 'processing':
+                    return {text: 'Deleting...', disabled: true, className: 'btn-warning'};
+                case 'success':
+                    return {text: 'Delete Complete', disabled: true, className: 'btn-success'};
+                case 'error':
+                    return {text: 'Error - Try Again', disabled: false, className: 'btn-danger'};
+                default:
+                    return {text: 'Delete Selected', disabled: false, className: 'btn-warning'};
+            }
+        },
+
         getButtonProperties() {
-            const { status } = this.state;
+            const {status} = this.state;
             switch (status) {
                 case 'processing':
-                    return { text: 'Processing...', disabled: true, className: 'btn-primary' };
+                    return {text: 'Processing...', disabled: true, className: 'btn-primary'};
                 case 'success':
-                    return { text: 'Reprocess Complete', disabled: true, className: 'btn-success' };
+                    return {text: 'Reprocess Complete', disabled: true, className: 'btn-success'};
                 case 'error':
-                    return { text: 'Error - Try Again', disabled: false, className: 'btn-danger' };
+                    return {text: 'Error - Try Again', disabled: false, className: 'btn-danger'};
                 default:
-                    return { text: 'Reprocess Selected', disabled: false, className: 'btn-primary' };
+                    return {text: 'Reprocess Selected', disabled: false, className: 'btn-primary'};
             }
         },
 
         render() {
-            const { errorMessage, workspaces } = this.state;
+            const {errorMessage, workspaces, currentYear, selectAll} = this.state;
             const buttonProps = this.getButtonProperties();
+            const deleteButtonProps = this.getDeleteButtonProperties();
 
             return (
                 <div className="reprocess-container">
                     <h2>Reprocess Entities</h2>
-                    <p className="text-muted">Select entity types to reprocess and click the button below.</p>
+                    <p className="text-muted">Select entity types to reprocess or delete and click the appropriate
+                        button below.</p>
 
-                    {/* Workspace selector dropdown */}
                     <div className="form-group workspace-selection">
                         <label>Workspace:</label>
                         <select
@@ -175,8 +265,33 @@ define([
                         </select>
                     </div>
 
+                    {/* New current year checkbox */}
+                    <div className="form-group current-year-option">
+                        <div className="checkbox">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={currentYear}
+                                    onChange={this.handleCurrentYearChange}
+                                /> Only process items modified in current year
+                            </label>
+                        </div>
+                    </div>
+
                     <div className="entity-types form-group">
                         <label>Entity Types:</label>
+
+                        {/* Select all checkbox */}
+                        <div className="checkbox select-all">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={selectAll}
+                                    onChange={this.handleSelectAllChange}
+                                /> <strong>Select All</strong>
+                            </label>
+                        </div>
+
                         <div className="checkbox-list">
                             {ENTITY_TYPES.map(type => (
                                 <div className="checkbox" key={type.id}>
@@ -184,6 +299,7 @@ define([
                                         <input
                                             type="checkbox"
                                             value={type.id}
+                                            checked={!!this.state.selectedTypes[type.id]}
                                             onChange={this.handleCheckboxChange}
                                         /> {type.name}
                                     </label>
@@ -194,19 +310,29 @@ define([
 
                     {errorMessage && <div className="errors">{errorMessage}</div>}
 
-                    <button
-                        className={`btn ${buttonProps.className} reprocess-button`}
-                        onClick={this.handleSubmit}
-                        disabled={buttonProps.disabled}
-                    >
-                        {buttonProps.text}
-                    </button>
+                    <div className="button-group">
+                        <button
+                            className={`btn ${buttonProps.className} reprocess-button`}
+                            onClick={this.handleSubmit}
+                            disabled={buttonProps.disabled}
+                        >
+                            {buttonProps.text}
+                        </button>
+                        <button
+                            className={`btn ${deleteButtonProps.className} delete-button`}
+                            onClick={this.handleDelete}
+                            disabled={deleteButtonProps.disabled}
+                            style={{marginLeft: '10px'}}
+                        >
+                            {deleteButtonProps.text}
+                        </button>
+                    </div>
 
                     <style jsx>{`
                         .reprocess-container {
                             padding: 20px;
                         }
-                        
+
                         .checkbox-list {
                             max-height: 300px;
                             overflow-y: auto;
@@ -215,16 +341,25 @@ define([
                             border-radius: 4px;
                             margin-bottom: 20px;
                         }
-                        
+
+                        .select-all {
+                            margin-bottom: 10px;
+                        }
+
                         .priority-selection,
-                        .workspace-selection {
+                        .workspace-selection,
+                        .current-year-option {
                             max-width: 300px;
                             margin-bottom: 15px;
                         }
-                        
+
                         .errors {
                             color: #a94442;
                             margin-bottom: 10px;
+                        }
+
+                        .button-group button {
+                            min-width: 150px;
                         }
                     `}</style>
                 </div>
@@ -235,13 +370,13 @@ define([
     return defineComponent(ReprocessManager, withFormFieldErrors);
 
     function ReprocessManager() {
-        this.after('initialize', function() {
+        this.after('initialize', function () {
             ReactDOM.render(
                 React.createElement(ReprocessComponent),
                 this.node
             );
 
-            this.on('teardown', function() {
+            this.on('teardown', function () {
                 ReactDOM.unmountComponentAtNode(this.node);
             });
         });

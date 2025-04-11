@@ -146,7 +146,7 @@ public class VertexImport implements ParameterizedHandler {
 
     @Handle
     public ClientApiArtifactImportResponse handle(
-            @Optional(name = "publish", defaultValue = "false") boolean shouldPublish,
+            @Optional(name = "publish", defaultValue = "true") boolean shouldPublish,
             @Optional(name = "addToWorkspace", defaultValue = "false") boolean addToWorkspace,
             @Optional(name = "findExistingByFileHash", defaultValue = "true") boolean findExistingByFileHash,
             @ActiveWorkspaceId String workspaceId,
