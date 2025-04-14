@@ -323,6 +323,12 @@ define([
                     ontologyRelationships = ontology.relationships,
                     ontologyProperties = ontology.properties;
 
+                const prop = ontologyProperties.byTitle['last_modified'];
+                if (prop && prop.dataType === 'integer') {
+                    if (!prop.displayType || prop.displayType === '') {
+                        delete prop.displayType;
+                    }
+                }
                 self.config = config;
                 self.ontologyProperties = ontologyProperties;
 
@@ -838,7 +844,15 @@ define([
                         } else {
                             const { full, truncated, expanded, toggleable } = getOrUpdateValue(vertex, property.name, property.key);
 
-                            valueSpan.textContent = expanded ? full : truncated;
+                            if (property.name === 'last_modified' && ontologyProperties.byTitle[property.name]?.dataType === 'integer') {
+                                const timestamp = Number(full.toString().replace(/,/g, ''));
+                                const date = new Date(timestamp);
+                                valueSpan.textContent = isNaN(date.getTime())
+                                    ? full
+                                    : `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                            } else {
+                                valueSpan.textContent = expanded ? full : truncated;
+                            }
 
                             if (toggleable) {
                                 $('<span/>').addClass('value-expand')
