@@ -55,14 +55,14 @@ public class MultiVertexRequeue implements ParameterizedHandler {
             vertices = graph.getVertices(authorizations);
         }
 
-        // Calculate the timestamp for January 1st of the current year
         long startOfYearTimestamp = 0;
         if (currentYear) {
             final Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
+            // Modified code to keep timestamp in milliseconds
             calendar.set(year, Calendar.JANUARY, 1, 0, 0, 0);
             calendar.set(Calendar.MILLISECOND, 0);
-            startOfYearTimestamp = calendar.getTimeInMillis() / 1000; // Convert to seconds for unix timestamp
+            startOfYearTimestamp = calendar.getTimeInMillis();
         }
 
         Priority priority = Priority.safeParse(requeuePriority);

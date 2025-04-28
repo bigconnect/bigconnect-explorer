@@ -37,6 +37,7 @@ import com.mware.core.model.clientapi.dto.SandboxStatus;
 import com.mware.ge.util.IterableUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -122,8 +123,9 @@ public class VertexRemoveClassificationProperties extends SetPropertyBase implem
      * @throws Exception If there is an error during processing.
      */
     @Handle
-    public List<ClientApiVertex> handle(
+    public ProgressResult handle(
             HttpServletRequest request,
+            HttpServletResponse response,
             @Required(name = "concept") String concept,
             @Optional(name = "visibilitySource") String visibilitySource,
             @ActiveWorkspaceId String workspaceId,
@@ -137,6 +139,9 @@ public class VertexRemoveClassificationProperties extends SetPropertyBase implem
                 ? visibilityTranslator.toVisibility(new VisibilityJson(visibilitySource)).getVisibility()
                 : new Visibility("");
 
+        LOGGER.info("Finding vertices of concept: {}", concept);
+
+        // First, collect all vertices of the specified concept type
         List<Vertex> allVertices = new ArrayList<>();
         for (Vertex vertex : graph.getVertices(authorizations)) {
             if (concept.equals(vertex.getConceptType())) {
@@ -148,6 +153,9 @@ public class VertexRemoveClassificationProperties extends SetPropertyBase implem
             throw new BcException("No vertices found for concept: " + concept);
         }
 
+        LOGGER.info("Found {} vertices with concept: {}", allVertices.size(), concept);
+
+        // Filter for vertices that have classification properties
         List<Vertex> vertices = new ArrayList<>();
         for (Vertex vertex : allVertices) {
             boolean hasClassificationProp = false;
@@ -161,27 +169,104 @@ public class VertexRemoveClassificationProperties extends SetPropertyBase implem
                 vertices.add(vertex);
             }
         }
+
         if (vertices.isEmpty()) {
             throw new BcException("No vertices found for concept: " + concept +
                     " that contain any of the classification properties.");
         }
 
-        List<ClientApiVertex> results = new ArrayList<>();
-        for (Vertex vertex : vertices) {
-            List<Property> props = IterableUtils.toList(vertex.getProperties());
-            for (Property property : props) {
-                if (CLASSIFICATION_PROPS.contains(property.getName())) {
-                    SandboxStatus[] sandboxStatuses = SandboxStatusUtil.getPropertySandboxStatuses(props, workspaceId);
-                    boolean isPropertyPublic = sandboxStatuses[props.indexOf(property)] == SandboxStatus.PUBLIC;
+        LOGGER.info("Found {} vertices with classification properties", vertices.size());
 
-                    workspaceHelper.deleteProperty(vertex, property, isPropertyPublic, workspaceId, Priority.HIGH, authorizations, user);
+        // Process vertices in batches and update progress
+        int totalVertices = vertices.size();
+        int processedCount = 0;
+        List<ClientApiVertex> results = new ArrayList<>();
+
+        // Choose a reasonable batch size
+        int batchSize = 50;
+
+        // Create a progress object to track and report status
+        ProgressResult progress = new ProgressResult(totalVertices, 0, 0, concept);
+
+        // Process in batches
+        for (int i = 0; i < vertices.size(); i += batchSize) {
+            int endIndex = Math.min(i + batchSize, vertices.size());
+            List<Vertex> batch = vertices.subList(i, endIndex);
+
+            // Process this batch
+            for (Vertex vertex : batch) {
+                List<Property> props = IterableUtils.toList(vertex.getProperties());
+                int propertiesDeleted = 0;
+
+                for (Property property : props) {
+                    if (CLASSIFICATION_PROPS.contains(property.getName())) {
+                        SandboxStatus[] sandboxStatuses = SandboxStatusUtil.getPropertySandboxStatuses(props, workspaceId);
+                        boolean isPropertyPublic = sandboxStatuses[props.indexOf(property)] == SandboxStatus.PUBLIC;
+
+                        workspaceHelper.deleteProperty(vertex, property, isPropertyPublic, workspaceId, Priority.HIGH, authorizations, user);
+                        propertiesDeleted++;
+                    }
                 }
+
+                if (propertiesDeleted > 0) {
+                    results.add((ClientApiVertex) ClientApiConverter.toClientApi(vertex, workspaceId, authorizations));
+                }
+
+                processedCount++;
             }
-            results.add((ClientApiVertex) ClientApiConverter.toClientApi(vertex, workspaceId, authorizations));
+
+            // Flush changes for this batch
+            graph.flush();
+
+            // Update the progress
+            progress.setProcessed(processedCount);
+            progress.setPercentComplete((int) (((double) processedCount / totalVertices) * 100));
+
+            LOGGER.info("Processed {}/{} vertices for concept {}", processedCount, totalVertices, concept);
+
+            // This next line is important - don't hold on to too many vertex objects in memory
+            results = new ArrayList<>(Math.min(1000, results.size() + batch.size()));
         }
 
-        graph.flush();
+        // Final update
+        progress.setProcessed(totalVertices);
+        progress.setPercentComplete(100);
+        progress.setComplete(true);
 
-        return results;
+        LOGGER.info("Completed processing {} vertices for concept {}", totalVertices, concept);
+
+        return progress;
+    }
+
+    // Add this class to your file to represent progress updates
+    public static class ProgressResult {
+        private int total;
+        private int processed;
+        private int percentComplete;
+        private String concept;
+        private boolean complete;
+
+        public ProgressResult(int total, int processed, int percentComplete, String concept) {
+            this.total = total;
+            this.processed = processed;
+            this.percentComplete = percentComplete;
+            this.concept = concept;
+            this.complete = false;
+        }
+
+        public int getTotal() { return total; }
+        public void setTotal(int total) { this.total = total; }
+
+        public int getProcessed() { return processed; }
+        public void setProcessed(int processed) { this.processed = processed; }
+
+        public int getPercentComplete() { return percentComplete; }
+        public void setPercentComplete(int percentComplete) { this.percentComplete = percentComplete; }
+
+        public String getConcept() { return concept; }
+        public void setConcept(String concept) { this.concept = concept; }
+
+        public boolean isComplete() { return complete; }
+        public void setComplete(boolean complete) { this.complete = complete; }
     }
 }

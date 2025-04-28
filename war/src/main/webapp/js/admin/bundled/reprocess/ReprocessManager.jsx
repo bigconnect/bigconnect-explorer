@@ -50,7 +50,6 @@ define([
             bcApi.connect().then(({dataRequest}) => {
                 dataRequest('workspace', 'all')
                     .then(workspaces => {
-                        console.log('Retrieved workspaces:', workspaces);
                         this.setState({
                             workspaces: workspaces,
                             workspaceId: workspaces.length > 0 ? workspaces[0].workspaceId : 'public-ontology'
@@ -168,12 +167,42 @@ define([
                 return;
             }
 
-            this.setState({deleteStatus: 'processing', errorMessage: ''});
+            this.setState({
+                deleteStatus: 'processing',
+                errorMessage: '',
+                progress: {
+                    concept: '',
+                    processed: 0,
+                    total: 0,
+                    percentComplete: 0
+                }
+            });
+
             console.log('Starting deletion for selected concept types:', typesToDelete);
 
-            // Sending individual requests for each selected type for deletion as well
-            const promises = typesToDelete.map(type => {
-                return $.ajax({
+            // Process each type sequentially to avoid overwhelming the server
+            const processNextType = (index) => {
+                if (index >= typesToDelete.length) {
+                    // All types processed
+                    this.setState({deleteStatus: 'success'});
+                    setTimeout(() => this.setState({deleteStatus: 'ready'}), 2000);
+                    return;
+                }
+
+                const type = typesToDelete[index];
+                console.log(`Processing ${type}...`);
+
+                this.setState({
+                    progress: {
+                        ...this.state.progress,
+                        concept: type,
+                        processed: 0,
+                        total: 0,
+                        percentComplete: 0
+                    }
+                });
+
+                $.ajax({
                     url: 'vertex/remove-classification-props',
                     method: 'GET',
                     data: {
@@ -181,34 +210,24 @@ define([
                     },
                     headers: {
                         'bc-workspace-id': this.getWorkspaceId()
-                    }
-                });
-            });
-
-            Promise.all(promises)
-                .then(() => {
-                    this.setState({deleteStatus: 'success'});
-                    setTimeout(() => this.setState({deleteStatus: 'ready'}), 2000);
+                    },
+                    timeout: 300000
                 })
-                .catch(error => {
-                    console.error('Error deleting classification properties:', error);
-                    this.setState({deleteStatus: 'error'});
-                    setTimeout(() => this.setState({deleteStatus: 'ready'}), 2000);
-                });
-        },
+                    .then(progressResult => {
+                        console.log(`Completed processing ${type}:`, progressResult);
 
-        getDeleteButtonProperties() {
-            const {deleteStatus} = this.state;
-            switch (deleteStatus) {
-                case 'processing':
-                    return {text: 'Deleting...', disabled: true, className: 'btn-warning'};
-                case 'success':
-                    return {text: 'Delete Complete', disabled: true, className: 'btn-success'};
-                case 'error':
-                    return {text: 'Error - Try Again', disabled: false, className: 'btn-danger'};
-                default:
-                    return {text: 'Delete Selected', disabled: false, className: 'btn-warning'};
-            }
+                        // Move to the next concept type
+                        processNextType(index + 1);
+                    })
+                    .catch(error => {
+                        console.error(`Error processing ${type}:`, error);
+                        this.setState({deleteStatus: 'error'});
+                        setTimeout(() => this.setState({deleteStatus: 'ready'}), 2000);
+                    });
+            };
+
+            // Start with the first type
+            processNextType(0);
         },
 
         getButtonProperties() {
@@ -225,8 +244,22 @@ define([
             }
         },
 
+        getDeleteButtonProperties() {
+            const {deleteStatus} = this.state;
+            switch (deleteStatus) {
+                case 'processing':
+                    return {text: 'Deleting...', disabled: true, className: 'btn-warning'};
+                case 'success':
+                    return {text: 'Delete Complete', disabled: true, className: 'btn-success'};
+                case 'error':
+                    return {text: 'Error - Try Again', disabled: false, className: 'btn-danger'};
+                default:
+                    return {text: 'Delete Selected', disabled: false, className: 'btn-warning'};
+            }
+        },
+
         render() {
-            const {errorMessage, workspaces, currentYear, selectAll} = this.state;
+            const {errorMessage, workspaces, currentYear, selectAll, progress} = this.state;
             const buttonProps = this.getButtonProperties();
             const deleteButtonProps = this.getDeleteButtonProperties();
 
@@ -265,7 +298,7 @@ define([
                         </select>
                     </div>
 
-                    {/* New current year checkbox */}
+                    {/* Current year checkbox */}
                     <div className="form-group current-year-option">
                         <div className="checkbox">
                             <label>
@@ -310,6 +343,29 @@ define([
 
                     {errorMessage && <div className="errors">{errorMessage}</div>}
 
+                    {/* Progress display for deletion */}
+                    {this.state.deleteStatus === 'processing' && this.state.progress && (
+                        <div className="progress-container">
+                            <div className="progress-header">
+                                Processing: {this.state.progress.concept}
+                            </div>
+                            <div className="progress">
+                                <div
+                                    className="progress-bar progress-bar-striped active"
+                                    role="progressbar"
+                                    style={{width: `${this.state.progress.percentComplete}%`}}
+                                >
+                                    {this.state.progress.percentComplete}%
+                                </div>
+                            </div>
+                            {this.state.progress.total > 0 && (
+                                <div className="progress-text">
+                                    Processed {this.state.progress.processed} of {this.state.progress.total} items
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <div className="button-group">
                         <button
                             className={`btn ${buttonProps.className} reprocess-button`}
@@ -328,40 +384,60 @@ define([
                         </button>
                     </div>
 
-                    <style jsx>{`
-                        .reprocess-container {
-                            padding: 20px;
-                        }
-
-                        .checkbox-list {
-                            max-height: 300px;
-                            overflow-y: auto;
-                            border: 1px solid #ddd;
-                            padding: 10px;
-                            border-radius: 4px;
-                            margin-bottom: 20px;
-                        }
-
-                        .select-all {
-                            margin-bottom: 10px;
-                        }
-
-                        .priority-selection,
-                        .workspace-selection,
-                        .current-year-option {
-                            max-width: 300px;
-                            margin-bottom: 15px;
-                        }
-
-                        .errors {
-                            color: #a94442;
-                            margin-bottom: 10px;
-                        }
-
-                        .button-group button {
-                            min-width: 150px;
-                        }
-                    `}</style>
+                    <style>{`
+                .reprocess-container {
+                    padding: 20px;
+                }
+            
+                .checkbox-list {
+                    max-height: 300px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                    padding: 10px;
+                    border-radius: 4px;
+                    margin-bottom: 20px;
+                }
+            
+                .select-all {
+                    margin-bottom: 10px;
+                }
+            
+                .priority-selection,
+                .workspace-selection,
+                .current-year-option {
+                    max-width: 300px;
+                    margin-bottom: 15px;
+                }
+            
+                .errors {
+                    color: #a94442;
+                    margin-bottom: 10px;
+                }
+            
+                .button-group button {
+                    min-width: 150px;
+                }
+                
+                .progress-container {
+                    margin: 15px 0;
+                    max-width: 600px;
+                }
+                
+                .progress-header {
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                }
+                
+                .progress {
+                    height: 20px;
+                    margin-bottom: 5px;
+                }
+                
+                .progress-text {
+                    font-size: 12px;
+                    color: #666;
+                }
+            `}</style>
                 </div>
             );
         }
