@@ -81,14 +81,12 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.mware.ge.util.IterableUtils.toList;
 
@@ -422,6 +420,10 @@ public class FileImport {
                     (Metadata) null,
                     defaultVisibility
             );
+            if (StringUtils.isBlank(title) && StringUtils.isNotBlank(fileName)){
+                LOGGER.error("#### file name "+fileName);
+                title = removeFileExtension(fileName);
+            }
             if (!StringUtils.isEmpty(title)) {
                 LOGGER.error("#### Setting title "+title);
                 BcSchema.TITLE.updateProperty(
@@ -481,6 +483,15 @@ public class FileImport {
                 addSupportingFilesResult.close();
             }
         }
+    }
+
+    public static String removeFileExtension(String fileName) {
+        if (fileName == null) return null;
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0) {
+            return fileName.substring(0, dotIndex);
+        }
+        return fileName;
     }
 
     private void addProperties(ClientApiImportProperty[] properties, List<BcPropertyUpdate> changedProperties, VertexBuilder vertexBuilder, VisibilityJson visibilityJson, Workspace workspace, User user) throws ParseException {
