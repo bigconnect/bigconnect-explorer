@@ -1,44 +1,7 @@
-/*
- * This file is part of the BigConnect project.
- *
- * Copyright (c) 2013-2020 MWARE SOLUTIONS SRL
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * MWARE SOLUTIONS SRL, MWARE SOLUTIONS SRL DISCLAIMS THE WARRANTY OF
- * NON INFRINGEMENT OF THIRD PARTY RIGHTS
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License for more details.
- * You should have received a copy of the GNU Affero General Public License
- * along with this program; if not, see http://www.gnu.org/licenses or write to
- * the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA, 02110-1301 USA, or download the license from the following URL:
- * https://www.gnu.org/licenses/agpl-3.0.txt
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the BigConnect software without
- * disclosing the source code of your own applications.
- *
- * These activities include: offering paid services to customers as an ASP,
- * embedding the product in a web application, shipping BigConnect with a
- * closed source product.
- */
 package com.mware.web.routes.vertex;
 
 import com.google.inject.Inject;
 import com.mware.core.ingest.dataworker.ElementOrPropertyStatus;
-import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.workQueue.Priority;
 import com.mware.core.model.workQueue.WebQueueRepository;
 import com.mware.core.model.workQueue.WorkQueueRepository;
@@ -46,7 +9,6 @@ import com.mware.ge.Authorizations;
 import com.mware.ge.Graph;
 import com.mware.ge.Property;
 import com.mware.ge.Vertex;
-import com.mware.ge.query.Compare;
 import com.mware.web.BcResponse;
 import com.mware.web.framework.ParameterizedHandler;
 import com.mware.web.framework.annotations.Handle;
@@ -54,6 +16,11 @@ import com.mware.web.framework.annotations.Optional;
 import com.mware.web.model.ClientApiSuccess;
 import com.mware.web.parameterProviders.ActiveWorkspaceId;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MultiVertexRequeue implements ParameterizedHandler {
     private final Graph graph;
@@ -75,6 +42,7 @@ public class MultiVertexRequeue implements ParameterizedHandler {
     public ClientApiSuccess handle(
             @Optional(name = "concept") String conceptType,
             @Optional(name = "property") String propertyName,
+            @Optional(name = "currentYear", defaultValue = "false") boolean currentYear,
             @Optional(name = "priority", defaultValue = "LOW") String requeuePriority,
             Authorizations authorizations,
             @ActiveWorkspaceId String workspaceId
@@ -87,38 +55,100 @@ public class MultiVertexRequeue implements ParameterizedHandler {
             vertices = graph.getVertices(authorizations);
         }
 
+        long startOfYearTimestamp = 0;
+        if (currentYear) {
+            final Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            // Modified code to keep timestamp in milliseconds
+            calendar.set(year, Calendar.JANUARY, 1, 0, 0, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            startOfYearTimestamp = calendar.getTimeInMillis();
+        }
+
         Priority priority = Priority.safeParse(requeuePriority);
 
-        vertices.forEach(v -> {
-            if (StringUtils.isEmpty(propertyName)) {
-                webQueueRepository.broadcastPropertyChange(v, null, null, workspaceId);
-                workQueueRepository.pushOnDwQueue(
-                        v,
-                        null,
-                        null,
-                        workspaceId,
-                        null,
-                        priority,
-                        ElementOrPropertyStatus.UPDATE,
-                        null
-                );
-            } else {
-                Iterable<Property> properties = v.getProperties(propertyName);
-                for (Property property : properties) {
-                    webQueueRepository.broadcastPropertyChange(v, property.getKey(), property.getName(), workspaceId);
+        int totalVertices = 0;
+        int processedVertices = 0;
+
+        // Count total vertices first
+        for (Vertex v : vertices) {
+            totalVertices++;
+        }
+
+        // Now process with filtering
+        final long finalStartOfYearTimestamp = startOfYearTimestamp;
+        for (Vertex v : vertices) {
+            boolean shouldProcess = true;
+
+            if (currentYear) {
+                Property lastModified = v.getProperty("last_modified");
+                if (lastModified != null) {
+                    Object value = lastModified.getValue();
+                    long lastModifiedTimestamp = 0;
+
+                    // Properly handle Long values
+                    if (value instanceof Long) {
+                        lastModifiedTimestamp = (Long) value;
+                        shouldProcess = lastModifiedTimestamp >= finalStartOfYearTimestamp;
+                    } else if (value != null && value.toString().startsWith("Long(")) {
+                        // Handle the "Long(1744218757762)" format
+                        String valueStr = value.toString();
+                        try {
+                            // Extract the number from inside Long(...)
+                            String numberPart = valueStr.substring(5, valueStr.length() - 1);
+                            lastModifiedTimestamp = Long.parseLong(numberPart);
+                            shouldProcess = lastModifiedTimestamp >= finalStartOfYearTimestamp;
+                        } catch (Exception e) {
+                            System.out.println("Error parsing Long value: " + valueStr + " - " + e.getMessage());
+                            shouldProcess = false;
+                        }
+                    } else if (value instanceof Number) {
+                        lastModifiedTimestamp = ((Number) value).longValue();
+                        shouldProcess = lastModifiedTimestamp >= finalStartOfYearTimestamp;
+                    } else {
+                        shouldProcess = false;
+                    }
+                } else {
+                    shouldProcess = false;
+                }
+            }
+
+            if (shouldProcess) {
+                processedVertices++;
+                if (StringUtils.isEmpty(propertyName)) {
+                    webQueueRepository.broadcastPropertyChange(v, null, null, workspaceId);
                     workQueueRepository.pushOnDwQueue(
                             v,
-                            property.getKey(),
-                            property.getName(),
+                            null,
+                            null,
                             workspaceId,
                             null,
                             priority,
                             ElementOrPropertyStatus.UPDATE,
                             null
                     );
+                } else {
+                    Iterable<Property> properties = v.getProperties(propertyName);
+                    boolean hasProperties = false;
+                    for (Property property : properties) {
+                        hasProperties = true;
+                        webQueueRepository.broadcastPropertyChange(v, property.getKey(), property.getName(), workspaceId);
+                        workQueueRepository.pushOnDwQueue(
+                                v,
+                                property.getKey(),
+                                property.getName(),
+                                workspaceId,
+                                null,
+                                priority,
+                                ElementOrPropertyStatus.UPDATE,
+                                null
+                        );
+                    }
                 }
             }
-        });
+        }
+
+        System.out.println("Successfully sent " + processedVertices + " out of " + totalVertices + " vertices to requeue");
 
         return BcResponse.SUCCESS;
     }

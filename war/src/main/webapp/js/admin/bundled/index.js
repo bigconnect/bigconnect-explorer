@@ -75,4 +75,11 @@ define([
         name: 'Relatii',
         subtitle: 'Gesitiune relatii'
     });
+
+    registry.registerExtension(adminExtensionPoint, {
+        componentPath: 'admin/bundled/reprocess/ReprocessManager',
+        section: 'Data',
+        name: 'Reprocess',
+        subtitle: 'Reprocess entities by type'
+    });
 })
