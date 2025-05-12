@@ -16,15 +16,7 @@ define([
     'use strict';
 
     const ENTITY_TYPES = [
-        {id: 'youtubeVideo', name: 'Youtube Videos'},
-        {id: 'instagramPost', name: 'Instagram Posts'},
-        {id: 'instagramComment', name: 'Instagram Comments'},
-        {id: 'twitterPost', name: 'Twitter Posts'},
-        {id: 'twitterComment', name: 'Twitter Comment'},
-        {id: 'fbPost', name: 'Facebook Posts'},
-        {id: 'fbComment', name: 'Facebook Comment'},
-        {id: 'ttVideo', name: 'TikTok Videos'},
-        {id: 'webArticle', name: 'Web Articles'}
+        {id: 'image', name: 'Images'}
     ];
 
     const ReprocessComponent = createReactClass({
