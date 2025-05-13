@@ -137,6 +137,12 @@ define([
             cls: 'requires-EDIT',
             event: 'requeue'
         },
+        REQUEUE_MULTIPLE_ITEMS: {
+            title: i18n('detail.toolbar.reprocess'),
+            subtitle: i18n('detail.toolbar.reprocess.subtitle'),
+            cls: 'requires-EDIT',
+            event: 'reprocessItems'
+        },
         UNRESOLVE_MENTIONS: {
             title: i18n('detail.toolbar.unresolveMentions'),
             subtitle: i18n('detail.toolbar.unresolveMentions.subtitle'),
@@ -268,6 +274,7 @@ define([
                             title: i18n('detail.toolbar.actions'),
                             submenu: _.compact([
                                 ToolbarComponent.ITEMS.DELETE_ITEMS,
+                                ToolbarComponent.ITEMS.REQUEUE_MULTIPLE_ITEMS,
                             ])
                         },
                         {

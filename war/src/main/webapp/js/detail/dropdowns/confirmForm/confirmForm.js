@@ -89,6 +89,36 @@ define([
                 text: 'Deleting...'
             });
 
+            if (this.attr.method === 'requeue-each') {
+                const promises = this.attr.arguments.map(el =>
+                    this.dataRequest('vertex', 'requeue', el.id)
+                );
+
+                Promise.all(promises)
+                    .finally(function() {
+                        self.trigger('maskWithOverlay', { done: true });
+                    })
+                    .then(function() {
+                        self.teardown();
+
+                        bcData.storePromise.then(store => {
+                            const product = productSelectors.getProduct(store.getState());
+                            if (product) {
+                                store.dispatch(productActions.get(product.id, true));
+                            }
+                        });
+                    })
+                    .catch(function(error) {
+                        if (self.$node.is(':empty')) {
+                            self.render();
+                        }
+                        self.markFieldErrors(error);
+                        self.clearLoading();
+                    });
+
+                return;
+            }
+
             this.dataRequest(this.attr.service, this.attr.method, this.attr.arguments)
                 .finally(function() {
                     self.trigger('maskWithOverlay', { done: true });

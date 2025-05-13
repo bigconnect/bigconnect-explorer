@@ -75,6 +75,7 @@ define([
 
             this.on('openFullscreen', this.onOpenFullscreen);
             this.on('deleteMultipleItems', this.deleteMultipleItems);
+            this.on('reprocessItems', this.requeueMultipleItems);
 
             if (!_.isArray(this.attr.model)) {
                 this.on('addProperty', this.redirectToPropertiesComponent);
@@ -204,6 +205,34 @@ define([
                     method: 'requeue',
                     message: i18n('detail.requeue.form.warning.explanation.' + self.attr.model.type),
                     arguments: self.attr.model.id
+                });
+            });
+        };
+
+        this.requeueMultipleItems = function (event, data) {
+            event.stopPropagation();
+
+            const elements = _.map(this.attr.model, function (d) {
+                return { type: d.type, id: d.id };
+            });
+
+            const self = this;
+            let $container = this.select('confirmFormSelector');
+
+            if ($container.length === 0) {
+                $container = $('<div class="confirm"></div>').insertBefore(
+                    this.select('multipleSelector')
+                );
+            }
+
+            require(['../dropdowns/confirmForm/confirmForm'], function (ConfirmForm) {
+                const node = $('<div class="underneath"></div>').appendTo($container);
+                ConfirmForm.attachTo(node, {
+                    data: self.attr.model,
+                    service: 'vertex',
+                    method: 'requeue-each', // custom handler for calling /requeue per item
+                    message: i18n('detail.requeue.form.warning.explanation.multiple'),
+                    arguments: elements // exact list of selected elements
                 });
             });
         };
