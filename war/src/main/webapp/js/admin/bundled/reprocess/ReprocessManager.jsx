@@ -366,14 +366,14 @@ define([
                         >
                             {buttonProps.text}
                         </button>
-                        <button
-                            className={`btn ${deleteButtonProps.className} delete-button`}
-                            onClick={this.handleDelete}
-                            disabled={deleteButtonProps.disabled}
-                            style={{marginLeft: '10px'}}
-                        >
-                            {deleteButtonProps.text}
-                        </button>
+                        {/*<button*/}
+                        {/*    className={`btn ${deleteButtonProps.className} delete-button`}*/}
+                        {/*    onClick={this.handleDelete}*/}
+                        {/*    disabled={deleteButtonProps.disabled}*/}
+                        {/*    style={{marginLeft: '10px'}}*/}
+                        {/*>*/}
+                        {/*    {deleteButtonProps.text}*/}
+                        {/*</button>*/}
                     </div>
 
                     <style>{`
