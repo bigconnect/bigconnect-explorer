@@ -187,11 +187,6 @@
         </dependency>
         <dependency>
             <groupId>io.bigconnect</groupId>
-            <artifactId>dw-text-zero-shot-classification</artifactId>
-            <version>${bigconnect.dw.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.bigconnect</groupId>
             <artifactId>dw-image-object-detector</artifactId>
             <version>${bigconnect.dw.version}</version>
         </dependency>
