@@ -27,14 +27,66 @@ public class SSOHandler implements RequestResponseHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse httpServletResponse, HandlerChain handlerChain) throws Exception {
         String encrypted = request.getParameter("sso");
+
+        // Only process SSO if parameter exists
         if (!StringUtils.isEmpty(encrypted)) {
-            String userName = decrypt(encrypted);
-            User user = userRepository.findByUsername(userName);
-            if (user != null) {
-                CurrentUser.set(request, user);
+            try {
+                String userName = decrypt(encrypted);
+                System.out.println("Decrypted username from SSO: '" + userName + "'");
+
+                if (userName != null) {
+                    // Only check if user exists, don't create
+                    User user = findExistingUser(userName);
+                    if (user != null) {
+                        // User exists, set them as current user
+                        CurrentUser.set(request, user);
+                        System.out.println("SSO: Set existing user in session: " + user.getUsername());
+                        httpServletResponse.sendRedirect("/");
+                        return;
+                    } else {
+                        // User doesn't exist locally, redirect to login with SSO username
+                        // The login handler will create the user via LDAP
+                        System.out.println("SSO: User not found locally, redirecting to login for LDAP creation: " + userName);
+                        httpServletResponse.sendRedirect("/login?sso_username=" + userName);
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("SSO decryption failed: " + e.getMessage());
             }
         }
-        httpServletResponse.sendRedirect("/");
+
+        // Continue to next handler for all non-SSO requests or failed SSO
+        handlerChain.next(request, httpServletResponse);
+    }
+
+    private User findExistingUser(String userName) {
+        // Try different variations to find the existing user
+        String[] variations = {
+                userName,
+                userName.trim(),
+                userName.toLowerCase(),
+                userName.replace(" ", ""),
+                userName.replace(" ", "."),
+                getFirstWord(userName)
+        };
+
+        for (String variation : variations) {
+            if (variation != null && !variation.isEmpty()) {
+                User user = userRepository.findByUsername(variation);
+                if (user != null) {
+                    System.out.println("Found existing user: " + user.getUsername() + " using variation: " + variation);
+                    return user;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getFirstWord(String text) {
+        if (text == null || text.trim().isEmpty()) return null;
+        String[] words = text.trim().split("\\s+");
+        return words.length > 0 ? words[0] : null;
     }
 
     private String decrypt(String ciphertext)
