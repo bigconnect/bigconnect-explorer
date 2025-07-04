@@ -1,8 +1,15 @@
 package com.mware.web;
 
+import com.google.common.collect.ImmutableSet;
 import com.mware.core.bootstrap.InjectHelper;
+import com.mware.core.config.Configuration;
+import com.mware.core.model.clientapi.dto.Privilege;
+import com.mware.core.model.role.AuthorizationRepository;
+import com.mware.core.model.user.UserPropertyPrivilegeRepository;
 import com.mware.core.model.user.UserRepository;
+import com.mware.core.user.SystemUser;
 import com.mware.core.user.User;
+import com.mware.security.ldap.LDAPAuthenticator;
 import com.mware.web.framework.HandlerChain;
 import com.mware.web.framework.RequestResponseHandler;
 import com.mware.web.framework.utils.StringUtils;
@@ -11,43 +18,55 @@ import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Set;
 
 public class SSOHandler implements RequestResponseHandler {
     private static final String SSO_KEY = "U3VwZXJTZWNyZXRTU09LZQ==";
+    private static final String DEFAULT_SSO_PASSWORD_FALLBACK = "sso-generated-password-123";
 
     private final UserRepository userRepository;
+    private final LDAPAuthenticator ldapAuthenticator;
+    private final AuthorizationRepository authorizationRepository;
+    private final UserPropertyPrivilegeRepository privilegeRepository;
+    private final Configuration configuration;
+    private final String ssoDefaultPassword;
 
     public SSOHandler() {
         userRepository = InjectHelper.getInstance(UserRepository.class);
+        ldapAuthenticator = InjectHelper.getInstance(LDAPAuthenticator.class);
+        authorizationRepository = InjectHelper.getInstance(AuthorizationRepository.class);
+        privilegeRepository = InjectHelper.getInstance(UserPropertyPrivilegeRepository.class);
+        configuration = InjectHelper.getInstance(Configuration.class);
+
+        // Load SSO password from config with fallback
+        ssoDefaultPassword = configuration.get("sso.default.password", DEFAULT_SSO_PASSWORD_FALLBACK);
+        System.out.println("SSO: Using default password from config: " + (ssoDefaultPassword.equals(DEFAULT_SSO_PASSWORD_FALLBACK) ? "fallback" : "configured"));
     }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse httpServletResponse, HandlerChain handlerChain) throws Exception {
         String encrypted = request.getParameter("sso");
 
-        // Only process SSO if parameter exists
         if (!StringUtils.isEmpty(encrypted)) {
             try {
                 String userName = decrypt(encrypted);
                 System.out.println("Decrypted username from SSO: '" + userName + "'");
 
-                if (userName != null) {
-                    // Only check if user exists, don't create
-                    User user = findExistingUser(userName);
+                if (userName != null && !userName.trim().isEmpty()) {
+                    User user = findOrCreateUser(userName.trim());
                     if (user != null) {
-                        // User exists, set them as current user
                         CurrentUser.set(request, user);
-                        System.out.println("SSO: Set existing user in session: " + user.getUsername());
+                        System.out.println("SSO: Set user in session: " + user.getUsername());
                         httpServletResponse.sendRedirect("/");
                         return;
                     } else {
-                        // User doesn't exist locally, redirect to login with SSO username
-                        // The login handler will create the user via LDAP
-                        System.out.println("SSO: User not found locally, redirecting to login for LDAP creation: " + userName);
-                        httpServletResponse.sendRedirect("/login?sso_username=" + userName);
+                        System.out.println("SSO: User not found in local DB or LDAP: " + userName);
+                        httpServletResponse.sendRedirect("/login?error=user_not_found");
                         return;
                     }
                 }
@@ -56,37 +75,88 @@ public class SSOHandler implements RequestResponseHandler {
             }
         }
 
-        // Continue to next handler for all non-SSO requests or failed SSO
         handlerChain.next(request, httpServletResponse);
     }
 
-    private User findExistingUser(String userName) {
-        // Try different variations to find the existing user
-        String[] variations = {
-                userName,
-                userName.trim(),
-                userName.toLowerCase(),
-                userName.replace(" ", ""),
-                userName.replace(" ", "."),
-                getFirstWord(userName)
-        };
-
-        for (String variation : variations) {
-            if (variation != null && !variation.isEmpty()) {
-                User user = userRepository.findByUsername(variation);
-                if (user != null) {
-                    System.out.println("Found existing user: " + user.getUsername() + " using variation: " + variation);
-                    return user;
-                }
-            }
+    private User findOrCreateUser(String userName) {
+        // First, check if user exists in local database - EXACT match only
+        User user = userRepository.findByUsername(userName);
+        if (user != null) {
+            System.out.println("Found existing local user: " + user.getUsername());
+            return user;
         }
+
+        // User not found locally - check if LDAP is enabled and try to create user
+        if (ldapAuthenticator.isLdapEnabled()) {
+            return createUserFromLdap(userName);
+        }
+
         return null;
     }
 
-    private String getFirstWord(String text) {
-        if (text == null || text.trim().isEmpty()) return null;
-        String[] words = text.trim().split("\\s+");
-        return words.length > 0 ? words[0] : null;
+    private User createUserFromLdap(String userName) {
+        try {
+            // Check if user exists in LDAP by getting their group memberships
+            Set<String> groups = ldapAuthenticator.getGroupMemberships(userName);
+
+            if (groups != null) {
+                System.out.println("SSO: User found in LDAP: " + userName + " with groups: " + groups);
+
+                // Create user locally with password from config
+                User user = userRepository.findOrAddUser(
+                        userName,
+                        userName,
+                        null,
+                        ssoDefaultPassword
+                );
+
+                // Add roles from LDAP groups
+                addRolesFromLdapGroups(user, groups);
+
+                // Set admin privileges if user has admin flag
+                if (ldapAuthenticator.hasAdminFlag(userName)) {
+                    System.out.println("SSO: Setting admin privileges for user: " + userName);
+                    setAdminPrivileges(user);
+                }
+
+                System.out.println("SSO: Created local user from LDAP: " + user.getUsername());
+                return user;
+            } else {
+                System.out.println("SSO: User not found in LDAP: " + userName);
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("SSO: Failed to check/create LDAP user " + userName + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    private void addRolesFromLdapGroups(User user, Set<String> groupMemberships) {
+        try {
+            Set<String> existingRoles = authorizationRepository.getRoleNames(user);
+            for (String group : groupMemberships) {
+                if (!existingRoles.contains(group)) {
+                    authorizationRepository.addRoleToUser(user, group, new SystemUser());
+                    System.out.println("SSO: Added role '" + group + "' to user: " + user.getUsername());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("SSO: Failed to add roles for user " + user.getUsername() + ": " + e.getMessage());
+        }
+    }
+
+    private void setAdminPrivileges(User user) {
+        try {
+            String[] adminPrivileges = new String[]{
+                    Privilege.READ, Privilege.COMMENT, Privilege.EDIT, Privilege.PUBLISH,
+                    Privilege.SEARCH_SAVE_GLOBAL, Privilege.HISTORY_READ,
+                    Privilege.ADMIN, Privilege.ONTOLOGY_ADD, Privilege.ONTOLOGY_PUBLISH
+            };
+            privilegeRepository.setPrivileges(user, ImmutableSet.copyOf(adminPrivileges), new SystemUser());
+            System.out.println("SSO: Set admin privileges for user: " + user.getUsername());
+        } catch (Exception e) {
+            System.err.println("SSO: Failed to set admin privileges for user " + user.getUsername() + ": " + e.getMessage());
+        }
     }
 
     private String decrypt(String ciphertext)
@@ -94,7 +164,18 @@ public class SSOHandler implements RequestResponseHandler {
         SecretKey secretKey = getSecretKey(SSO_KEY);
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        return new String(cipher.doFinal(Base64.getDecoder().decode(ciphertext)));
+
+        byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(ciphertext));
+        String decrypted = new String(decryptedBytes, StandardCharsets.UTF_8);
+
+        System.out.println("SSO: Raw decrypted bytes: " + Arrays.toString(decryptedBytes));
+        System.out.println("SSO: Decrypted string: '" + decrypted + "'");
+
+        // Fix common decryption issue: replace spaces with dots
+        String fixed = decrypted.replace(" ", ".");
+        System.out.println("SSO: Fixed username: '" + fixed + "'");
+
+        return fixed;
     }
 
     private SecretKey getSecretKey(String secretKey) {
