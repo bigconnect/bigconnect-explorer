@@ -55,17 +55,14 @@ public class SSOHandler implements RequestResponseHandler {
         if (!StringUtils.isEmpty(encrypted)) {
             try {
                 String userName = decrypt(encrypted);
-                System.out.println("Decrypted username from SSO: '" + userName + "'");
 
                 if (userName != null && !userName.trim().isEmpty()) {
                     User user = findOrCreateUser(userName.trim());
                     if (user != null) {
                         CurrentUser.set(request, user);
-                        System.out.println("SSO: Set user in session: " + user.getUsername());
                         httpServletResponse.sendRedirect("/");
                         return;
                     } else {
-                        System.out.println("SSO: User not found in local DB or LDAP: " + userName);
                         httpServletResponse.sendRedirect("/login?error=user_not_found");
                         return;
                     }
@@ -100,7 +97,6 @@ public class SSOHandler implements RequestResponseHandler {
             Set<String> groups = ldapAuthenticator.getGroupMemberships(userName);
 
             if (groups != null) {
-                System.out.println("SSO: User found in LDAP: " + userName + " with groups: " + groups);
 
                 // Create user locally with password from config
                 User user = userRepository.findOrAddUser(
@@ -115,14 +111,11 @@ public class SSOHandler implements RequestResponseHandler {
 
                 // Set admin privileges if user has admin flag
                 if (ldapAuthenticator.hasAdminFlag(userName)) {
-                    System.out.println("SSO: Setting admin privileges for user: " + userName);
                     setAdminPrivileges(user);
                 }
 
-                System.out.println("SSO: Created local user from LDAP: " + user.getUsername());
                 return user;
             } else {
-                System.out.println("SSO: User not found in LDAP: " + userName);
                 return null;
             }
         } catch (Exception e) {
@@ -137,7 +130,6 @@ public class SSOHandler implements RequestResponseHandler {
             for (String group : groupMemberships) {
                 if (!existingRoles.contains(group)) {
                     authorizationRepository.addRoleToUser(user, group, new SystemUser());
-                    System.out.println("SSO: Added role '" + group + "' to user: " + user.getUsername());
                 }
             }
         } catch (Exception e) {
@@ -153,7 +145,6 @@ public class SSOHandler implements RequestResponseHandler {
                     Privilege.ADMIN, Privilege.ONTOLOGY_ADD, Privilege.ONTOLOGY_PUBLISH
             };
             privilegeRepository.setPrivileges(user, ImmutableSet.copyOf(adminPrivileges), new SystemUser());
-            System.out.println("SSO: Set admin privileges for user: " + user.getUsername());
         } catch (Exception e) {
             System.err.println("SSO: Failed to set admin privileges for user " + user.getUsername() + ": " + e.getMessage());
         }
@@ -168,12 +159,9 @@ public class SSOHandler implements RequestResponseHandler {
         byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(ciphertext));
         String decrypted = new String(decryptedBytes, StandardCharsets.UTF_8);
 
-        System.out.println("SSO: Raw decrypted bytes: " + Arrays.toString(decryptedBytes));
-        System.out.println("SSO: Decrypted string: '" + decrypted + "'");
-
         // Fix common decryption issue: replace spaces with dots
         String fixed = decrypted.replace(" ", ".");
-        System.out.println("SSO: Fixed username: '" + fixed + "'");
+
 
         return fixed;
     }
