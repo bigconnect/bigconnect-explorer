@@ -217,7 +217,8 @@
             <groupId>io.bigconnect</groupId>
             <artifactId>search-index</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
+            <!-- provided: the admin reclassify page queries Elasticsearch directly; the release package ships search-index -->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.bigconnect</groupId>

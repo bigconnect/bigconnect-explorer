@@ -55,6 +55,7 @@ import com.mware.web.privilegeFilters.*;
 import com.mware.web.routes.Download;
 import com.mware.web.routes.Index;
 import com.mware.web.routes.admin.*;
+import com.mware.web.routes.admin.reclassify.*;
 import com.mware.web.routes.behaviour.*;
 import com.mware.web.routes.dashboard.*;
 import com.mware.web.routes.dataload.*;
@@ -330,6 +331,11 @@ public class Router extends HttpServlet {
             app.post("/admin/ontologyRelDelete", authenticator, csrfProtector, AdminPrivilegeFilter.class, OntologyManagerRelDelete.class);
             app.delete("/admin/deleteElements", authenticator, csrfProtector, AdminPrivilegeFilter.class, DeleteElements.class);
             app.post("/admin/restoreElements", authenticator, csrfProtector, AdminPrivilegeFilter.class, RestoreElements.class);
+            app.get("/admin/reclassify/facets", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyFacets.class);
+            app.get("/admin/reclassify/preview", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyPreview.class);
+            app.post("/admin/reclassify/start", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyStart.class);
+            app.get("/admin/reclassify/jobs", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyStatus.class);
+            app.post("/admin/reclassify/cancel", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyCancel.class);
 
             app.get("/ping", RateLimitFilter.class, Ping.class);
             app.get("/ping/stats", authenticator, AdminPrivilegeFilter.class, PingStats.class);
