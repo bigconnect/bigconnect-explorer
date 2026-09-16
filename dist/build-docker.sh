@@ -11,8 +11,8 @@ echo "##############################################"
 
 mvn -o clean package || exit
 cd target/explorer-4.2.2-SNAPSHOT/explorer-4.2.2-SNAPSHOT || exit
-docker build -t registry.escor.local/explorer:$CURRENT_RELEASE -f Dockerfile .
-docker push registry.escor.local/explorer:$CURRENT_RELEASE
+docker build -t registry.mae.local/explorer:$CURRENT_RELEASE -f Dockerfile .
+#docker push registry.escor.local/explorer:$CURRENT_RELEASE
 
 echo "##############################################"
 echo "Marking release $CURRENT_RELEASE as successful"
