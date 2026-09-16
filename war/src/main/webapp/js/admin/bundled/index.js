@@ -121,14 +121,7 @@ define([
     registry.registerExtension(adminExtensionPoint, {
         componentPath: 'admin/bundled/reclassify/ReclassifyManager',
         section: 'Data',
-        name: 'Reclassify',
-        subtitle: 'Re-run relevance and topic classification for chosen keywords, buckets and dates'
-    });
-
-    registry.registerExtension(adminExtensionPoint, {
-        componentPath: 'admin/bundled/reprocess/ReprocessManager',
-        section: 'Data',
         name: 'Reprocess',
-        subtitle: 'Reprocess entities by type'
+        subtitle: 'Re-run classification or a data worker for chosen types, keywords, buckets and dates'
     });
 })

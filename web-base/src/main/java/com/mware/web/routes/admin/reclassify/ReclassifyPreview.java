@@ -27,9 +27,14 @@ public class ReclassifyPreview implements ParameterizedHandler {
             @Optional(name = "to") String to,
             @Optional(name = "scope") String scope,
             @Optional(name = "action", defaultValue = "TOPICS") String action,
+            @Optional(name = "worker") String worker,
             Authorizations authorizations
     ) {
-        ReclassifyService.Filter filter = ReclassifyFilters.parse(concepts, keywords, buckets, projects, from, to, scope);
-        return reclassifyService.preview(filter, ReclassifyService.Action.valueOf(action.trim().toUpperCase()), authorizations);
+        ReclassifyService.Action parsedAction = ReclassifyFilters.action(action);
+        ReclassifyService.Filter filter = ReclassifyFilters.parse(concepts, keywords, buckets, projects, from, to, scope, parsedAction);
+        if (parsedAction == ReclassifyService.Action.WORKER) {
+            return reclassifyService.previewWorker(filter, worker, authorizations);
+        }
+        return reclassifyService.preview(filter, parsedAction, authorizations);
     }
 }

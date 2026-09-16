@@ -335,6 +335,7 @@ public class Router extends HttpServlet {
             app.get("/admin/reclassify/preview", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyPreview.class);
             app.post("/admin/reclassify/start", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyStart.class);
             app.get("/admin/reclassify/jobs", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyStatus.class);
+            app.get("/admin/reclassify/workers", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyWorkers.class);
             app.post("/admin/reclassify/cancel", authenticator, csrfProtector, AdminPrivilegeFilter.class, ReclassifyCancel.class);
 
             app.get("/ping", RateLimitFilter.class, Ping.class);

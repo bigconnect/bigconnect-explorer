@@ -31,7 +31,8 @@ define([
 
     const ACTIONS = [
         {id: 'TOPICS', name: 'Topics', help: 'Keeps the relevant keywords/buckets and runs only the topic classification.'},
-        {id: 'RELEVANCE_AND_TOPICS', name: 'Relevance + topics', help: 'Recomputes the relevant keywords/buckets first, then the topics.'}
+        {id: 'RELEVANCE_AND_TOPICS', name: 'Relevance + topics', help: 'Recomputes the relevant keywords/buckets first, then the topics.'},
+        {id: 'WORKER', name: 'Run a data worker', help: 'Sends the posts to a data worker running in Explorer. The worker itself decides which posts it handles.'}
     ];
 
     const FACETS = [
@@ -111,6 +112,9 @@ define([
                 to: '',
                 scope: 'MISSING',
                 action: 'TOPICS',
+                worker: '',
+                workers: [],
+                workersError: '',
                 priority: 'LOW',
                 limit: '',
                 facets: {keywords: [], buckets: [], projects: []},
@@ -128,6 +132,25 @@ define([
             this.mounted = true;
             this.refresh();
             this.loadJobs();
+            this.loadWorkers();
+        },
+
+        loadWorkers() {
+            $.ajax({url: 'admin/reclassify/workers'})
+                .then(result => {
+                    if (!this.mounted) return;
+                    const workers = (result.workers || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+                    this.setState({workers, workersError: workers.length ? '' : 'No data workers are running in this Explorer.'});
+                })
+                .catch(err => {
+                    console.error('Could not load the data workers', err);
+                    if (this.mounted) this.setState({workersError: 'Could not load the data workers.'});
+                });
+        },
+
+        workerName(className) {
+            const worker = this.state.workers.find(w => w.className === className);
+            return worker ? worker.name : (className || '').split('.').pop();
         },
 
         componentWillUnmount() {
@@ -137,8 +160,10 @@ define([
         },
 
         filterParams() {
-            const {concepts, keywords, buckets, projects, from, to, scope, action} = this.state;
-            return {concepts, keywords, buckets, projects, from, to, scope, action};
+            const {concepts, keywords, buckets, projects, from, to, scope, action, worker} = this.state;
+            const params = {concepts, keywords, buckets, projects, from, to, scope, action};
+            if (action === 'WORKER') params.worker = worker;
+            return params;
         },
 
         update(changes) {
@@ -156,7 +181,11 @@ define([
             const params = this.filterParams();
             const requestId = (this.requestId || 0) + 1;
             this.requestId = requestId;
-            this.setState({facetsLoading: true, previewLoading: true, error: ''});
+            const workerMissing = params.action === 'WORKER' && !params.worker;
+            this.setState({facetsLoading: true, previewLoading: !workerMissing, error: ''});
+            if (workerMissing) {
+                this.setState({preview: null});
+            }
 
             $.ajax({url: 'admin/reclassify/facets', data: params})
                 .then(facets => {
@@ -166,6 +195,7 @@ define([
                 })
                 .catch(err => this.fail('Could not load the keyword counts', err));
 
+            if (workerMissing) return;
             $.ajax({url: 'admin/reclassify/preview', data: params})
                 .then(preview => {
                     if (this.mounted && requestId === this.requestId) {
@@ -213,19 +243,19 @@ define([
             const {preview, limit} = this.state;
             if (!preview) return null;
             const max = parseInt(limit, 10);
-            return max > 0 ? Math.min(max, preview.toClassify) : preview.toClassify;
+            const available = preview.toClassify !== undefined ? preview.toClassify : preview.matching;
+            return max > 0 ? Math.min(max, available) : available;
         },
 
         onStart() {
             const toRun = this.postsToRun();
-            const needsConfirm = this.state.scope === 'ALL' || toRun > LARGE_RUN;
+            const needsConfirm = (this.state.action !== 'WORKER' && this.state.scope === 'ALL') || toRun > LARGE_RUN;
             if (needsConfirm && !this.state.confirming) {
                 this.setState({confirming: true});
                 return;
             }
             const max = parseInt(this.state.limit, 10);
             const data = Object.assign(this.filterParams(), {
-                action: this.state.action,
                 priority: this.state.priority
             }, max > 0 ? {limit: max} : {});
 
@@ -236,7 +266,7 @@ define([
                     this.setState({starting: false});
                     this.loadJobs();
                 })
-                .catch(err => this.fail('Could not start the reclassification', err));
+                .catch(err => this.fail('Could not start the run', err));
         },
 
         onCancel(id) {
@@ -253,8 +283,32 @@ define([
             if (filter.keywords.length) parts.push(`keywords: ${filter.keywords.join(', ')}`);
             if (filter.projects.length) parts.push(`projects: ${filter.projects.join(', ')}`);
             if (filter.from || filter.to) parts.push(`modified ${filter.from ? new Date(filter.from).toISOString().slice(0, 10) : '…'} → ${filter.to ? new Date(filter.to - 1).toISOString().slice(0, 10) : '…'}`);
-            parts.push((SCOPES.find(s => s.id === filter.scope) || {name: filter.scope}).name.toLowerCase());
+            if (filter.scope && !filter.worker) parts.push((SCOPES.find(s => s.id === filter.scope) || {name: filter.scope}).name.toLowerCase());
             return parts.join(' · ');
+        },
+
+        renderWorkerPreview(preview) {
+            const share = preview.sample ? Math.round(100 * preview.handledInSample / preview.sample) : 0;
+            return (
+                <div className="rc-worker-preview">
+                    <div>
+                        Checked on {formatNumber(preview.sample)} of the matching posts: the worker handles <b>{formatNumber(preview.handledInSample)}</b> ({share}%).
+                        {preview.handledInSample === 0 && preview.sample > 0 && <span className="text-warning"> It will skip them, e.g. because it already processed them or they miss what it needs.</span>}
+                    </div>
+                    {preview.properties.length > 0 && (
+                        <table className="table table-condensed rc-worker-table">
+                            <thead><tr><th>Re-queued property</th><th>Posts in sample</th><th>Also starts</th></tr></thead>
+                            <tbody>{preview.properties.map(p => (
+                                <tr key={p.property}>
+                                    <td><code>{p.property}</code></td>
+                                    <td>{formatNumber(p.posts)}</td>
+                                    <td>{p.alsoStarts.length ? p.alsoStarts.join(', ') : <span className="rc-muted">no other worker</span>}</td>
+                                </tr>
+                            ))}</tbody>
+                        </table>
+                    )}
+                </div>
+            );
         },
 
         renderJobs() {
@@ -269,22 +323,23 @@ define([
                     <div className="rc-job" key={job.id}>
                         <div className="rc-job-head">
                             <span className={`label label-${stateClass}`}>{job.state}</span>
-                            <strong>{(ACTIONS.find(a => a.id === job.action) || {name: job.action}).name}</strong>
+                            <strong>{job.action === 'WORKER' ? this.workerName(job.worker) : (ACTIONS.find(a => a.id === job.action) || {name: job.action}).name}</strong>
                             <span className="rc-muted">{formatTime(job.startedAt)}</span>
                             {job.state === 'RUNNING' && !job.total && <span className="rc-muted">finding posts…</span>}
                             {job.state === 'RUNNING' && (
                                 <button className="btn btn-xs btn-default rc-right" onClick={() => this.onCancel(job.id)}>Stop</button>
                             )}
                         </div>
-                        <div className="rc-muted rc-job-filter">{this.describeFilter(job.filter)}</div>
+                        <div className="rc-muted rc-job-filter">{this.describeFilter(Object.assign({}, job.filter, {worker: job.worker}))}</div>
                         <div className="progress rc-progress">
                             <div className={`progress-bar ${job.state === 'RUNNING' ? 'progress-bar-striped active' : ''}`} style={{width: `${pct}%`}} />
                         </div>
                         <div className="rc-job-stats">
-                            <span><b>{formatNumber(job.requeued)}</b> sent to classification</span>
+                            <span><b>{formatNumber(job.requeued)}</b> sent to {job.action === 'WORKER' ? 'the worker' : 'classification'}</span>
                             <span>{formatNumber(job.processed)} / {formatNumber(job.total)} checked</span>
                             {job.skippedNoLanguage > 0 && <span title="The classifiers need a detected language">{formatNumber(job.skippedNoLanguage)} without language</span>}
                             {job.skippedAlreadyClassified > 0 && <span title="Classified between the search and the run">{formatNumber(job.skippedAlreadyClassified)} already classified</span>}
+                            {job.skippedNotHandled > 0 && <span title="The worker does not handle these posts, e.g. it already processed them">{formatNumber(job.skippedNotHandled)} not handled by the worker</span>}
                             {job.errors > 0 && <span className="text-danger">{formatNumber(job.errors)} errors</span>}
                             {job.message && <span className="text-danger">{job.message}</span>}
                         </div>
@@ -297,17 +352,18 @@ define([
             const s = this.state;
             const toRun = this.postsToRun();
             const running = s.jobs.some(j => j.state === 'RUNNING');
-            const canStart = !s.starting && !s.previewLoading && toRun > 0 && s.concepts.length > 0;
+            const isWorker = s.action === 'WORKER';
+            const canStart = !s.starting && !s.previewLoading && toRun > 0 && s.concepts.length > 0 && (!isWorker || s.worker);
             const allConcepts = s.concepts.length === CONCEPTS.length;
 
             return (
                 <div className="rc-container">
-                    <h2>Reclassify posts</h2>
+                    <h2>Reprocess posts</h2>
                     <p className="rc-muted">
-                        Choose the posts, then send them back to the relevance and topic classification.
-                        Only the classification workers run again; nothing else about the posts changes.
-                        All counts are posts that will really be classified: posts without a detected language, and for
-                        “Topics” posts without relevant keywords, are left out.
+                        Choose the posts, then send them back to the relevance and topic classification, or to any data
+                        worker running in Explorer. For the classification, all counts are posts that will really be
+                        classified: posts without a detected language, and for “Topics” posts without relevant keywords,
+                        are left out.
                     </p>
 
                     <div className="rc-section">
@@ -357,7 +413,7 @@ define([
                                 {(s.from || s.to) && <a onClick={() => this.update({from: '', to: ''})}>any date</a>}
                             </div>
 
-                            <div className="rc-row rc-row-top">
+                            {!isWorker && <div className="rc-row rc-row-top">
                                 <label className="rc-label">Status</label>
                                 <div className="rc-options">
                                     {SCOPES.map(o => (
@@ -368,7 +424,7 @@ define([
                                         </label>
                                     ))}
                                 </div>
-                            </div>
+                            </div>}
                         </div>
                     </div>
 
@@ -377,7 +433,7 @@ define([
                         <div className="rc-section-body">
                             <h4>What to run</h4>
                             <div className="rc-row rc-row-top">
-                                <label className="rc-label">Classification</label>
+                                <label className="rc-label">Run</label>
                                 <div className="rc-options">
                                     {ACTIONS.map(o => (
                                         <label key={o.id} className={`rc-option ${s.action === o.id ? 'rc-option-on' : ''}`}>
@@ -388,6 +444,19 @@ define([
                                     ))}
                                 </div>
                             </div>
+                            {isWorker && <div className="rc-row">
+                                <label className="rc-label">Data worker</label>
+                                <select className="form-control input-sm rc-worker" value={s.worker}
+                                        onChange={e => this.update({worker: e.target.value})}>
+                                    <option value="">Choose a data worker…</option>
+                                    {s.workers.map(w => (
+                                        <option key={w.className} value={w.className} title={w.description}>{w.name}</option>
+                                    ))}
+                                </select>
+                                {s.worker && <span className="rc-muted rc-worker-help">{(s.workers.find(w => w.className === s.worker) || {}).description}</span>}
+                                {s.workersError && <span className="text-danger">{s.workersError}</span>}
+                            </div>}
+                            {isWorker && s.preview && s.preview.properties && this.renderWorkerPreview(s.preview)}
                             <div className="rc-row">
                                 <label className="rc-label">Priority</label>
                                 <select className="form-control input-sm rc-small" value={s.priority}
@@ -406,9 +475,10 @@ define([
 
                     <div className="rc-summary">
                         <div className="rc-summary-text">
-                            {s.previewLoading || !s.preview ? <span className="rc-muted">Counting posts…</span> : (
-                                <span><b className="rc-big">{formatNumber(toRun)}</b> posts will be classified</span>
-                            )}
+                            {isWorker && !s.worker ? <span className="rc-muted">Choose a data worker</span>
+                                : s.previewLoading || !s.preview ? <span className="rc-muted">Counting posts…</span>
+                                : isWorker ? <span><b className="rc-big">{formatNumber(toRun)}</b> posts will be checked by {this.workerName(s.worker)}</span>
+                                : <span><b className="rc-big">{formatNumber(toRun)}</b> posts will be classified</span>}
                         </div>
                         {s.confirming && (
                             <span className="rc-confirm">
@@ -417,7 +487,7 @@ define([
                         )}
                         {s.confirming && <button className="btn btn-default" onClick={() => this.setState({confirming: false})}>Back</button>}
                         <button className={`btn ${s.confirming ? 'btn-danger' : 'btn-primary'}`} disabled={!canStart} onClick={this.onStart}>
-                            {s.starting ? 'Starting…' : s.confirming ? 'Yes, start' : 'Start reclassification'}
+                            {s.starting ? 'Starting…' : s.confirming ? 'Yes, start' : isWorker ? 'Start worker' : 'Start reclassification'}
                         </button>
                     </div>
                     {running && <div className="rc-muted rc-note">A run is in progress; a new one starts after it.</div>}
@@ -475,6 +545,10 @@ define([
                         .rc-job-filter { font-size: 12px; margin: 4px 0; }
                         .rc-progress { height: 8px; margin: 6px 0; }
                         .rc-job-stats { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; }
+                        .rc-worker { width: 320px; }
+                        .rc-worker-help { flex: 1; min-width: 200px; }
+                        .rc-worker-preview { margin: 6px 0 10px 118px; font-size: 13px; }
+                        .rc-worker-table { margin-top: 6px; max-width: 760px; }
                     `}</style>
                 </div>
             );

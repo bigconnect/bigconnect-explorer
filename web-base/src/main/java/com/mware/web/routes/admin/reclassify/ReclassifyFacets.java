@@ -29,7 +29,8 @@ public class ReclassifyFacets implements ParameterizedHandler {
             @Optional(name = "action", defaultValue = "TOPICS") String action,
             Authorizations authorizations
     ) {
-        ReclassifyService.Filter filter = ReclassifyFilters.parse(concepts, keywords, buckets, projects, from, to, scope);
-        return reclassifyService.facets(filter, ReclassifyService.Action.valueOf(action.trim().toUpperCase()), authorizations);
+        ReclassifyService.Action parsedAction = ReclassifyFilters.action(action);
+        ReclassifyService.Filter filter = ReclassifyFilters.parse(concepts, keywords, buckets, projects, from, to, scope, parsedAction);
+        return reclassifyService.facets(filter, parsedAction, authorizations);
     }
 }

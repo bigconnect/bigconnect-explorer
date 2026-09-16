@@ -14,6 +14,7 @@ import com.mware.ge.Graph;
 import com.mware.ge.Property;
 import com.mware.ge.Vertex;
 import com.mware.core.config.Configuration;
+import com.mware.core.ingest.dataworker.DataWorker;
 import com.mware.ge.GraphWithSearchIndex;
 import com.mware.ge.elasticsearch5.Elasticsearch5SearchIndex;
 import com.mware.ge.elasticsearch5.ElasticsearchDocumentType;
@@ -44,9 +45,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Finds posts by type, SERP keyword/bucket/project and date, clears their classification and sends them back
- * to the data workers. Only the language property is re-queued, which is what the relevance and topic
- * classification workers listen for, so the other data workers are not run again.
+ * Finds posts by type, SERP keyword/bucket/project and date and sends them back to the data workers:
+ * - TOPICS / RELEVANCE_AND_TOPICS clear the classification and re-queue only the language property, which is what the
+ *   relevance and topic classification workers listen for
+ * - WORKER re-queues the properties a chosen data worker handles on each post, as decided by the running worker
+ *   itself; other workers handling the same properties start too, the preview lists them
  */
 @Singleton
 public class ReclassifyService {
@@ -65,11 +68,12 @@ public class ReclassifyService {
     private static final int BATCH_SIZE = 100;
     private static final int FACET_SIZE = 1000;
     private static final int MAX_KEPT_JOBS = 20;
+    private static final int PREVIEW_SAMPLE = 100;
     private static final String EXACT = Elasticsearch5SearchIndex.EXACT_MATCH_PROPERTY_NAME_SUFFIX;
 
     public enum Scope { MISSING, NO_CONFIDENT, ALL }
 
-    public enum Action { TOPICS, RELEVANCE_AND_TOPICS }
+    public enum Action { TOPICS, RELEVANCE_AND_TOPICS, WORKER }
 
     public static class Filter {
         List<String> concepts = DEFAULT_CONCEPTS;
@@ -79,6 +83,7 @@ public class ReclassifyService {
         Long fromMillis;
         Long toMillis;
         Scope scope = Scope.MISSING;
+        boolean ignoreScope;
 
         JSONObject toJson() {
             return new JSONObject()
@@ -98,6 +103,7 @@ public class ReclassifyService {
         final Action action;
         final Priority priority;
         final Integer limit;
+        final String worker;
         final long startedAt = System.currentTimeMillis();
         volatile String state = "RUNNING";
         volatile String message = "";
@@ -106,13 +112,15 @@ public class ReclassifyService {
         volatile long requeued;
         volatile long skippedNoLanguage;
         volatile long skippedAlreadyClassified;
+        volatile long skippedNotHandled;
         volatile long errors;
         volatile Long finishedAt;
         volatile boolean cancelRequested;
 
-        Job(Filter filter, Action action, Priority priority, Integer limit) {
+        Job(Filter filter, Action action, String worker, Priority priority, Integer limit) {
             this.filter = filter;
             this.action = action;
+            this.worker = worker;
             this.priority = priority;
             this.limit = limit;
         }
@@ -123,6 +131,7 @@ public class ReclassifyService {
                     .put("state", state)
                     .put("message", message)
                     .put("action", action.name())
+                    .put("worker", worker == null ? JSONObject.NULL : worker)
                     .put("priority", priority.name())
                     .put("limit", limit == null ? JSONObject.NULL : limit)
                     .put("filter", filter.toJson())
@@ -131,6 +140,7 @@ public class ReclassifyService {
                     .put("requeued", requeued)
                     .put("skippedNoLanguage", skippedNoLanguage)
                     .put("skippedAlreadyClassified", skippedAlreadyClassified)
+                    .put("skippedNotHandled", skippedNotHandled)
                     .put("errors", errors)
                     .put("startedAt", startedAt)
                     .put("finishedAt", finishedAt == null ? JSONObject.NULL : finishedAt);
@@ -140,6 +150,7 @@ public class ReclassifyService {
     private final Graph graph;
     private final WorkQueueRepository workQueueRepository;
     private final String indexName;
+    private final DataWorkerCatalog dataWorkerCatalog;
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "reclassify");
         t.setDaemon(true);
@@ -153,8 +164,10 @@ public class ReclassifyService {
     });
 
     @Inject
-    public ReclassifyService(Graph graph, WorkQueueRepository workQueueRepository, Configuration configuration) {
+    public ReclassifyService(Graph graph, WorkQueueRepository workQueueRepository, Configuration configuration,
+                             DataWorkerCatalog dataWorkerCatalog) {
         this.graph = graph;
+        this.dataWorkerCatalog = dataWorkerCatalog;
         this.workQueueRepository = workQueueRepository;
         this.indexName = configuration.get("graph.search.indexName", "ge");
     }
@@ -212,9 +225,83 @@ public class ReclassifyService {
         return new JSONObject().put("toClassify", count(buildRunQuery(filter, action, authorizations)));
     }
 
+    /**
+     * For the WORKER action: the matching posts, and on a sample of them which properties the worker handles and which
+     * other workers the same properties start.
+     */
+    public JSONObject previewWorker(Filter filter, String workerClass, Authorizations authorizations) {
+        Map<String, DataWorker> workers = dataWorkerCatalog.workers();
+        DataWorker worker = workers.get(workerClass);
+        if (worker == null) {
+            throw new IllegalArgumentException("Data worker is not running here: " + workerClass);
+        }
+        long matching = count(buildRunQuery(filter, Action.WORKER, authorizations));
+        List<String> sampleIds = findIds(filter, Action.WORKER, PREVIEW_SAMPLE, authorizations);
+        int handledPosts = 0;
+        Map<String, Integer> postsByProperty = new LinkedHashMap<>();
+        Map<String, java.util.Set<String>> alsoByProperty = new HashMap<>();
+        for (Vertex vertex : graph.getVertices(sampleIds, FetchHints.ALL, authorizations)) {
+            boolean handled = false;
+            for (Property property : handledProperties(worker, vertex)) {
+                String key = property == null ? "(whole post)" : property.getName();
+                handled = true;
+                postsByProperty.merge(key, 1, Integer::sum);
+                for (String other : dataWorkerCatalog.handling(workers, vertex, property)) {
+                    if (!other.equals(workerClass)) {
+                        alsoByProperty.computeIfAbsent(key, k -> new java.util.TreeSet<>())
+                                .add(DataWorkerCatalog.name(workers.get(other)));
+                    }
+                }
+            }
+            if (handled) {
+                handledPosts++;
+            }
+        }
+        JSONArray properties = new JSONArray();
+        postsByProperty.forEach((name, posts) -> properties.put(new JSONObject()
+                .put("property", name)
+                .put("posts", posts)
+                .put("alsoStarts", new JSONArray(alsoByProperty.getOrDefault(name, Collections.emptySet())))));
+        return new JSONObject()
+                .put("matching", matching)
+                .put("sample", sampleIds.size())
+                .put("handledInSample", handledPosts)
+                .put("properties", properties);
+    }
+
+    /** The properties of the post the worker handles; null stands for the whole post. */
+    private static List<Property> handledProperties(DataWorker worker, Vertex vertex) {
+        List<Property> handled = new ArrayList<>();
+        if (safeIsHandled(worker, vertex, null)) {
+            handled.add(null);
+        }
+        for (Property property : vertex.getProperties()) {
+            if (safeIsHandled(worker, vertex, property)) {
+                handled.add(property);
+            }
+        }
+        return handled;
+    }
+
+    private static boolean safeIsHandled(DataWorker worker, Vertex vertex, Property property) {
+        try {
+            return worker.isHandled(vertex, property);
+        } catch (Exception e) {
+            LOGGER.debug("isHandled of %s failed on %s", worker.getClass().getName(), vertex.getId(), e);
+            return false;
+        }
+    }
+
+    public JSONArray workers() {
+        return dataWorkerCatalog.toJson();
+    }
+
     /** The posts an action can classify; the others would only be skipped by the data workers. */
     private BoolQueryBuilder buildRunQuery(Filter filter, Action action, Authorizations authorizations) {
         BoolQueryBuilder query = buildQuery(filter, authorizations);
+        if (action == Action.WORKER) {
+            return query;                          // the worker decides on each post which properties it handles
+        }
         query.filter(existsAny(RawObjectSchema.RAW_LANGUAGE.getPropertyName(), authorizations));
         if (action == Action.TOPICS) {
             query.filter(existsAny(RELEVANT_KEYWORDS, authorizations));
@@ -260,8 +347,11 @@ public class ReclassifyService {
         return ids;
     }
 
-    public Job start(Filter filter, Action action, Priority priority, Integer limit, Authorizations authorizations) {
-        Job job = new Job(filter, action, priority, limit);
+    public Job start(Filter filter, Action action, String worker, Priority priority, Integer limit, Authorizations authorizations) {
+        if (action == Action.WORKER && !dataWorkerCatalog.workers().containsKey(worker)) {
+            throw new IllegalArgumentException("Data worker is not running here: " + worker);
+        }
+        Job job = new Job(filter, action, action == Action.WORKER ? worker : null, priority, limit);
         jobs.put(job.id, job);
         executor.submit(() -> run(job, authorizations));
         return job;
@@ -311,6 +401,10 @@ public class ReclassifyService {
     }
 
     private void processBatch(Job job, List<String> ids, Authorizations authorizations) {
+        if (job.action == Action.WORKER) {
+            requeueForWorker(job, ids, authorizations);
+            return;
+        }
         List<Vertex> changed = new ArrayList<>();
         for (Vertex vertex : graph.getVertices(ids, FetchHints.ALL, authorizations)) {
             try {
@@ -354,6 +448,33 @@ public class ReclassifyService {
                 job.errors++;
                 LOGGER.error("Could not re-queue %s", vertex.getId(), e);
             }
+        }
+    }
+
+    private void requeueForWorker(Job job, List<String> ids, Authorizations authorizations) {
+        DataWorker worker = dataWorkerCatalog.workers().get(job.worker);
+        if (worker == null) {
+            throw new IllegalStateException("Data worker is no longer running: " + job.worker);
+        }
+        for (Vertex vertex : graph.getVertices(ids, FetchHints.ALL, authorizations)) {
+            try {
+                List<Property> handled = handledProperties(worker, vertex);
+                if (handled.isEmpty()) {
+                    job.skippedNotHandled++;
+                }
+                for (Property property : handled) {
+                    workQueueRepository.pushOnDwQueue(vertex, property == null ? null : property.getKey(),
+                            property == null ? null : property.getName(), null, null, job.priority,
+                            ElementOrPropertyStatus.UPDATE, null);
+                }
+                if (!handled.isEmpty()) {
+                    job.requeued++;
+                }
+            } catch (Exception e) {
+                job.errors++;
+                LOGGER.error("Could not re-queue %s for %s", vertex.getId(), job.worker, e);
+            }
+            job.processed++;
         }
     }
 
@@ -408,6 +529,9 @@ public class ReclassifyService {
             query.filter(anyDate);
         }
         String topic = TOPIC_PREFIX + "1";
+        if (filter.ignoreScope) {
+            return query;
+        }
         if (filter.scope == Scope.MISSING) {
             query.mustNot(existsAny(topic, authorizations));
         } else if (filter.scope == Scope.NO_CONFIDENT) {
@@ -457,6 +581,7 @@ public class ReclassifyService {
         copy.fromMillis = filter.fromMillis;
         copy.toMillis = filter.toMillis;
         copy.scope = filter.scope;
+        copy.ignoreScope = filter.ignoreScope;
         return copy;
     }
 }

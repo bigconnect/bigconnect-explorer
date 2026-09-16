@@ -29,13 +29,15 @@ public class ReclassifyStart implements ParameterizedHandler {
             @Optional(name = "to") String to,
             @Optional(name = "scope") String scope,
             @Required(name = "action") String action,
+            @Optional(name = "worker") String worker,
             @Optional(name = "priority", defaultValue = "LOW") String priority,
             @Optional(name = "limit") Integer limit,
             Authorizations authorizations
     ) {
-        ReclassifyService.Filter filter = ReclassifyFilters.parse(concepts, keywords, buckets, projects, from, to, scope);
-        ReclassifyService.Job job = reclassifyService.start(filter, ReclassifyService.Action.valueOf(action.trim().toUpperCase()),
-                Priority.safeParse(priority), limit, authorizations);
+        ReclassifyService.Action parsedAction = ReclassifyFilters.action(action);
+        ReclassifyService.Filter filter = ReclassifyFilters.parse(concepts, keywords, buckets, projects, from, to, scope, parsedAction);
+        ReclassifyService.Job job = reclassifyService.start(filter, parsedAction, worker, Priority.safeParse(priority), limit,
+                authorizations);
         return job.toJson();
     }
 }

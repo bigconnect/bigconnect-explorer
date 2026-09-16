@@ -12,9 +12,15 @@ final class ReclassifyFilters {
     }
 
     /** Dates are yyyy-MM-dd, UTC; "to" includes the whole day. */
+    static ReclassifyService.Action action(String action) {
+        return ReclassifyService.Action.valueOf(action.trim().toUpperCase());
+    }
+
     static ReclassifyService.Filter parse(String[] concepts, String[] keywords, String[] buckets, String[] projects,
-                                          String from, String to, String scope) {
+                                          String from, String to, String scope, ReclassifyService.Action action) {
         ReclassifyService.Filter filter = new ReclassifyService.Filter();
+        // the classification status only matters to the classification actions
+        filter.ignoreScope = action == ReclassifyService.Action.WORKER;
         List<String> conceptList = values(concepts);
         if (!conceptList.isEmpty()) {
             filter.concepts = conceptList;
