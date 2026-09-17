@@ -41,8 +41,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Finds posts by type, SERP keyword/bucket/project and date and sends them back to the data workers:
@@ -69,6 +73,14 @@ public class ReclassifyService {
     private static final int FACET_SIZE = 1000;
     private static final int MAX_KEPT_JOBS = 20;
     private static final int PREVIEW_SAMPLE = 100;
+    private static final int PROGRESS_CHECK_SECONDS = 30;
+    private static final int PROGRESS_BATCH = 1000;
+    private static final int WORKER_CHECKS_PER_ROUND = 5000;
+    private static final long STALLED_AFTER_MILLIS = TimeUnit.MINUTES.toMillis(15);
+    // with the queue empty and nothing finishing for this long, the posts still waiting will not get a result
+    private static final long FINISHED_WHEN_QUEUE_EMPTY_MILLIS = TimeUnit.MINUTES.toMillis(2);
+    // posts whose relevance recomputation finds no keywords never get a topic; they count as done after this
+    private static final long NO_KEYWORDS_GRACE_MILLIS = TimeUnit.MINUTES.toMillis(10);
     private static final String EXACT = Elasticsearch5SearchIndex.EXACT_MATCH_PROPERTY_NAME_SUFFIX;
 
     public enum Scope { MISSING, NO_CONFIDENT, ALL }
@@ -116,6 +128,13 @@ public class ReclassifyService {
         volatile long errors;
         volatile Long finishedAt;
         volatile boolean cancelRequested;
+        // what the data workers did with the posts sent: a post is pending until its result is there
+        final Set<String> pending = ConcurrentHashMap.newKeySet();
+        volatile long done;
+        volatile long doneWithoutKeywords;
+        volatile Long sentAt;
+        volatile long lastProgressAt = System.currentTimeMillis();
+        volatile Authorizations authorizations;
 
         Job(Filter filter, Action action, String worker, Priority priority, Integer limit) {
             this.filter = filter;
@@ -142,6 +161,11 @@ public class ReclassifyService {
                     .put("skippedAlreadyClassified", skippedAlreadyClassified)
                     .put("skippedNotHandled", skippedNotHandled)
                     .put("errors", errors)
+                    .put("done", done)
+                    .put("doneWithoutKeywords", doneWithoutKeywords)
+                    .put("waiting", pending.size())
+                    .put("sentAt", sentAt == null ? JSONObject.NULL : sentAt)
+                    .put("lastProgressAt", lastProgressAt)
                     .put("startedAt", startedAt)
                     .put("finishedAt", finishedAt == null ? JSONObject.NULL : finishedAt);
         }
@@ -153,6 +177,11 @@ public class ReclassifyService {
     private final DataWorkerCatalog dataWorkerCatalog;
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "reclassify");
+        t.setDaemon(true);
+        return t;
+    });
+    private final ScheduledExecutorService progressChecker = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "reclassify-progress");
         t.setDaemon(true);
         return t;
     });
@@ -170,6 +199,7 @@ public class ReclassifyService {
         this.dataWorkerCatalog = dataWorkerCatalog;
         this.workQueueRepository = workQueueRepository;
         this.indexName = configuration.get("graph.search.indexName", "ge");
+        progressChecker.scheduleWithFixedDelay(this::checkProgress, PROGRESS_CHECK_SECONDS, PROGRESS_CHECK_SECONDS, TimeUnit.SECONDS);
     }
 
     // The SERP properties are indexed only as keywords (".exact"), but the graph has no exact-match definition for them,
@@ -352,6 +382,7 @@ public class ReclassifyService {
             throw new IllegalArgumentException("Data worker is not running here: " + worker);
         }
         Job job = new Job(filter, action, action == Action.WORKER ? worker : null, priority, limit);
+        job.authorizations = authorizations;
         jobs.put(job.id, job);
         executor.submit(() -> run(job, authorizations));
         return job;
@@ -369,13 +400,23 @@ public class ReclassifyService {
         }
     }
 
+    /** Stops sending posts; a run that already sent everything stops being tracked (queued posts are still processed). */
     public boolean cancel(String id) {
         Job job = jobs.get(id);
-        if (job == null || !"RUNNING".equals(job.state) && !"QUEUED".equals(job.state)) {
+        if (job == null) {
             return false;
         }
-        job.cancelRequested = true;
-        return true;
+        if ("RUNNING".equals(job.state) || "QUEUED".equals(job.state)) {
+            job.cancelRequested = true;
+            return true;
+        }
+        if ("PROCESSING".equals(job.state) || "STALLED".equals(job.state)) {
+            job.state = "CANCELLED";
+            job.message = "No longer tracked; posts already sent are still processed";
+            job.finishedAt = System.currentTimeMillis();
+            return true;
+        }
+        return false;
     }
 
     private void run(Job job, Authorizations authorizations) {
@@ -388,15 +429,24 @@ public class ReclassifyService {
                 processBatch(job, ids.subList(i, Math.min(i + BATCH_SIZE, ids.size())), authorizations);
             }
 
-            job.state = job.cancelRequested ? "CANCELLED" : "DONE";
-            job.message = job.cancelRequested ? "Stopped by user" : "";
+            job.sentAt = System.currentTimeMillis();
+            job.lastProgressAt = job.sentAt;
+            if (job.cancelRequested) {
+                job.state = "CANCELLED";
+                job.message = "Stopped by user; posts already sent are still processed";
+            } else {
+                job.state = job.pending.isEmpty() ? "DONE" : "PROCESSING";
+                job.message = "";
+            }
         } catch (Exception e) {
             LOGGER.error("Reclassify job %s failed", job.id, e);
             job.state = "FAILED";
             job.message = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
         } finally {
-            job.finishedAt = System.currentTimeMillis();
-            LOGGER.info("Reclassify job %s finished: %s", job.id, job.toJson());
+            if (!"PROCESSING".equals(job.state)) {
+                job.finishedAt = System.currentTimeMillis();
+            }
+            LOGGER.info("Reclassify job %s sent its posts: %s", job.id, job.toJson());
         }
     }
 
@@ -444,6 +494,7 @@ public class ReclassifyService {
                             job.priority, ElementOrPropertyStatus.UPDATE, null);
                 }
                 job.requeued++;
+                job.pending.add(vertex.getId());
             } catch (Exception e) {
                 job.errors++;
                 LOGGER.error("Could not re-queue %s", vertex.getId(), e);
@@ -469,12 +520,125 @@ public class ReclassifyService {
                 }
                 if (!handled.isEmpty()) {
                     job.requeued++;
+                    job.pending.add(vertex.getId());
                 }
             } catch (Exception e) {
                 job.errors++;
                 LOGGER.error("Could not re-queue %s for %s", vertex.getId(), job.worker, e);
             }
             job.processed++;
+        }
+    }
+
+    /** Every half minute: which of the posts sent by each run have their result now. */
+    private void checkProgress() {
+        for (Job job : getJobs()) {
+            if (job.pending.isEmpty() || job.authorizations == null
+                    || !("RUNNING".equals(job.state) || "PROCESSING".equals(job.state) || "STALLED".equals(job.state))) {
+                continue;
+            }
+            try {
+                long before = job.done;
+                if (job.action == Action.WORKER) {
+                    checkWorkerProgress(job);
+                } else {
+                    checkClassificationProgress(job);
+                }
+                long now = System.currentTimeMillis();
+                if (job.done > before) {
+                    job.lastProgressAt = now;
+                }
+                if (job.sentAt != null) {
+                    if (job.pending.isEmpty()) {
+                        job.state = "DONE";
+                        job.finishedAt = now;
+                    } else if (now - job.lastProgressAt > FINISHED_WHEN_QUEUE_EMPTY_MILLIS && dwQueueIsEmpty()) {
+                        // e.g. posts without usable text: the worker clears them and writes nothing
+                        job.state = "DONE";
+                        job.finishedAt = now;
+                        job.message = String.format("%,d posts got no result (no usable text, or skipped by the worker)",
+                                job.pending.size());
+                    } else if (now - job.lastProgressAt > STALLED_AFTER_MILLIS) {
+                        job.state = "STALLED";
+                        job.message = "Nothing finished in the last 15 minutes: check the data workers and the AI server";
+                    } else {
+                        job.state = "PROCESSING";
+                        job.message = "";
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Could not check the progress of reclassify job %s", job.id, e);
+            }
+        }
+    }
+
+    private boolean dwQueueIsEmpty() {
+        try {
+            return workQueueRepository.getDwQueueSize() == 0;
+        } catch (Exception e) {
+            LOGGER.debug("Could not read the data worker queue size", e);
+            return false;
+        }
+    }
+
+    /** A post is done once the topic classification wrote topicClassification1 again (cleared before sending). */
+    private void checkClassificationProgress(Job job) {
+        List<String> ids = new ArrayList<>(job.pending);
+        boolean graceOver = job.sentAt != null && System.currentTimeMillis() - job.sentAt > NO_KEYWORDS_GRACE_MILLIS;
+        for (int i = 0; i < ids.size(); i += PROGRESS_BATCH) {
+            List<String> batch = ids.subList(i, Math.min(i + PROGRESS_BATCH, ids.size()));
+            for (String id : findAmong(batch, existsAny(TOPIC_PREFIX + "1", job.authorizations))) {
+                if (job.pending.remove(id)) {
+                    job.done++;
+                }
+            }
+            if (job.action == Action.RELEVANCE_AND_TOPICS && graceOver) {
+                BoolQueryBuilder noKeywords = QueryBuilders.boolQuery().mustNot(existsAny(RELEVANT_KEYWORDS, job.authorizations));
+                for (String id : findAmong(batch, noKeywords)) {
+                    if (job.pending.remove(id)) {
+                        job.done++;
+                        job.doneWithoutKeywords++;
+                    }
+                }
+            }
+        }
+    }
+
+    private List<String> findAmong(List<String> ids, org.elasticsearch.index.query.QueryBuilder condition) {
+        SearchResponse response = client().prepareSearch(indexName)
+                .setQuery(QueryBuilders.boolQuery()
+                        .filter(QueryBuilders.termsQuery(Elasticsearch5SearchIndex.ELEMENT_ID_FIELD_NAME, ids))
+                        .filter(condition))
+                .setFetchSource(Elasticsearch5SearchIndex.ELEMENT_ID_FIELD_NAME, null)
+                .setSize(ids.size())
+                .get();
+        List<String> found = new ArrayList<>();
+        for (SearchHit hit : response.getHits().getHits()) {
+            Object id = hit.getSourceAsMap().get(Elasticsearch5SearchIndex.ELEMENT_ID_FIELD_NAME);
+            if (id instanceof List && !((List<?>) id).isEmpty()) {
+                id = ((List<?>) id).get(0);
+            }
+            if (id != null) {
+                found.add(id.toString());
+            }
+        }
+        return found;
+    }
+
+    /** A post is done once the worker no longer handles any of its properties (it wrote its result). */
+    private void checkWorkerProgress(Job job) {
+        DataWorker worker = dataWorkerCatalog.workers().get(job.worker);
+        if (worker == null) {
+            return;
+        }
+        List<String> ids = new ArrayList<>(job.pending);
+        ids = ids.subList(0, Math.min(ids.size(), WORKER_CHECKS_PER_ROUND));
+        for (int i = 0; i < ids.size(); i += BATCH_SIZE) {
+            for (Vertex vertex : graph.getVertices(ids.subList(i, Math.min(i + BATCH_SIZE, ids.size())), FetchHints.ALL, job.authorizations)) {
+                if (handledProperties(worker, vertex).isEmpty() && job.pending.remove(vertex.getId())) {
+                    job.done++;
+                }
+            }
         }
     }
 

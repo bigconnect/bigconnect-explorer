@@ -219,8 +219,8 @@ define([
                 .then(result => {
                     if (!this.mounted) return;
                     this.setState({jobs: result.jobs || []});
-                    const running = (result.jobs || []).some(j => j.state === 'RUNNING');
-                    this.jobsTimer = setTimeout(this.loadJobs, running ? 2000 : 15000);
+                    const active = (result.jobs || []).some(j => ['RUNNING', 'PROCESSING', 'STALLED'].indexOf(j.state) >= 0);
+                    this.jobsTimer = setTimeout(this.loadJobs, active ? 5000 : 15000);
                 })
                 .catch(err => {
                     console.error('Could not load reclassify jobs', err);
@@ -317,31 +317,45 @@ define([
                 return <div className="rc-muted">No runs since Explorer started.</div>;
             }
             return jobs.map(job => {
-                const pct = job.total ? Math.round(100 * job.processed / job.total) : (job.state === 'RUNNING' ? 0 : 100);
-                const stateClass = {RUNNING: 'info', DONE: 'success', FAILED: 'danger', CANCELLED: 'default'}[job.state] || 'default';
+                const sending = job.state === 'RUNNING';
+                // while sending the bar shows the posts checked; afterwards the posts the data workers finished
+                const pct = sending
+                    ? (job.total ? Math.round(100 * job.processed / job.total) : 0)
+                    : (job.requeued ? Math.round(100 * job.done / job.requeued) : 100);
+                const stateClass = {RUNNING: 'info', PROCESSING: 'primary', DONE: 'success', STALLED: 'warning', FAILED: 'danger', CANCELLED: 'default'}[job.state] || 'default';
+                const stateLabel = {RUNNING: 'SENDING', PROCESSING: 'PROCESSING'}[job.state] || job.state;
+                const tracking = job.state === 'PROCESSING' || job.state === 'STALLED';
                 return (
                     <div className="rc-job" key={job.id}>
                         <div className="rc-job-head">
-                            <span className={`label label-${stateClass}`}>{job.state}</span>
+                            <span className={`label label-${stateClass}`}>{stateLabel}</span>
                             <strong>{job.action === 'WORKER' ? this.workerName(job.worker) : (ACTIONS.find(a => a.id === job.action) || {name: job.action}).name}</strong>
                             <span className="rc-muted">{formatTime(job.startedAt)}</span>
-                            {job.state === 'RUNNING' && !job.total && <span className="rc-muted">finding posts…</span>}
-                            {job.state === 'RUNNING' && (
+                            {sending && !job.total && <span className="rc-muted">finding posts…</span>}
+                            {sending && (
                                 <button className="btn btn-xs btn-default rc-right" onClick={() => this.onCancel(job.id)}>Stop</button>
+                            )}
+                            {tracking && (
+                                <button className="btn btn-xs btn-default rc-right" title="Posts already sent are still processed"
+                                        onClick={() => this.onCancel(job.id)}>Stop tracking</button>
                             )}
                         </div>
                         <div className="rc-muted rc-job-filter">{this.describeFilter(Object.assign({}, job.filter, {worker: job.worker}))}</div>
                         <div className="progress rc-progress">
-                            <div className={`progress-bar ${job.state === 'RUNNING' ? 'progress-bar-striped active' : ''}`} style={{width: `${pct}%`}} />
+                            <div className={`progress-bar ${sending || tracking ? 'progress-bar-striped active' : ''} ${job.state === 'STALLED' ? 'progress-bar-warning' : ''}`} style={{width: `${pct}%`}} />
                         </div>
                         <div className="rc-job-stats">
-                            <span><b>{formatNumber(job.requeued)}</b> sent to {job.action === 'WORKER' ? 'the worker' : 'classification'}</span>
-                            <span>{formatNumber(job.processed)} / {formatNumber(job.total)} checked</span>
+                            {!sending && <span><b>{formatNumber(job.done)}</b> / {formatNumber(job.requeued)} done ({pct}%)</span>}
+                            {!sending && job.waiting > 0 && <span>{formatNumber(job.waiting)} waiting in the queue</span>}
+                            {!sending && job.lastProgressAt && tracking && <span className="rc-muted">last finished {formatTime(job.lastProgressAt)}</span>}
+                            {job.doneWithoutKeywords > 0 && <span title="The recomputed relevance found no keywords, so no topic is classified">{formatNumber(job.doneWithoutKeywords)} without relevant keywords</span>}
+                            <span>{formatNumber(job.requeued)} sent to {job.action === 'WORKER' ? 'the worker' : 'classification'}</span>
+                            {sending && <span>{formatNumber(job.processed)} / {formatNumber(job.total)} checked</span>}
                             {job.skippedNoLanguage > 0 && <span title="The classifiers need a detected language">{formatNumber(job.skippedNoLanguage)} without language</span>}
                             {job.skippedAlreadyClassified > 0 && <span title="Classified between the search and the run">{formatNumber(job.skippedAlreadyClassified)} already classified</span>}
                             {job.skippedNotHandled > 0 && <span title="The worker does not handle these posts, e.g. it already processed them">{formatNumber(job.skippedNotHandled)} not handled by the worker</span>}
                             {job.errors > 0 && <span className="text-danger">{formatNumber(job.errors)} errors</span>}
-                            {job.message && <span className="text-danger">{job.message}</span>}
+                            {job.message && <span className={job.state === 'DONE' ? 'rc-muted' : 'text-danger'}>{job.message}</span>}
                         </div>
                     </div>
                 );
@@ -490,7 +504,7 @@ define([
                             {s.starting ? 'Starting…' : s.confirming ? 'Yes, start' : isWorker ? 'Start worker' : 'Start reclassification'}
                         </button>
                     </div>
-                    {running && <div className="rc-muted rc-note">A run is in progress; a new one starts after it.</div>}
+                    {running && <div className="rc-muted rc-note">A run is sending posts; a new one starts after it.</div>}
                     {s.error && <div className="alert alert-danger rc-error">{s.error}</div>}
 
                     <div className="rc-section">
