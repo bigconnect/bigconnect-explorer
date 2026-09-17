@@ -295,6 +295,21 @@ html.fullscreenDetails {
   align-items: center;
   justify-content: space-around;
   width: 80%;
+  // the logos belong to the dashboard: they must never catch clicks meant for the page under them
+  pointer-events: none;
+}
+
+// hidden while a page is open over the dashboard, otherwise the logos cover its content
+.ingest-pane.visible,
+.search-pane.visible,
+.products-pane.visible,
+.workspaces-pane.visible,
+.admin-pane.visible,
+.activity-pane.visible,
+.detail-pane.visible {
+  & ~ .visual-identity-mae {
+    display: none;
+  }
 }
 
 .menubar-pane {
