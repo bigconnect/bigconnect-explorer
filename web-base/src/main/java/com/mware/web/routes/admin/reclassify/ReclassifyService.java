@@ -3,6 +3,7 @@ package com.mware.web.routes.admin.reclassify;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mware.core.ingest.dataworker.ElementOrPropertyStatus;
+import com.mware.core.model.properties.BcSchema;
 import com.mware.core.model.properties.RawObjectSchema;
 import com.mware.core.model.workQueue.Priority;
 import com.mware.core.model.workQueue.WorkQueueRepository;
@@ -12,6 +13,7 @@ import com.mware.ge.Authorizations;
 import com.mware.ge.FetchHints;
 import com.mware.ge.Graph;
 import com.mware.ge.Property;
+import com.mware.ge.values.storable.StreamingPropertyValue;
 import com.mware.ge.Vertex;
 import com.mware.core.config.Configuration;
 import com.mware.core.ingest.dataworker.DataWorker;
@@ -21,6 +23,8 @@ import com.mware.ge.elasticsearch5.ElasticsearchDocumentType;
 import com.mware.ge.mutation.ExistingElementMutation;
 import com.mware.ge.search.SearchIndex;
 import org.apache.commons.lang3.StringUtils;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -69,6 +73,8 @@ public class ReclassifyService {
     private static final String RELEVANT_KEYWORDS = "otherRelevantKeywords";
     private static final String RELEVANT_BUCKETS = "otherRelevantBuckets";
     private static final String LAST_MODIFIED = "last_modified";
+    private static final String RETWEET_TEXT = "text_from_retweet";
+    private static final int TEXT_PROBE_BYTES = 256;
     private static final int BATCH_SIZE = 100;
     private static final int FACET_SIZE = 1000;
     private static final int MAX_KEPT_JOBS = 20;
@@ -79,8 +85,10 @@ public class ReclassifyService {
     private static final long STALLED_AFTER_MILLIS = TimeUnit.MINUTES.toMillis(15);
     // with the queue empty and nothing finishing for this long, the posts still waiting will not get a result
     private static final long FINISHED_WHEN_QUEUE_EMPTY_MILLIS = TimeUnit.MINUTES.toMillis(2);
-    // posts whose relevance recomputation finds no keywords never get a topic; they count as done after this
+    // posts the worker cannot answer for (no keywords, no usable text) never get a topic; they count as done after this
     private static final long NO_KEYWORDS_GRACE_MILLIS = TimeUnit.MINUTES.toMillis(10);
+    // text that cannot be read may be a passing storage failure, so give it longer before giving up on it
+    private static final long UNREADABLE_GRACE_MILLIS = TimeUnit.MINUTES.toMillis(30);
     private static final String EXACT = Elasticsearch5SearchIndex.EXACT_MATCH_PROPERTY_NAME_SUFFIX;
 
     public enum Scope { MISSING, NO_CONFIDENT, ALL }
@@ -132,6 +140,8 @@ public class ReclassifyService {
         final Set<String> pending = ConcurrentHashMap.newKeySet();
         volatile long done;
         volatile long doneWithoutKeywords;
+        volatile long doneWithoutText;
+        volatile long doneUnreadable;
         volatile Long sentAt;
         volatile long lastProgressAt = System.currentTimeMillis();
         volatile Authorizations authorizations;
@@ -163,6 +173,8 @@ public class ReclassifyService {
                     .put("errors", errors)
                     .put("done", done)
                     .put("doneWithoutKeywords", doneWithoutKeywords)
+                    .put("doneWithoutText", doneWithoutText)
+                    .put("doneUnreadable", doneUnreadable)
                     .put("waiting", pending.size())
                     .put("sentAt", sentAt == null ? JSONObject.NULL : sentAt)
                     .put("lastProgressAt", lastProgressAt)
@@ -552,6 +564,12 @@ public class ReclassifyService {
                     if (job.pending.isEmpty()) {
                         job.state = "DONE";
                         job.finishedAt = now;
+                        if (job.doneUnreadable > 0) {
+                            job.message = String.format("%,d posts had no text, %,d could not be read at all - "
+                                            + "check the storage for those", job.doneWithoutText, job.doneUnreadable);
+                        } else if (job.doneWithoutText > 0) {
+                            job.message = String.format("%,d posts had no text the classifier could read", job.doneWithoutText);
+                        }
                     } else if (now - job.lastProgressAt > FINISHED_WHEN_QUEUE_EMPTY_MILLIS && dwQueueIsEmpty()) {
                         // e.g. posts without usable text: the worker clears them and writes nothing
                         job.state = "DONE";
@@ -592,6 +610,9 @@ public class ReclassifyService {
                     job.done++;
                 }
             }
+            if (graceOver) {
+                markPostsWithoutText(job, batch);
+            }
             if (job.action == Action.RELEVANCE_AND_TOPICS && graceOver) {
                 BoolQueryBuilder noKeywords = QueryBuilders.boolQuery().mustNot(existsAny(RELEVANT_KEYWORDS, job.authorizations));
                 for (String id : findAmong(batch, noKeywords)) {
@@ -602,6 +623,67 @@ public class ReclassifyService {
                 }
             }
         }
+    }
+
+    /**
+     * The classifier writes nothing at all for a post it cannot read - no text property, or text that is blank and
+     * has no retweet text behind it. Waiting for a result that will never come used to leave a run at 98% until the
+     * whole data worker queue happened to be empty, which on a busy system never happens.
+     */
+    private void markPostsWithoutText(Job job, List<String> batch) {
+        List<String> stillPending = new ArrayList<>();
+        for (String id : batch) {
+            if (job.pending.contains(id)) {
+                stillPending.add(id);
+            }
+        }
+        if (stillPending.isEmpty()) {
+            return;
+        }
+        boolean unreadableGraceOver = job.sentAt != null
+                && System.currentTimeMillis() - job.sentAt > UNREADABLE_GRACE_MILLIS;
+        for (Vertex vertex : graph.getVertices(stillPending, FetchHints.ALL, job.authorizations)) {
+            Text text = readableText(vertex);
+            if (text == Text.PRESENT || (text == Text.UNREADABLE && !unreadableGraceOver)) {
+                continue;
+            }
+            if (job.pending.remove(vertex.getId())) {
+                job.done++;
+                if (text == Text.UNREADABLE) {
+                    job.doneUnreadable++;
+                } else {
+                    job.doneWithoutText++;
+                }
+            }
+        }
+    }
+
+    private enum Text { PRESENT, MISSING, UNREADABLE }
+
+    /** Mirrors what the topic classification worker reads: the text property, or the retweet text behind it. */
+    private static Text readableText(Vertex vertex) {
+        boolean unreadable = false;
+        for (Property property : vertex.getProperties(BcSchema.TEXT.getPropertyName())) {
+            StreamingPropertyValue value = BcSchema.TEXT.getPropertyValue(property);
+            if (value == null) {
+                continue;
+            }
+            try (InputStream in = value.getInputStream()) {
+                byte[] head = new byte[TEXT_PROBE_BYTES];
+                int read = in.read(head);
+                if (read > 0 && StringUtils.isNotBlank(new String(head, 0, read, StandardCharsets.UTF_8))) {
+                    return Text.PRESENT;
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Could not read the text of %s while checking a reclassify run", vertex.getId(), e);
+                unreadable = true;
+            }
+        }
+        Property retweet = vertex.getProperty(RETWEET_TEXT);
+        if (retweet != null && retweet.getValue() != null && StringUtils.isNotBlank(retweet.getValue().toString())) {
+            return Text.PRESENT;
+        }
+        return unreadable ? Text.UNREADABLE : Text.MISSING;
     }
 
     private List<String> findAmong(List<String> ids, org.elasticsearch.index.query.QueryBuilder condition) {
